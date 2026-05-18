@@ -688,10 +688,298 @@ button{
     opacity: 0;
     pointer-events: none;
 }
+
+#menuOverlay {
+    position: fixed;
+    inset: 0;
+    
+    background: rgba(0, 0, 0, 0.45);
+    
+    display: none;
+    justify-content: center;
+    align-items: center;
+    
+    z-index: 9999;
+}
+
+#bigMenu {
+    width: 260px;
+    height: 260px;
+    
+    background: #232323;
+    
+    border-radius: 12px;
+    
+    display: flex;
+    flex-direction: column;
+    
+    padding: 10px;
+    
+    box-sizing: border-box;
+    
+    border: 1px solid #3a3a3a;
+    
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+}
+
+#searchInput {
+    width: 100%;
+    
+    padding: 8px 10px;
+    
+    border: none;
+    outline: none;
+    
+    border-radius: 7px;
+    
+    background: #2f2f2f;
+    color: white;
+    
+    font-size: 13px;
+    
+    margin-bottom: 10px;
+    
+    box-sizing: border-box;
+}
+
+#buttonContainer {
+    flex: 1;
+    
+    overflow-y: auto;
+    
+    display: flex;
+    flex-direction: column;
+    
+    gap: 4px;
+}
+
+.menuBtn {
+    width: 100%;
+    
+    padding: 8px 10px;
+    
+    border: none;
+    border-radius: 7px;
+    
+    background: #2d2d2d;
+    color: white;
+    
+    text-align: left;
+    
+    font-size: 13px;
+    
+    cursor: pointer;
+    
+    transition: 0.15s;
+}
+
+.menuBtn:hover {
+    background: #3b3b3b;
+}
+#customKeyboard {
+    position: fixed;
+    left: 50%;
+    bottom: 10px;
+    transform: translateX(-50%);
+
+    width: 90%;
+    max-width: 700px;
+
+    background: #1f1f1f;
+    border: 1px solid #333;
+
+    padding: 8px;
+    border-radius: 10px;
+
+    z-index: 99999;
+}
+
+.keys {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+}
+
+.key {
+    width: 8%;
+    min-width: 28px;
+
+    padding: 8px 0;
+
+    background: #2d2d2d;
+    color: white;
+
+    border: none;
+    border-radius: 6px;
+
+    font-size: 12px;
+}
+
+.key:active {
+    background: #444;
+}
+
+.wide {
+    width: 40%;
+}
+.hidden {
+    display: none;
+}
+#closeKeyBtn {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+
+    width: 26px;
+    height: 26px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: #3a3a3a;
+    color: white;
+
+    font-size: 18px;
+    line-height: 26px;
+
+    cursor: pointer;
+}
+
+#customKeyboard {
+    position: fixed;
+    left: 50%;
+    bottom: 10px;
+    transform: translateX(-50%);
+
+    width: 90%;
+    max-width: 700px;
+
+    background: #1f1f1f;
+
+    border: 1px solid #333;
+    border-radius: 10px;
+
+    padding: 10px;
+
+    z-index: 99999;
+
+    position: fixed;
+}
+#okKey {
+
+    background: linear-gradient(180deg, #4caf50, #2e7d32);
+
+    color: white;
+
+    border: 1px solid #66bb6a;
+
+    border-radius: 8px;
+
+    font-weight: bold;
+
+    letter-spacing: 0.5px;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,0.35),
+        inset 0 1px 0 rgba(255,255,255,0.15);
+
+    transition:
+        transform 0.08s ease,
+        background 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+#okKey:hover {
+
+    background: linear-gradient(180deg, #57c95d, #388e3c);
+
+}
+
+#okKey:active {
+
+    transform: scale(0.96);
+
+    box-shadow:
+        0 1px 4px rgba(0,0,0,0.4),
+        inset 0 2px 4px rgba(0,0,0,0.25);
+}
 </style>
 </head>
 
 <body>
+<div id="customKeyboard" class="hidden">
+
+    <div class="keys">
+
+        <button class="key">Q</button>
+        <button class="key">W</button>
+        <button class="key">E</button>
+        <button class="key">R</button>
+        <button class="key">T</button>
+        <button class="key">Y</button>
+        <button class="key">U</button>
+        <button class="key">I</button>
+        <button class="key">O</button>
+        <button class="key">P</button>
+
+        <button class="key">A</button>
+        <button class="key">S</button>
+        <button class="key">D</button>
+        <button class="key">F</button>
+        <button class="key">G</button>
+        <button class="key">H</button>
+        <button class="key">J</button>
+        <button class="key">K</button>
+        <button class="key">L</button>
+
+        <button class="key">Z</button>
+        <button class="key">X</button>
+        <button class="key">C</button>
+        <button class="key">V</button>
+        <button class="key">B</button>
+        <button class="key">N</button>
+        <button class="key">M</button>
+<button id="closeKeyBtn">×</button>
+        <button class="key wide" id="spaceKey">SPACE</button>
+        <button class="key wide" id="backKey">DEL</button>
+<button class="wide" id="okKey">OK</button>
+    </div>
+
+</div>
+
+<div id="menuOverlay">
+
+    <div id="bigMenu">
+
+        <input type="text" id="searchInput" placeholder="Buscar...">
+
+        <div id="buttonContainer">
+
+            <button class="menuBtn">Animación</button>
+            <button class="menuBtn">Audio</button>
+            <button class="menuBtn">Bloques</button>
+            <button class="menuBtn">Cámara</button>
+            <button class="menuBtn">Círculo</button>
+            <button class="menuBtn">Color</button>
+            <button class="menuBtn">Editor</button>
+            <button class="menuBtn">Exportar</button>
+            <button class="menuBtn">Imagen</button>
+            <button class="menuBtn">Importar</button>
+            <button class="menuBtn">Luz</button>
+            <button class="menuBtn">Material</button>
+            <button class="menuBtn">Objeto</button>
+            <button class="menuBtn">Partículas</button>
+            <button class="menuBtn">Render</button>
+            <button class="menuBtn">Script</button>
+            <button class="menuBtn">Texto</button>
+            <button class="menuBtn">Video</button>
+
+        </div>
+
+    </div>
+
+</div>
     <div id="orientationPanel">
   <img id="orientationImage" src="" alt="">
 </div>
@@ -740,7 +1028,9 @@ button{
     <button class="btn" id="addBtn"><i class="fa-solid fa-plus"></i>add</button>
     <button class="btn" id="spawnBtn"><i class="fa-solid fa-crosshairs"></i></button>
     <button class="btn" id="togglePanel">☰</button>
-       
+       <button class="btn" id="openMenuBtn">
+    <i class="fa-solid fa-magnifying-glass"></i>
+</button>
 
 <div class="toolbar">
     <button class="btn1" id="moveBtn"><i class="fa-solid fa-arrows-up-down-left-right"></i></button>
@@ -859,7 +1149,10 @@ button{
 <div id="contextMenu">
     <button id="copyBtn"><i class="fa-solid fa-copy"></i> Copiar</button>
     <button id="deleteBtn"><i class="fa-solid fa-trash"></i> Eliminar</button>
-    <button id="renameBtn"><i class="fa-solid fa-pen"></i> Renombrar</button>
+   <button id="renameBtn">
+    <i class="fa-solid fa-pen"></i> Renombrar
+</button>
+    <input id="renameInput" type="text" style="position:absolute; opacity:0; pointer-events:none;">
 </div>
 <div class="overlay2" id="overlay2" onclick="closeSplash2(event)">
 
@@ -1013,7 +1306,41 @@ scene.add(dir);
 
 /* GRID */
 scene.add(new THREE.GridHelper(20,20));
+const openMenuBtn = document.getElementById("openMenuBtn");
+const menuOverlay = document.getElementById("menuOverlay");
+const searchInput = document.getElementById("searchInput");
 
+openMenuBtn.onclick = () => {
+
+    menuOverlay.style.display = "flex";
+
+    searchInput.value = "";
+
+    filterButtons();
+};
+
+menuOverlay.onclick = (e) => {
+
+    if (e.target === menuOverlay) {
+        menuOverlay.style.display = "none";
+    }
+};
+
+searchInput.addEventListener("input", filterButtons);
+
+function filterButtons() {
+
+    const text = searchInput.value.toLowerCase();
+
+    const buttons = document.querySelectorAll(".menuBtn");
+
+    buttons.forEach(btn => {
+
+        const visible = btn.textContent.toLowerCase().includes(text);
+
+        btn.style.display = visible ? "block" : "none";
+    });
+}
 /* variables */
 let selectedMaterialTarget = null;
 let currentTexture = null;
@@ -1744,19 +2071,136 @@ document.getElementById("deleteBtn").onclick = () => {
 };
 
 document.getElementById("renameBtn").onclick = () => {
-    if (target && target !== spawn) {
-        const n = prompt("Nuevo nombre:", target.name || "");
-        if (n && n.trim() !== "") {
-            target.name = n.trim();
-            refreshOutliner();
-        }
-    }
+    
+    console.log("click rename OK");
+    
+    if (!target || target === spawn) return;
+    
+    const input = document.getElementById("renameInput");
+    
+    if (!input) return;
+    
+    input.value = target.name || "";
+    
+    activeInput = input;
+    
+    openKeyboard(input);
+    
+    // guardar target actual globalmente
+    window.renameTarget = target;
+    
     menu.style.display = "none";
+    
+    // 👇 AGREGAR ESTO - Prevenir que OK agregue texto
+    window.isRenamingMode = true;
 };
 window.addEventListener("click",(e)=>{
     if(!menu.contains(e.target)) menu.style.display="none";
 });
+function openKeyboard(input) {
 
+    const keyboard = document.getElementById("customKeyboard");
+
+    if (!keyboard || !input) return;
+
+    activeInput = input;
+
+    keyboard.classList.remove("hidden");
+
+    keyboard.style.display = "block";
+}
+function closeKeyboard() {
+    
+    const keyboard = document.getElementById("customKeyboard");
+    
+    if (!keyboard) return;
+    
+    keyboard.classList.add("hidden");
+    keyboard.style.display = "none";
+    activeInput = null;
+    
+    window.renameTarget = null;
+}
+function confirmKeyboard() {
+
+    const input = document.getElementById("renameInput");
+
+    const n = input?.value;
+
+    if (n && n.trim() !== "" && window.renameTarget) {
+
+        window.renameTarget.name = n.trim();
+        refreshOutliner();
+    }
+
+    closeKeyboard();
+}
+function pressKey(value) {
+
+    if (!activeInput) return;
+
+    if (value === "DEL") {
+        activeInput.value = activeInput.value.slice(0, -1);
+    } 
+    else if (value === "SPACE") {
+        activeInput.value += " ";
+    } 
+    else {
+        activeInput.value += value;
+    }
+
+    activeInput.dispatchEvent(new Event("input"));
+}
+// Reemplaza la sección completa de manejo del teclado:
+
+
+function forceCloseKeyboard() {
+
+    const keyboard = document.getElementById("customKeyboard");
+
+    if (!keyboard) {
+        console.log("keyboard no existe");
+        return;
+    }
+
+    keyboard.style.display = "none";
+    keyboard.classList.add("hidden");
+
+    activeInput = null;
+
+    keyboard.onConfirm = null;
+}
+document.getElementById("okKey").onclick = confirmKeyboard;
+document.getElementById("okKey").addEventListener("click", () => {
+    
+    const keyboard = document.getElementById("customKeyboard");
+    
+    if (keyboard && keyboard.onConfirm) {
+        keyboard.onConfirm();
+    }
+    
+    closeKeyboard();
+});
+window.addEventListener("load", () => {
+    
+    const btn = document.getElementById("closeKeyBtn");
+    
+    if (!btn) {
+        console.log("closeKeyBtn no existe");
+        return;
+    }
+    
+    btn.onclick = () => {
+        
+        const keyboard = document.getElementById("customKeyboard");
+        
+        if (!keyboard) return;
+        
+        keyboard.classList.add("hidden");
+        
+        activeInput = null;
+    };
+});
 /* BUTTONS */
 document.getElementById("spawnBtn").onclick=()=>select(spawn);
 document.getElementById("addBtn").onclick = () => {
@@ -2160,6 +2604,115 @@ function updateOrientationPanel() {
 
 window.addEventListener("resize", updateOrientationPanel);
 window.addEventListener("load", updateOrientationPanel);
+
+let activeInput = null;
+
+const keyboard = document.getElementById("customKeyboard");
+
+document.addEventListener("focusin", (e) => {
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") {
+        activeInput = e.target;
+        keyboard.classList.remove("hidden");
+    }
+});
+
+document.addEventListener("click", (e) => {
+    if (!e.target.closest("#customKeyboard") && e.target.tagName !== "INPUT") {
+        keyboard.classList.add("hidden");
+    }
+});
+
+// Reemplaza esta sección de los botones del teclado:
+
+document.querySelectorAll(".key").forEach(btn => {
+    
+    btn.addEventListener("click", (e) => {
+        
+        e.stopPropagation();
+        
+        const value = btn.textContent;
+        
+        // botones especiales
+        if (btn.id === "okKey") {
+            confirmKeyboard();
+            closeKeyboard();
+            return;
+        }
+        
+        if (btn.id === "closeKeyBtn") {
+            closeKeyboard();
+            return;
+        }
+        
+        // escribir en cualquier input activo
+        if (!activeInput) return;
+        
+        if (value === "DEL") {
+            
+            activeInput.value =
+                activeInput.value.slice(0, -1);
+            
+        } else if (value === "SPACE") {
+            
+            activeInput.value += " ";
+            
+        } else {
+            
+            activeInput.value += value;
+        }
+        
+        // actualizar eventos del input
+        activeInput.dispatchEvent(
+            new Event("input", { bubbles: true })
+        );
+    });
+    
+});
+document.getElementById("okKey").onclick = (e) => {
+    e.stopPropagation();
+    confirmKeyboard();
+    closeKeyboard();
+};
+// El botón OK debe ser ESPECIAL - no puede llamar a pressKey()
+document.getElementById("okKey").onclick = (e) => {
+    e.stopPropagation(); // Evitar que se dispare pressKey
+    confirmKeyboard();
+    closeKeyboard();
+};
+
+// El botón Close también debe ser especial
+document.getElementById("closeKeyBtn").onclick = (e) => {
+    e.stopPropagation();
+    const keyboard = document.getElementById("customKeyboard");
+    if (!keyboard) return;
+    
+    keyboard.classList.add("hidden");
+    activeInput = null;
+};
+function disableSystemKeyboard(input, onActivate) {
+    
+    input.setAttribute("readonly", true);
+    input.setAttribute("inputmode", "none");
+    input.setAttribute("autocomplete", "off");
+    
+    input.addEventListener("click", () => {
+        
+        activeInput = input;
+        
+        const keyboard = document.getElementById("customKeyboard");
+        
+        keyboard.classList.remove("hidden");
+        keyboard.style.display = "block";
+        
+        if (onActivate) onActivate(input);
+    });
+}
+const input = document.querySelector("input");
+
+disableSystemKeyboard(input, (el) => {
+    activeInput = el;
+    keyboard.classList.remove("hidden");
+});
 /* LOOP */
 function animate(){
     
