@@ -784,6 +784,72 @@ button{
         <input id="textureIntensity" type="range" min="0" max="2" step="0.01" value="1">
     </div>
 </div>
+<div class="extraPanel" id="lightSettingsPanel" style="display:none;">
+
+    <div style="padding:8px;color:#aaa;font-size:12px;border-bottom:1px solid #333;">
+        Luz
+    </div>
+
+    <div style="display:flex;gap:6px;padding:8px;">
+        <button class="itemBtn" id="lightTabBtn" style="flex:1;">Luz</button>
+        <button class="itemBtn" id="shadowTabBtn" style="flex:1;">Sombra</button>
+    </div>
+
+    <!-- PANEL LUZ -->
+    <div id="lightControls">
+
+        <div style="padding:8px;">
+            <label style="font-size:11px;color:#ccc;">Color</label>
+            <input type="color" id="lightColor" value="#ffffff"
+            style="width:100%;height:40px;background:none;border:none;">
+        </div>
+
+        <div style="padding:8px;">
+            <label style="font-size:11px;color:#ccc;">Intensidad</label>
+            <input type="range" id="lightIntensity"
+            min="0" max="100" step="0.1" value="2"
+            style="width:100%;">
+        </div>
+
+        <div style="padding:8px;">
+            <label style="font-size:11px;color:#ccc;">Rango</label>
+            <input type="range" id="lightRange"
+            min="1" max="100" step="1" value="20"
+            style="width:100%;">
+        </div>
+
+    </div>
+
+    <!-- PANEL SOMBRA -->
+    <div id="shadowControls" style="display:none;">
+
+        <div style="padding:8px;">
+            <label style="font-size:11px;color:#ccc;">Sombras</label>
+            <select id="shadowEnabled" style="width:100%;padding:8px;background:#2a2a2a;color:white;border:1px solid #444;">
+                <option value="true">Activadas</option>
+                <option value="false">Desactivadas</option>
+            </select>
+        </div>
+
+        <div style="padding:8px;">
+            <label style="font-size:11px;color:#ccc;">Tipo de sombra</label>
+            <select id="shadowType" style="width:100%;padding:8px;background:#2a2a2a;color:white;border:1px solid #444;">
+                <option value="basic">BasicShadow</option>
+                <option value="soft">SoftShadow</option>
+                <option value="vsm">VSMShadow</option>
+            </select>
+        </div>
+
+        <div style="padding:8px;">
+            <label style="font-size:11px;color:#ccc;">Suavidad</label>
+            <input type="range" id="shadowBlur"
+            min="0" max="20" step="1" value="4"
+            style="width:100%;">
+        </div>
+
+    </div>
+
+</div>
   <div class="extraPanel"></div>
 <div class="extraPanel"></div>
 <div class="extraPanel"></div>
@@ -955,6 +1021,7 @@ let currentView = "perspective";
 let selectedInUI = null;
 let objects = [];
 let selected = null;
+let selectedLight = null;
 let lights = [];
 const hideTexturePanelFor = new Set([
     "light",
@@ -963,12 +1030,30 @@ const hideTexturePanelFor = new Set([
 ]);
 const texturePanel = document.getElementById("texturePanel");
 
+const lightSettingsPanel = document.getElementById("lightSettingsPanel");
+
 function updateTexturePanelVisibility(obj) {
-    if (!obj || hideTexturePanelFor.has(obj.userData.type)) {
+    
+    if (!obj) {
         texturePanel.style.display = "none";
-    } else {
-        texturePanel.style.display = "block";
+        lightSettingsPanel.style.display = "none";
+        return;
     }
+    
+    // LUZ
+    if (obj.userData.type === "light") {
+        
+        texturePanel.style.display = "none";
+        lightSettingsPanel.style.display = "block";
+        
+        loadLightSettings(obj);
+        
+        return;
+    }
+    
+    // MESH
+    texturePanel.style.display = "block";
+    lightSettingsPanel.style.display = "none";
 }
 window.openPanel2 = function(t, txt) {
   document.getElementById("title2").innerText = t;
@@ -1907,7 +1992,129 @@ textureViewer.onclick = (e) => {
     if (e.target === textureViewer) {
         textureViewer.style.display = "none";
     }
-};const orientationPanel = document.getElementById("orientationPanel");
+};
+function loadLightSettings(obj) {
+
+    selectedLight = obj;
+
+    const light = obj.userData.light;
+
+    if (!light) return;
+
+    document.getElementById("lightColor").value =
+        "#" + light.color.getHexString();
+
+    document.getElementById("lightIntensity").value =
+        light.intensity || 1;
+
+    document.getElementById("lightRange").value =
+        light.distance || 20;
+
+    document.getElementById("shadowEnabled").value =
+        light.castShadow ? "true" : "false";
+
+    document.getElementById("shadowBlur").value =
+        light.shadow.radius || 4;
+}
+
+/* TABS */
+
+document.getElementById("lightTabBtn").onclick = () => {
+
+    document.getElementById("lightControls").style.display = "block";
+    document.getElementById("shadowControls").style.display = "none";
+};
+
+document.getElementById("shadowTabBtn").onclick = () => {
+
+    document.getElementById("lightControls").style.display = "none";
+    document.getElementById("shadowControls").style.display = "block";
+};
+
+/* COLOR */
+
+document.getElementById("lightColor").addEventListener("input", (e) => {
+
+    if (!selectedLight) return;
+
+    const light = selectedLight.userData.light;
+
+    if (!light) return;
+
+    light.color.set(e.target.value);
+});
+
+/* INTENSIDAD */
+
+document.getElementById("lightIntensity").addEventListener("input", (e) => {
+
+    if (!selectedLight) return;
+
+    const light = selectedLight.userData.light;
+
+    if (!light) return;
+
+    light.intensity = parseFloat(e.target.value);
+});
+
+/* RANGO */
+
+document.getElementById("lightRange").addEventListener("input", (e) => {
+
+    if (!selectedLight) return;
+
+    const light = selectedLight.userData.light;
+
+    if (!light) return;
+
+    light.distance = parseFloat(e.target.value);
+});
+
+/* ACTIVAR SOMBRA */
+
+document.getElementById("shadowEnabled").addEventListener("change", (e) => {
+
+    if (!selectedLight) return;
+
+    const light = selectedLight.userData.light;
+
+    if (!light) return;
+
+    light.castShadow = e.target.value === "true";
+});
+
+/* TIPO SOMBRA */
+
+document.getElementById("shadowType").addEventListener("change", (e) => {
+
+    if (e.target.value === "basic") {
+        renderer.shadowMap.type = THREE.BasicShadowMap;
+    }
+
+    if (e.target.value === "soft") {
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    }
+
+    if (e.target.value === "vsm") {
+        renderer.shadowMap.type = THREE.VSMShadowMap;
+    }
+
+    renderer.shadowMap.needsUpdate = true;
+});
+
+/* SUAVIDAD */
+
+document.getElementById("shadowBlur").addEventListener("input", (e) => {
+
+    if (!selectedLight) return;
+
+    const light = selectedLight.userData.light;
+
+    if (!light || !light.shadow) return;
+
+    light.shadow.radius = parseFloat(e.target.value);
+});
+const orientationPanel = document.getElementById("orientationPanel");
 const orientationImage = document.getElementById("orientationImage");
 
 function updateOrientationPanel() {
