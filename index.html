@@ -1270,9 +1270,135 @@ button{
     </div>
 
 </div>
-  <div class="extraPanel"></div>
-<div class="extraPanel"></div>
-<div class="extraPanel"></div>
+<div class="extraPanel" id="scenePanel">
+
+    <div style="
+        padding:8px;
+        color:#aaa;
+        font-size:12px;
+        border-bottom:1px solid #333;
+    ">
+        Escena
+    </div>
+
+<!-- SKYBOX -->
+
+<div style="
+    padding:10px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+">
+
+    <label style="
+        font-size:11px;
+        color:#ccc;
+        font-weight:600;
+        letter-spacing:0.5px;
+    ">
+        Imagen 360
+    </label>
+
+    <label
+        for="skyboxInput"
+
+        style="
+            background:#1f1f1f;
+            border:1px solid #3a3a3a;
+            border-radius:10px;
+            padding:12px;
+            color:white;
+            font-size:12px;
+            cursor:pointer;
+            transition:0.2s;
+            text-align:center;
+            user-select:none;
+        "
+
+        onmouseenter="
+            this.style.background='#2a2a2a';
+            this.style.borderColor='#5a5a5a';
+        "
+
+        onmouseleave="
+            this.style.background='#1f1f1f';
+            this.style.borderColor='#3a3a3a';
+        "
+    >
+
+        🌌 Importar imagen 360
+
+    </label>
+
+    <input
+        type="file"
+        id="skyboxInput"
+        accept="image/*"
+
+        style="display:none;"
+    >
+
+</div>
+    <!-- LUZ AMBIENTAL -->
+
+    <div style="padding:8px;">
+
+        <label style="
+            font-size:11px;
+            color:#ccc;
+        ">
+            Luz ambiental
+        </label>
+
+        <input
+            type="range"
+            id="ambientIntensity"
+            min="-5"
+            max="5"
+            step="0.1"
+            value="1"
+
+            style="width:100%;"
+        >
+    </div>
+
+    <!-- RESOLUCIÓN -->
+
+    <div style="padding:8px;">
+
+        <label style="
+            font-size:11px;
+            color:#ccc;
+        ">
+            Resolución
+        </label>
+
+        <select
+            id="pixelRatioSelect"
+
+            style="
+                width:100%;
+                margin-top:6px;
+                background:#222;
+                color:white;
+                border:1px solid #444;
+                padding:6px;
+            "
+        >
+
+            <option value="1">1K</option>
+
+            <option value="2">2K</option>
+
+            <option value="3">3K</option>
+
+            <option value="4">4K</option>
+
+        </select>
+    </div>
+
+</div>
+
 </div>
 
 <!-- CONTEXT MENU -->
@@ -1452,7 +1578,10 @@ transform.addEventListener("dragging-changed",(e)=>{
 });
 const gltfLoader = new GLTFLoader();
 /* LIGHTS */
-scene.add(new THREE.AmbientLight(0xffffff,1));
+const ambientLight =
+    new THREE.AmbientLight(0xffffff, 1);
+
+scene.add(ambientLight);
 
 const dir = new THREE.DirectionalLight(0xffffff,2);
 dir.userData.type = "light";
@@ -1516,6 +1645,17 @@ const hideTexturePanelFor = new Set([
     "spawn",
     "camera"
 ]);
+const scenePanel =
+    document.getElementById("scenePanel");
+
+const skyboxInput =
+    document.getElementById("skyboxInput");
+
+const ambientIntensity =
+    document.getElementById("ambientIntensity");
+
+const pixelRatioSelect =
+    document.getElementById("pixelRatioSelect");
 let multiSelectMode = false;
 let selectionGroup = null;
 
@@ -3577,6 +3717,66 @@ window.addEventListener("pointercancel", () => {
 window.addEventListener("touchend", () => {
 
     unlockCamera();
+});
+skyboxInput.addEventListener("change", (e) => {
+
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    const url = URL.createObjectURL(file);
+
+    const loader = new THREE.TextureLoader();
+
+    loader.load(url, (texture) => {
+
+        texture.mapping =
+            THREE.EquirectangularReflectionMapping;
+
+        scene.background = texture;
+
+        scene.environment = texture;
+    });
+});
+ambientIntensity.addEventListener("input", (e) => {
+
+    ambientLight.intensity =
+        parseFloat(e.target.value);
+});
+pixelRatioSelect.addEventListener("change", (e) => {
+
+    const value =
+        parseInt(e.target.value);
+
+    let ratio = 1;
+
+    // MOBILE/EDITOR SCALE
+
+    switch(value){
+
+        case 1:
+            ratio = 1;
+            break;
+
+        case 2:
+            ratio = 1.5;
+            break;
+
+        case 3:
+            ratio = 2;
+            break;
+
+        case 4:
+            ratio = 3;
+            break;
+    }
+
+    renderer.setPixelRatio(ratio);
+
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
 });
 /* LOOP */
 function animate(){
