@@ -663,7 +663,7 @@ button{
     inset: 0;
     width: 100%;
     height: 100%;
-    z-index: 999999;
+    z-index: 9999;
     background: #000;
     display: flex;
     justify-content: center;
@@ -904,6 +904,23 @@ button{
         0 1px 4px rgba(0,0,0,0.4),
         inset 0 2px 4px rgba(0,0,0,0.25);
 }
+.btn i {
+    font-size: 11px;
+    pointer-events: none;
+}
+.vline {
+
+    width: 1px;
+    height: 20px;
+
+    border: none;
+
+    background: white;
+
+    margin: 0 6px;
+
+    opacity: 0.7;
+}
 </style>
 </head>
 
@@ -1031,7 +1048,22 @@ button{
        <button class="btn" id="openMenuBtn">
     <i class="fa-solid fa-magnifying-glass"></i>
 </button>
+<hr class="vline">
+<button class="btn" onclick="setViewportMode('wireframe')">
+    <i class="fa-solid fa-draw-polygon"></i>
+</button>
 
+<button class="btn" onclick="setViewportMode('solid')">
+    <i class="fa-solid fa-cube"></i>
+</button>
+
+<button class="btn" onclick="setViewportMode('texture')">
+    <i class="fa-solid fa-image"></i>
+</button>
+
+<button class="btn" onclick="setViewportMode('render')">
+    <i class="fa-solid fa-lightbulb"></i>
+</button>
 <div class="toolbar">
     <button class="btn1" id="moveBtn"><i class="fa-solid fa-arrows-up-down-left-right"></i></button>
     <button class="btn1" id="rotateBtn"><i class="fa-solid fa-rotate"></i></button>
@@ -1133,7 +1165,7 @@ button{
         <div style="padding:8px;">
             <label style="font-size:11px;color:#ccc;">Suavidad</label>
             <input type="range" id="shadowBlur"
-            min="0" max="20" step="1" value="4"
+            min="0" max="2000" step="1" value="4"
             style="width:100%;">
         </div>
 
@@ -1291,6 +1323,8 @@ const loader = new GLTFLoader();
 /* TRANSFORM */
 const transform = new TransformControls(camera,renderer.domElement);
 scene.add(transform);
+markEditorUI(transform);
+transform.userData.editorUI = true;
 transform.setMode("translate");
 transform.addEventListener("dragging-changed",(e)=>{
     orbit.enabled = !e.value;
@@ -1305,7 +1339,12 @@ dir.position.set(5,10,5);
 scene.add(dir);
 
 /* GRID */
-scene.add(new THREE.GridHelper(20,20));
+const grid = new THREE.GridHelper(20, 20);
+
+grid.userData.editorUI = true;
+
+scene.add(grid);
+markEditorUI(grid);
 const openMenuBtn = document.getElementById("openMenuBtn");
 const menuOverlay = document.getElementById("menuOverlay");
 const searchInput = document.getElementById("searchInput");
@@ -1342,6 +1381,7 @@ function filterButtons() {
     });
 }
 /* variables */
+let viewportMode = "solid";
 let selectedMaterialTarget = null;
 let currentTexture = null;
 let currentView = "perspective";
@@ -1412,11 +1452,13 @@ const tex = new THREE.TextureLoader().load("archivos/crosshairs-solid-full.svg")
 const spawn = new THREE.Mesh(
     new THREE.PlaneGeometry(1,1),
     new THREE.MeshBasicMaterial({map:tex,transparent:true})
+    
 );
 spawn.userData.type = "spawn";
 spawn.position.set(0,0,0);
+spawn.userData.editorUI = true;
 scene.add(spawn);
-
+markEditorUI(spawn);
 function updateSpawn(){
     spawn.lookAt(camera.position);
 }
@@ -1842,6 +1884,7 @@ window.createLight = function(type) {
     const icon = lightIconModel.clone();
     icon.position.copy(spawn.position);
     scene.add(icon);
+    markEditorUI(icon);
     
     // 3. TARGET
     const target = new THREE.Object3D();
@@ -1859,7 +1902,7 @@ window.createLight = function(type) {
     // 5. LISTAS
     lights.push(icon);
     objects.push(icon);
-    
+    icon.userData.editorUI = true;
     select(icon);
 };
 function createLight(type){
@@ -2340,9 +2383,11 @@ tex.needsUpdate = true;
         if (child.isMesh) {
 
             child.material = new THREE.MeshStandardMaterial({
-                map: tex,
-                color: 0xffffff
-            });
+    map: tex,
+    color: 0xffffff
+});
+
+child.userData.renderMaterial = child.material;
 
             child.material.needsUpdate = true;
         }
@@ -2357,6 +2402,7 @@ document.getElementById("removeTextureBtn").onclick = () => {
             child.material = new THREE.MeshStandardMaterial({
                 color: 0xaaaaaa
             });
+            child.userData.renderMaterial = child.material;
         }
     });
 
@@ -2562,6 +2608,179 @@ document.getElementById("shadowBlur").addEventListener("input", (e) => {
 const orientationPanel = document.getElementById("orientationPanel");
 const orientationImage = document.getElementById("orientationImage");
 
+async function unlockAudio() {
+
+    if (audioUnlocked) return;
+
+    try {
+
+        bgMusic.volume = 0;
+
+        bgMusic.src = playlist[0];
+
+        await bgMusic.play();
+
+        bgMusic.pause();
+
+        bgMusic.currentTime = 0;
+
+        audioUnlocked = true;
+
+        console.log("audio desbloqueado");
+
+    } catch(err) {
+
+        console.log(err);
+    }
+}
+/* ================= MUSIC PLAYER ================= */
+
+const playlist = [
+
+    "archivos/Ari.mp3",
+    "archivos/moon.mp3",
+    "archivos/asu.mp3"
+
+];
+
+let currentTrack = 0;
+
+const bgMusic = new Audio();
+
+let audioUnlocked = false;
+
+bgMusic.volume = 0;
+
+function randomDelay(min, max) {
+
+    return Math.random() * (max - min) + min;
+}
+
+/* FADE IN */
+
+function fadeIn(audio, duration = 6000, target = 0.35) {
+
+    audio.volume = 0;
+
+    const step = target / (duration / 100);
+
+    const interval = setInterval(() => {
+
+        audio.volume += step;
+
+        if (audio.volume >= target) {
+
+            audio.volume = target;
+
+            clearInterval(interval);
+        }
+
+    }, 100);
+}
+
+/* FADE OUT */
+
+function fadeOut(audio, duration = 6000) {
+
+    return new Promise((resolve) => {
+
+        const step = audio.volume / (duration / 100);
+
+        const interval = setInterval(() => {
+
+            audio.volume -= step;
+
+            if (audio.volume <= 0) {
+
+                audio.volume = 0;
+
+                clearInterval(interval);
+
+                resolve();
+            }
+
+        }, 100);
+    });
+}
+
+/* PLAY TRACK */
+
+async function playTrack(index) {
+
+    currentTrack = index % playlist.length;
+
+    bgMusic.src = playlist[currentTrack];
+
+    bgMusic.currentTime = 0;
+
+    try {
+
+        await bgMusic.play();
+
+        fadeIn(bgMusic);
+
+    } catch(err) {
+
+        console.log(err);
+
+        return;
+    }
+
+    // antes de terminar → fade out
+    bgMusic.onloadedmetadata = () => {
+
+        const fadeTime = 6000;
+
+        const trigger =
+            (bgMusic.duration * 1000) - fadeTime;
+
+        setTimeout(async () => {
+
+            await fadeOut(bgMusic, fadeTime);
+
+        }, trigger);
+    };
+
+    // cuando termina
+    bgMusic.onended = () => {
+
+        const silence =
+            randomDelay(120000, 300000);
+
+        console.log(
+            "silencio:",
+            Math.floor(silence / 1000),
+            "seg"
+        );
+
+        setTimeout(() => {
+
+            playTrack(currentTrack + 1);
+
+        }, silence);
+    };
+}
+
+/* START PLAYLIST */
+
+function startPlaylist() {
+
+    // espera aleatoria inicial
+    const firstDelay =
+        randomDelay(30000, 60000);
+
+    console.log(
+        "playlist inicia en:",
+        Math.floor(firstDelay / 1000),
+        "seg"
+    );
+
+    setTimeout(() => {
+
+        playTrack(0);
+
+    }, firstDelay);
+}
 function updateOrientationPanel() {
     
     const isVertical = window.innerHeight > window.innerWidth;
@@ -2582,23 +2801,30 @@ function updateOrientationPanel() {
         orientationImage.src = "archivos/continuar.jpg";
         
         orientationImage.onclick = async () => {
-            
-            try {
-                
-                if (!document.fullscreenElement) {
-                    await document.documentElement.requestFullscreen();
-                }
-                
-            } catch (err) {
-                console.log(err);
-            }
-            
-            orientationPanel.classList.add("fadeOutPanel");
-            
-            setTimeout(() => {
-                orientationPanel.classList.add("hiddenPanel");
-            }, 500);
-        };
+    
+    try {
+        
+        if (!document.fullscreenElement) {
+            await document.documentElement.requestFullscreen();
+        }
+        
+    } catch (err) {
+        
+        console.log(err);
+    }
+    
+    await unlockAudio();
+    
+    startPlaylist();
+    
+    orientationPanel.classList.add("fadeOutPanel");
+    
+    setTimeout(() => {
+        
+        orientationPanel.classList.add("hiddenPanel");
+        
+    }, 500);
+};
     }
 }
 
@@ -2713,6 +2939,94 @@ disableSystemKeyboard(input, (el) => {
     activeInput = el;
     keyboard.classList.remove("hidden");
 });
+function setViewportMode(mode) {
+    
+    viewportMode = mode;
+    
+    scene.traverse((obj) => {
+    
+    if (obj.userData.editorUI) return;
+    
+    if (!obj.isMesh) return;
+    
+    // guardar material original SOLO UNA VEZ
+    if (!obj.userData.renderMaterial) {
+        
+        obj.userData.renderMaterial = obj.material;
+        
+    }
+    
+    const original = obj.userData.renderMaterial;
+    
+    // ================= WIREFRAME =================
+    if (mode === "wireframe") {
+        
+        obj.material = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            wireframe: true
+        });
+        
+    }
+    
+    // ================= SOLID =================
+    else if (mode === "solid") {
+        
+        obj.material = new THREE.MeshStandardMaterial({
+            color: 0x999999
+        });
+        
+    }
+    
+    // ================= TEXTURE =================
+    else if (mode === "texture") {
+        
+        // conservar texturas originales
+        if (original.map) {
+            
+            obj.material = new THREE.MeshBasicMaterial({
+                map: original.map
+            });
+            
+        } else {
+            
+            obj.material = new THREE.MeshBasicMaterial({
+                color: 0xffffff
+            });
+        }
+    }
+    
+    // ================= RENDER =================
+    else if (mode === "render") {
+        
+        obj.material = original;
+    }
+    
+    obj.material.needsUpdate = true;
+});
+    // ocultar UI SOLO en render
+    const visible = mode !== "render";
+    
+    grid.visible = visible;
+    transform.visible = visible;
+    grid.visible = visible;
+    spawn.visible = visible;
+    lights.forEach(obj => {
+    obj.visible = visible;
+});
+}
+
+window.setViewportMode = setViewportMode;
+function markEditorUI(obj) {
+
+    obj.userData.editorUI = true;
+
+    obj.traverse((child) => {
+        child.userData.editorUI = true;
+    });
+}
+
+
+
 /* LOOP */
 function animate(){
     
