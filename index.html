@@ -921,10 +921,25 @@ button{
 
     opacity: 0.7;
 }
+#selectionBox{
+
+    position:fixed;
+
+    border:1px solid #4da3ff;
+
+    background:rgba(77,163,255,0.12);
+
+    pointer-events:none;
+
+    display:none;
+
+    z-index:9999;
+}
 </style>
 </head>
 
 <body>
+    <div id="selectionBox"></div>
 <div id="customKeyboard" class="hidden">
 
     <div class="keys">
@@ -1152,14 +1167,14 @@ button{
         <div style="padding:4px;">
             <label style="font-size:5px;color:#ccc;">Intensidad</label>
             <input type="range" id="lightIntensity"
-            min="0" max="100" step="0.1" value="2"
+            min="0" max="500" step="0.1" value="2"
             style="width:100%;">
         </div>
 
         <div style="padding:4px;">
             <label style="font-size:5px;color:#ccc;">Rango</label>
             <input type="range" id="lightRange"
-            min="1" max="100" step="1" value="20"
+            min="1" max="10000" step="1" value="20"
             style="width:100%;">
         </div>
 
@@ -1188,9 +1203,69 @@ button{
         <div style="padding:8px;">
             <label style="font-size:11px;color:#ccc;">Suavidad</label>
             <input type="range" id="shadowBlur"
-            min="0" max="2000" step="1" value="4"
+            min="0" max="200" step="1" value="4"
             style="width:100%;">
         </div>
+
+    </div>
+
+</div>
+<div class="extraPanel" id="materialPanel" style="display:none;">
+
+    <div style="padding:8px;color:#aaa;font-size:12px;border-bottom:1px solid #333;">
+        Material
+    </div>
+
+    <!-- COLOR -->
+    <div style="padding:8px;">
+        <label style="font-size:11px;color:#ccc;">Color</label>
+
+        <input
+            type="color"
+            id="materialColor"
+            value="#aaaaaa"
+
+            style="
+                width:100%;
+                height:40px;
+                background:none;
+                border:none;
+            "
+        >
+    </div>
+
+    <!-- TRANSPARENCIA -->
+    <div style="padding:8px;">
+        <label style="font-size:11px;color:#ccc;">
+            Transparencia
+        </label>
+
+        <input
+            type="range"
+            id="materialOpacity"
+            min="0"
+            max="1"
+            step="0.01"
+            value="1"
+
+            style="width:100%;"
+        >
+    </div>
+
+    <!-- TEXTURA TRANSPARENTE -->
+    <div style="padding:8px;display:flex;align-items:center;gap:8px;">
+
+        <input
+            type="checkbox"
+            id="transparentTextureToggle"
+        >
+
+        <label
+            for="transparentTextureToggle"
+            style="font-size:11px;color:#ccc;"
+        >
+            Textura transparente
+        </label>
 
     </div>
 
@@ -1346,6 +1421,29 @@ const loader = new GLTFLoader();
 /* TRANSFORM */
 const transform = new TransformControls(camera,renderer.domElement);
 scene.add(transform);
+transform.addEventListener("objectChange", () => {
+
+    if (
+        !selectionGroup ||
+        selectedObjects.length <= 1
+    ) return;
+
+    const delta = new THREE.Vector3();
+
+    delta.subVectors(
+        selectionGroup.position,
+        selectionGroup.userData.lastPos ||
+        selectionGroup.position.clone()
+    );
+
+    selectedObjects.forEach(obj => {
+
+        obj.position.add(delta);
+    });
+
+    selectionGroup.userData.lastPos =
+        selectionGroup.position.clone();
+});
 markEditorUI(transform);
 transform.userData.editorUI = true;
 transform.setMode("translate");
@@ -1418,7 +1516,20 @@ const hideTexturePanelFor = new Set([
     "spawn",
     "camera"
 ]);
+let multiSelectMode = false;
+let selectionGroup = null;
 
+let isBoxSelecting = false;
+let selectionStartX = 0;
+let selectionStartY = 0;
+
+let holdTimeout = null;
+
+const selectionBox =
+    document.getElementById("selectionBox");
+
+let selectedObjects = [];
+const materialPanel = document.getElementById("materialPanel");
 const texturePanel = document.getElementById("texturePanel");
 
 const lightSettingsPanel = document.getElementById("lightSettingsPanel");
@@ -1426,26 +1537,132 @@ const lightSettingsPanel = document.getElementById("lightSettingsPanel");
 function updateTexturePanelVisibility(obj) {
     
     if (!obj) {
+        
         texturePanel.style.display = "none";
         lightSettingsPanel.style.display = "none";
+        materialPanel.style.display = "none";
+        
         return;
     }
     
-    // LUZ
+    // LUCES
     if (obj.userData.type === "light") {
         
         texturePanel.style.display = "none";
         lightSettingsPanel.style.display = "block";
+        materialPanel.style.display = "none";
         
         loadLightSettings(obj);
         
         return;
     }
     
-    // MESH
+    // MESH / GLTF
     texturePanel.style.display = "block";
     lightSettingsPanel.style.display = "none";
+    materialPanel.style.display = "block";
+    
+    loadMaterialSettings(obj);
 }
+function loadMaterialSettings(obj) {
+
+    let material = null;
+
+    obj.traverse((child) => {
+
+        if (child.isMesh && child.material && !material) {
+            material = child.material;
+        }
+    });
+
+    if (!material) return;
+
+    // COLOR
+    document.getElementById("materialColor").value =
+        "#" + material.color.getHexString();
+
+    // OPACIDAD
+    document.getElementById("materialOpacity").value =
+        material.opacity ?? 1;
+
+    // TEXTURA TRANSPARENTE
+    document.getElementById("transparentTextureToggle").checked =
+        material.transparent === true;
+}
+/* ================= MATERIAL PANEL ================= */
+
+/* COLOR */
+
+document.getElementById("materialColor")
+.addEventListener("input", (e) => {
+
+    if (!selectedMaterialTarget) return;
+
+    selectedMaterialTarget.traverse((child) => {
+
+        if (child.isMesh && child.material) {
+
+            child.material.color.set(e.target.value);
+
+child.userData.originalMaterial =
+    child.material.clone();
+        }
+    });
+});
+
+/* OPACIDAD */
+
+document.getElementById("materialOpacity")
+.addEventListener("input", (e) => {
+
+    if (!selectedMaterialTarget) return;
+
+    const value = parseFloat(e.target.value);
+
+    selectedMaterialTarget.traverse((child) => {
+
+        if (child.isMesh && child.material) {
+
+            child.material.transparent = value < 1;
+
+            child.material.opacity = value;
+
+child.userData.originalMaterial =
+    child.material.clone();
+
+            child.material.needsUpdate = true;
+        }
+    });
+});
+
+/* TEXTURA TRANSPARENTE */
+
+document.getElementById("transparentTextureToggle")
+.addEventListener("change", (e) => {
+
+    if (!selectedMaterialTarget) return;
+
+    const enabled = e.target.checked;
+
+    selectedMaterialTarget.traverse((child) => {
+
+        if (child.isMesh && child.material) {
+
+            child.material.transparent = enabled;
+
+            if (enabled) {
+
+                child.material.alphaTest = 0.1;
+
+            } else {
+
+                child.material.alphaTest = 0;
+            }
+
+            child.material.needsUpdate = true;
+        }
+    });
+});
 window.openPanel2 = function(t, txt) {
   document.getElementById("title2").innerText = t;
   document.getElementById("text2").innerText = txt;
@@ -1496,8 +1713,20 @@ function select(obj) {
     selectedInUI = obj;
     updateTexturePanelVisibility(obj);
     transform.addEventListener("dragging-changed", (e) => {
+    
     orbit.enabled = !e.value;
-    updateTexturePanelVisibility(obj);
+    
+    // impedir box select mientras usa gizmo
+    if (e.value) {
+        
+        multiSelectMode = false;
+        
+        isBoxSelecting = false;
+        
+        clearTimeout(holdTimeout);
+        
+        selectionBox.style.display = "none";
+    }
 });
     transform.attach(obj);
     selectedMaterialTarget = obj; // 👈 clave para textura
@@ -1523,42 +1752,152 @@ let startX = 0;
 let startY = 0;
 
 renderer.domElement.addEventListener("pointerdown", (e) => {
+    
+    if (transform.dragging) return;
+    
     startX = e.clientX;
     startY = e.clientY;
+    
     isDragging = false;
+    
+    multiSelectMode = false;
+    
+    holdTimeout = setTimeout(() => {
+        
+        // si movió el dedo NO activar
+        if (isDragging) return;
+        
+        // usando gizmo
+        if (transform.dragging) return;
+        
+        multiSelectMode = true;
+        
+        isBoxSelecting = true;
+        
+        // bloquear cámara
+        orbit.enabled = false;
+        
+        selectionStartX = e.clientX;
+        selectionStartY = e.clientY;
+        
+        selectionBox.style.display = "block";
+        
+        selectionBox.style.left =
+            selectionStartX + "px";
+        
+        selectionBox.style.top =
+            selectionStartY + "px";
+        
+        selectionBox.style.width = "0px";
+        
+        selectionBox.style.height = "0px";
+        
+    }, 1500);
 });
-
 renderer.domElement.addEventListener("pointermove", (e) => {
-    if (Math.abs(e.clientX - startX) > 5 || Math.abs(e.clientY - startY) > 5) {
+    
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    
+    // si mueve suficiente => cámara
+    if (
+        Math.abs(dx) > 12 ||
+        Math.abs(dy) > 12
+    ) {
+        
         isDragging = true;
+        
+        clearTimeout(holdTimeout);
+    }
+    
+    // BOX SELECT
+    if (multiSelectMode) {
+        
+        const x =
+            Math.min(selectionStartX, e.clientX);
+        
+        const y =
+            Math.min(selectionStartY, e.clientY);
+        
+        const w =
+            Math.abs(e.clientX - selectionStartX);
+        
+        const h =
+            Math.abs(e.clientY - selectionStartY);
+        
+        selectionBox.style.left = x + "px";
+        selectionBox.style.top = y + "px";
+        
+        selectionBox.style.width = w + "px";
+        selectionBox.style.height = h + "px";
     }
 });
-
 renderer.domElement.addEventListener("pointerup", (e) => {
     
+    clearTimeout(holdTimeout);
+    
+    // BOX SELECT
+    if (multiSelectMode) {
+        
+        selectionBox.style.display = "none";
+        
+        selectMultipleInBox(
+            selectionStartX,
+            selectionStartY,
+            e.clientX,
+            e.clientY
+        );
+        
+        updateSelectionGroup();
+        
+        multiSelectMode = false;
+        
+        isBoxSelecting = false;
+        
+        orbit.enabled = true;
+        
+        return;
+    }
+    
     if (isDragging) return;
+    
     if (transform.dragging) return;
     
     mouse.x = (e.clientX / innerWidth) * 2 - 1;
+    
     mouse.y = -(e.clientY / innerHeight) * 2 + 1;
     
     raycaster.setFromCamera(mouse, camera);
     
-    const hits = raycaster.intersectObjects(scene.children, true);
+    const hits =
+        raycaster.intersectObjects(scene.children, true);
     
-    // filtra cosas que NO deben bloquear deselección
     const validHits = hits.filter(h => {
+        
         const obj = getRootObject(h.object);
-        return obj && obj !== spawn; // evita spawn bloqueando click vacío
+        
+        return obj && obj !== spawn;
     });
     
     if (validHits.length > 0) {
-        const root = getRootObject(validHits[0].object);
+        
+        const root =
+            getRootObject(validHits[0].object);
+        
+        clearMultiSelection();
+        
+        selectedObjects = [root];
+        
+        updateSelectionGroup();
+        
         select(root);
+        
     } else {
-        clear(); // <-- ahora sí funciona siempre
+        
+        clear();
+        
+        clearMultiSelection();
     }
-
 });
 document.getElementById("spawnBtn").onclick = () => {
     document.getElementById("gltfInputHidden").click();
@@ -1905,6 +2244,15 @@ window.createLight = function(type) {
     
     // 2. CREAR ICONO (AQUÍ recién existe)
     const icon = lightIconModel.clone();
+    
+    icon.traverse((obj) => {
+
+    if (obj.isMesh) {
+
+        obj.castShadow = false;
+        obj.receiveShadow = false;
+    }
+});
     icon.position.copy(spawn.position);
     scene.add(icon);
     markEditorUI(icon);
@@ -2047,7 +2395,14 @@ function refreshOutliner(){
     [...objects,spawn].forEach(obj=>{
 
         const item=document.createElement("div");
-        item.className = "item" + (obj === selectedInUI ? " active" : "");
+        item.className =
+    "item" +
+    (
+        obj === selectedInUI ||
+        selectedObjects.includes(obj) ?
+        " active" :
+        ""
+    );
 
         const left=document.createElement("div");
         left.className="left";
@@ -2056,9 +2411,9 @@ function refreshOutliner(){
         name.textContent = obj === spawn ? "SPAWN" : (obj.name || "Objeto");
 
         const eye=document.createElement("button");
-        eye.innerHTML=obj.visible
-        ?`<i class="fa-solid fa-eye"></i>`
-        :`<i class="fa-solid fa-eye-slash"></i>`;
+eye.innerHTML = obj.visible ?
+    `<i class="fa-solid fa-eye" style="color:white;"></i>` :
+    `<i class="fa-solid fa-eye-slash" style="color:white;"></i>`;
 
         eye.onclick=(e)=>{
             e.stopPropagation();
@@ -2067,14 +2422,16 @@ function refreshOutliner(){
         };
 
         const focus=document.createElement("button");
-        focus.innerHTML=`<i class="fa-solid fa-crosshairs"></i>`;
+        focus.innerHTML =
+    `<i class="fa-solid fa-crosshairs" style="color:white;"></i>`;
         focus.onclick=(e)=>{
             e.stopPropagation();
             orbit.target.copy(obj.position);
         };
 
         const dots=document.createElement("button");
-        dots.innerHTML=`<i class="fa-solid fa-ellipsis-vertical"></i>`;
+        dots.innerHTML =
+    `<i class="fa-solid fa-ellipsis-vertical" style="color:white;"></i>`;
         dots.onclick=(e)=>{
             e.stopPropagation();
             menu.style.display="flex";
@@ -2406,10 +2763,15 @@ tex.needsUpdate = true;
         if (child.isMesh) {
 
             child.material = new THREE.MeshStandardMaterial({
+    
     map: tex,
-    color: 0xffffff
+    
+    color: 0xffffff,
+    
+    transparent: true
 });
-
+child.userData.originalMaterial =
+    child.material.clone();
 child.userData.renderMaterial = child.material;
 
             child.material.needsUpdate = true;
@@ -2423,8 +2785,15 @@ document.getElementById("removeTextureBtn").onclick = () => {
     selectedMaterialTarget.traverse((child) => {
         if (child.isMesh) {
             child.material = new THREE.MeshStandardMaterial({
-                color: 0xaaaaaa
-            });
+    
+    map: tex,
+    
+    color: 0xffffff,
+    
+    transparent: true
+});
+child.userData.originalMaterial =
+    child.material.clone();
             child.userData.renderMaterial = child.material;
         }
     });
@@ -2967,75 +3336,69 @@ function setViewportMode(mode) {
     viewportMode = mode;
     
     scene.traverse((obj) => {
-    
-    if (obj.userData.editorUI) return;
-    
-    if (!obj.isMesh) return;
-    
-    // guardar material original SOLO UNA VEZ
-    if (!obj.userData.renderMaterial) {
         
-        obj.userData.renderMaterial = obj.material;
+        if (!obj.isMesh) return;
         
-    }
-    
-    const original = obj.userData.renderMaterial;
-    
-    // ================= WIREFRAME =================
-    if (mode === "wireframe") {
+        // ignorar UI editor
+        if (obj.userData.editorUI) return;
         
-        obj.material = new THREE.MeshBasicMaterial({
-            color: 0xffffff,
-            wireframe: true
-        });
-        
-    }
-    
-    // ================= SOLID =================
-    else if (mode === "solid") {
-        
-        obj.material = new THREE.MeshStandardMaterial({
-            color: 0x999999
-        });
-        
-    }
-    
-    // ================= TEXTURE =================
-    else if (mode === "texture") {
-        
-        // conservar texturas originales
-        if (original.map) {
+        // guardar material original UNA sola vez
+        if (!obj.userData.originalMaterial) {
             
-            obj.material = new THREE.MeshBasicMaterial({
-                map: original.map
-            });
-            
-        } else {
-            
-            obj.material = new THREE.MeshBasicMaterial({
-                color: 0xffffff
-            });
+            obj.userData.originalMaterial =
+                obj.material.clone();
         }
-    }
-    
-    // ================= RENDER =================
-    else if (mode === "render") {
         
-        obj.material = original;
-    }
-    
-    obj.material.needsUpdate = true;
-});
-    // ocultar UI SOLO en render
-    const visible = mode !== "render";
-    
-    grid.visible = visible;
-    transform.visible = visible;
-    grid.visible = visible;
-    spawn.visible = visible;
-    lights.forEach(obj => {
-    obj.visible = visible;
-});
+        // ========= WIREFRAME =========
+        if (mode === "wireframe") {
+            
+            obj.material = new THREE.MeshBasicMaterial({
+                
+                color: 0xffffff,
+                
+                wireframe: true
+            });
+            
+            return;
+        }
+        
+        // ========= SOLID =========
+        if (mode === "solid") {
+            
+            const old = obj.userData.originalMaterial;
+            
+            obj.material = new THREE.MeshStandardMaterial({
+                
+                color: old.color?.clone?.() || new THREE.Color(0xaaaaaa),
+                
+                transparent: old.transparent || false,
+                
+                opacity: old.opacity ?? 1,
+                
+                alphaTest: old.alphaTest || 0
+            });
+            
+            return;
+        }
+        
+        // ========= TEXTURE =========
+        if (mode === "texture") {
+            
+            obj.material =
+                obj.userData.originalMaterial.clone();
+            
+            return;
+        }
+        
+        // ========= RENDER =========
+        if (mode === "render") {
+            
+            obj.material =
+                obj.userData.originalMaterial.clone();
+            
+            return;
+        }
+    });
 }
 
 window.setViewportMode = setViewportMode;
@@ -3047,8 +3410,107 @@ function markEditorUI(obj) {
         child.userData.editorUI = true;
     });
 }
+function clearMultiSelection() {
+    
+    selectedObjects = [];
+    
+    if (selectionGroup) {
+        
+        transform.detach();
+        
+        scene.remove(selectionGroup);
+        
+        selectionGroup = null;
+    }
+    
+    refreshOutliner();
+}
+function addToSelection(obj) {
+    
+    if (!selectedObjects.includes(obj)) {
+        
+        selectedObjects.push(obj);
+    }
+    
+    updateSelectionGroup();
+    
+    refreshOutliner();
+}
+function selectMultipleInBox(x1, y1, x2, y2){
 
+    clearMultiSelection();
 
+    const minX = Math.min(x1, x2);
+    const minY = Math.min(y1, y2);
+
+    const maxX = Math.max(x1, x2);
+    const maxY = Math.max(y1, y2);
+
+    objects.forEach((obj) => {
+
+        if (!obj.visible) return;
+
+        if (obj === spawn) return;
+
+        const pos = obj.position.clone();
+
+        pos.project(camera);
+
+        const sx =
+            (pos.x * 0.5 + 0.5) * innerWidth;
+
+        const sy =
+            (-pos.y * 0.5 + 0.5) * innerHeight;
+
+        if (
+            sx >= minX &&
+            sx <= maxX &&
+            sy >= minY &&
+            sy <= maxY
+        ) {
+
+            addToSelection(obj);
+        }
+    });
+}
+
+function updateSelectionGroup(){
+
+    // limpiar grupo anterior
+    if (selectionGroup) {
+
+        scene.remove(selectionGroup);
+    }
+
+    if (selectedObjects.length <= 1) {
+
+        if (selectedObjects.length === 1) {
+
+            transform.attach(selectedObjects[0]);
+        }
+
+        return;
+    }
+
+    // calcular centro
+    const center = new THREE.Vector3();
+
+    selectedObjects.forEach(obj => {
+
+        center.add(obj.position);
+    });
+
+    center.divideScalar(selectedObjects.length);
+
+    // crear grupo virtual
+    selectionGroup = new THREE.Object3D();
+
+    selectionGroup.position.copy(center);
+
+    scene.add(selectionGroup);
+
+    transform.attach(selectionGroup);
+}
 
 /* LOOP */
 function animate(){
