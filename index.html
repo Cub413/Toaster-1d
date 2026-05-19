@@ -1799,18 +1799,27 @@ renderer.domElement.addEventListener("pointermove", (e) => {
     const dx = e.clientX - startX;
     const dy = e.clientY - startY;
     
-    // si mueve suficiente => cámara
-    if (
-        Math.abs(dx) > 12 ||
-        Math.abs(dy) > 12
-    ) {
+    // =========================
+    // MOVIMIENTO NORMAL
+    // =========================
+    
+    if (!multiSelectMode) {
         
-        isDragging = true;
-        
-        clearTimeout(holdTimeout);
+        if (
+            Math.abs(dx) > 12 ||
+            Math.abs(dy) > 12
+        ) {
+            
+            isDragging = true;
+            
+            clearTimeout(holdTimeout);
+        }
     }
     
+    // =========================
     // BOX SELECT
+    // =========================
+    
     if (multiSelectMode) {
         
         const x =
@@ -1826,9 +1835,11 @@ renderer.domElement.addEventListener("pointermove", (e) => {
             Math.abs(e.clientY - selectionStartY);
         
         selectionBox.style.left = x + "px";
+        
         selectionBox.style.top = y + "px";
         
         selectionBox.style.width = w + "px";
+        
         selectionBox.style.height = h + "px";
     }
 });
@@ -1854,7 +1865,7 @@ renderer.domElement.addEventListener("pointerup", (e) => {
         
         isBoxSelecting = false;
         
-        orbit.enabled = true;
+        unlockCamera();
         
         return;
     }
@@ -2050,19 +2061,26 @@ loader.load("archivos/light.gltf", (gltf) => {
     lightIconModel = gltf.scene;
     
     lightIconModel.userData.type = "light"; // 👈 IMPORTANTE
-    
+    gltf.scene.userData.isLightIcon = true;
     lightIconModel.scale.set(1, 1, 1);
     
     lightIconModel.traverse((child) => {
-        if (child.isMesh) {
-            child.material = child.material.clone();
-            child.material.emissive = new THREE.Color(0xffffff);
-            child.material.emissiveIntensity = 1.5;
-            
-            child.userData.type = "light"; // 👈 extra seguridad
-        }
-    });
-
+    
+    // marcar TODOS los nodos
+    child.userData.isLightIcon = true;
+    
+    child.userData.type = "light";
+    
+    if (child.isMesh) {
+        
+        child.material = child.material.clone();
+        
+        child.material.emissive =
+            new THREE.Color(0xffffff);
+        
+        child.material.emissiveIntensity = 1.5;
+    }
+});
 });
 function createAxis(color, axis, labelText) {
     
@@ -3332,11 +3350,34 @@ disableSystemKeyboard(input, (el) => {
     keyboard.classList.remove("hidden");
 });
 function setViewportMode(mode) {
+// sombras en solid y render
+renderer.shadowMap.enabled =
     
+    mode === "solid" ||
+    
+    mode === "render";
+    // ocultar helpers/gizmos en render
+const isRenderMode = mode === "render";
+
+// transform controls
+transform.visible = !isRenderMode;
+
+// spawn/icon
+spawn.visible = !isRenderMode;
+
+// grid
+grid.visible = !isRenderMode;
     viewportMode = mode;
     
     scene.traverse((obj) => {
-        
+        scene.traverse((obj) => {
+
+    // ocultar iconos de luz
+    if (obj.userData.isLightIcon) {
+
+        obj.visible = mode !== "render";
+    }
+});
         if (!obj.isMesh) return;
         
         // ignorar UI editor
@@ -3511,7 +3552,32 @@ function updateSelectionGroup(){
 
     transform.attach(selectionGroup);
 }
+function unlockCamera(){
 
+    orbit.enabled = true;
+
+    isBoxSelecting = false;
+
+    multiSelectMode = false;
+
+    selectionBox.style.display = "none";
+
+    clearTimeout(holdTimeout);
+}
+window.addEventListener("pointerup", () => {
+
+    unlockCamera();
+});
+
+window.addEventListener("pointercancel", () => {
+
+    unlockCamera();
+});
+
+window.addEventListener("touchend", () => {
+
+    unlockCamera();
+});
 /* LOOP */
 function animate(){
     
