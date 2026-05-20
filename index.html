@@ -2413,7 +2413,7 @@ value="250">
         <img src="archivos/toastertext.png">
       </div>
 
-      <div class="version2">v 1.00.2</div>
+      <div class="version2">v 1.00.3</div>
     </div>
 
     <div class="content2">
@@ -4656,36 +4656,56 @@ async function createVideoFromFrames(
     };
 }
 downloadRenderBtn.onclick = async () => {
-
-    if(!renderVideoPreview.src) return;
-
-    const response =
-        await fetch(
-            renderVideoPreview.src
-        );
-
-    const blob =
-        await response.blob();
-
-    const file =
-        new File(
-            [blob],
-            "render.webm",
-            {
-                type:"video/webm"
-            }
-        );
-
-    // compartir archivo
-    if(navigator.share){
-
-        const data = {
-            files:[file]
+    
+    if (!renderVideoPreview.src) return;
+    
+    try {
+        
+        const response =
+            await fetch(
+                renderVideoPreview.src
+            );
+        
+        const blob =
+            await response.blob();
+        
+        const reader =
+            new FileReader();
+        
+        reader.onloadend = () => {
+            
+            const base64 =
+                reader.result;
+            
+            // abrir descarga real
+            const a =
+                document.createElement("a");
+            
+            a.href =
+                base64;
+            
+            a.download =
+                "render.webm";
+            
+            a.target =
+                "_blank";
+            
+            document.body.appendChild(a);
+            
+            a.click();
+            
+            document.body.removeChild(a);
         };
-
-        navigator.share(data);
+        
+        reader.readAsDataURL(blob);
+        
+    } catch (err) {
+        
+        console.error(err);
     }
 };
+
+
 async function unlockAudio() {
 
     if (audioUnlocked) return;
