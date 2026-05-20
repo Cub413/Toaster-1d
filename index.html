@@ -1490,10 +1490,252 @@ button{
 
     border-color:#6a6a6a;
 }
+#renderMenu,
+#renderOverlay,
+#renderResult{
+
+    position:fixed;
+    inset:0;
+
+    display:none;
+
+    justify-content:center;
+    align-items:center;
+
+    background:rgba(0,0,0,0.7);
+
+    z-index:999;
+}
+
+.renderWindow,
+.renderProgressWindow,
+.resultWindow{
+
+    width:320px;
+
+    background:#2b2b2b;
+
+    border:1px solid #444;
+
+    border-radius:10px;
+
+    box-shadow:
+    0 0 30px rgba(0,0,0,0.5);
+
+    overflow:hidden;
+
+    color:white;
+
+    font-family:sans-serif;
+}
+
+.renderHeader{
+
+    height:42px;
+
+    background:#3a3a3a;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:0 14px;
+
+    border-bottom:1px solid #4d4d4d;
+}
+
+.renderHeader button{
+
+    border:none;
+
+    background:none;
+
+    color:white;
+
+    font-size:22px;
+
+    cursor:pointer;
+}
+
+.renderAction{
+
+    width:calc(100% - 20px);
+
+    margin:10px;
+
+    height:42px;
+
+    border:none;
+
+    background:#4a4a4a;
+
+    color:white;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+    transition:0.15s;
+}
+
+.renderAction:hover{
+
+    background:#5a5a5a;
+}
+
+#renderPercent{
+
+    text-align:center;
+
+    font-size:22px;
+
+    margin-top:25px;
+}
+
+#renderBar{
+
+    width:calc(100% - 30px);
+
+    margin:20px auto;
+
+    height:18px;
+
+    background:#1f1f1f;
+
+    border-radius:999px;
+
+    overflow:hidden;
+}
+
+#renderBarFill{
+
+    width:0%;
+
+    height:100%;
+
+    background:#4ea1ff;
+}
+
+#renderVideoPreview{
+
+    width:calc(100% - 20px);
+
+    margin:10px;
+
+    border-radius:6px;
+
+    background:black;
+}
+
+#downloadRenderBtn{
+
+    display:block;
+
+    margin:10px;
+
+    padding:12px;
+
+    text-align:center;
+
+    background:#4ea1ff;
+
+    color:white;
+
+    border-radius:6px;
+
+    text-decoration:none;
+}
 </style>
 </head>
 
 <body>
+    <!-- RENDER MENU -->
+
+<div id="renderMenu">
+
+    <div class="renderWindow">
+
+        <div class="renderHeader">
+
+            <span>Render</span>
+
+            <button class="closeRender">
+                ×
+            </button>
+
+        </div>
+
+        <button id="renderImageBtn" class="renderAction">
+            Imagen
+        </button>
+
+        <button id="renderVideoBtn" class="renderAction">
+            Video
+        </button>
+
+    </div>
+
+</div>
+
+<!-- RENDERING OVERLAY -->
+
+<div id="renderOverlay">
+
+    <div class="renderProgressWindow">
+
+        <div class="renderHeader">
+
+            <span>Rendering Animation</span>
+
+        </div>
+
+        <div id="renderPercent">
+            0%
+        </div>
+
+        <div id="renderBar">
+
+            <div id="renderBarFill"></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- RESULT PANEL -->
+
+<div id="renderResult">
+
+    <div class="resultWindow">
+
+        <div class="renderHeader">
+
+            <span>Render Complete</span>
+
+            <button id="closeRenderResult">
+                ×
+            </button>
+
+        </div>
+
+        <video
+            id="renderVideoPreview"
+            controls
+        ></video>
+
+        <a
+            id="downloadRenderBtn"
+            download="animation.webm"
+        >
+            Descargar
+        </a>
+
+    </div>
+
+</div>
     <div id="numericKeyboard">
 
     <div class="numRow">
@@ -1787,9 +2029,13 @@ value="250">
     <button class="btn" id="addBtn"><i class="fa-solid fa-plus"></i>add</button>
     <button class="btn" id="spawnBtn"><i class="fa-solid fa-crosshairs"></i></button>
     <button class="btn" id="togglePanel">☰</button>
+    <button class="topBtn" id="renderBtn">
+    <i class="fa-solid fa-clapperboard"></i>
+</button>
        <button class="btn" id="openMenuBtn">
     <i class="fa-solid fa-magnifying-glass"></i>
 </button>
+
 <div id="workspaceBar">
 
     <button class="workspaceBtn activeWorkspace"
@@ -2167,7 +2413,7 @@ value="250">
         <img src="archivos/toastertext.png">
       </div>
 
-      <div class="version2">v 1.00.1</div>
+      <div class="version2">v 1.00.2</div>
     </div>
 
     <div class="content2">
@@ -2191,7 +2437,7 @@ value="250">
           <i class="fa-solid fa-wand-magic-sparkles"></i> render
         </div>
 
-        <div class="item2" onclick="openPanel2('Video','aun no contamos con animación y exportación de videos')">
+        <div class="item2" onclick="openPanel2('Video','contamos con animación y exportación de videos')">
           <i class="fa-solid fa-video"></i> Video
         </div>
       </div>
@@ -2417,6 +2663,44 @@ const hideTexturePanelFor = new Set([
     "spawn",
     "camera"
 ]);
+const renderBtn =
+document.getElementById("renderBtn");
+
+const renderMenu =
+document.getElementById("renderMenu");
+
+const renderOverlay =
+document.getElementById("renderOverlay");
+
+const renderResult =
+document.getElementById("renderResult");
+
+const renderBarFill =
+document.getElementById("renderBarFill");
+
+const renderPercent =
+document.getElementById("renderPercent");
+
+const renderVideoPreview =
+document.getElementById("renderVideoPreview");
+
+const downloadRenderBtn =
+document.getElementById("downloadRenderBtn");
+renderBtn.onclick = () => {
+
+    renderMenu.style.display = "flex";
+};
+document.querySelector(".closeRender")
+.onclick = () => {
+
+    renderMenu.style.display = "none";
+};
+
+document.getElementById("closeRenderResult")
+.onclick = () => {
+
+    renderResult.style.display = "none";
+};
 const scenePanel =
     document.getElementById("scenePanel");
 
@@ -2735,9 +3019,12 @@ renderer.domElement.addEventListener("pointerdown", (e) => {
         // bloquear cámara
         orbit.enabled = true;
 
-orbit.target.copy(
-    activeSceneCamera.position
-);
+if (activeSceneCamera) {
+    
+    orbit.target.copy(
+        activeSceneCamera.position
+    );
+}
         
         selectionStartX = e.clientX;
         selectionStartY = e.clientY;
@@ -3150,9 +3437,12 @@ cameraViewBtn.onclick = () => {
     
     orbit.enabled = true;
 
-orbit.target.copy(
-    activeSceneCamera.position
-);
+if (activeSceneCamera) {
+    
+    orbit.target.copy(
+        activeSceneCamera.position
+    );
+}
     transform.detach();
     
     transform.visible = false;
@@ -3974,7 +4264,15 @@ if (!child.userData.originalMaterial) {
         child.material.clone();
 }
 
-child.userData.originalMaterial.map = texture;
+if (!child.userData.originalMaterial) {
+    
+    child.userData.originalMaterial =
+        child.material.clone();
+}
+
+// guardar textura real
+child.userData.originalMaterial.map =
+    child.material.map || null;
             child.userData.renderMaterial = child.material;
         }
     });
@@ -4180,7 +4478,183 @@ document.getElementById("shadowBlur").addEventListener("input", (e) => {
 });
 const orientationPanel = document.getElementById("orientationPanel");
 const orientationImage = document.getElementById("orientationImage");
-
+async function renderVideoFrames() {
+    
+    const start =
+        parseInt(startFrame.value) || 0;
+    
+    const end =
+        parseInt(endFrame.value) || 100;
+    
+    const fps =
+        parseInt(fpsInput.value) || 30;
+    
+    const frames = [];
+    
+    renderOverlay.style.display = "flex";
+    
+    for (let i = start; i <= end; i++) {
+        
+        try {
+            
+            currentFrame = i;
+            
+            // timeline
+            if (typeof setFrame === "function") {
+                
+                setFrame(i);
+            }
+            
+            // render
+            const renderCamera =
+                (
+                    usingSceneCamera &&
+                    activeSceneCamera &&
+                    activeSceneCamera.userData &&
+                    activeSceneCamera.userData.camera
+                ) ?
+                activeSceneCamera.userData.camera :
+                camera;
+            
+            renderer.render(
+                scene,
+                renderCamera
+            );
+            
+            // guardar frame
+            frames.push(
+                renderer.domElement.toDataURL(
+                    "image/jpeg",
+                    0.95
+                )
+            );
+            
+            // actualizar barra
+            const percent = Math.floor(
+                ((i - start + 1) /
+                    (end - start + 1)) * 100
+            );
+            
+            renderPercent.textContent =
+                percent + "%";
+            
+            renderBarFill.style.width =
+                percent + "%";
+            
+            // dejar respirar al navegador
+            await new Promise(resolve =>
+                requestAnimationFrame(resolve)
+            );
+            
+        } catch (err) {
+            
+            console.error(
+                "ERROR EN FRAME:",
+                i,
+                err
+            );
+        }
+    }
+    
+    console.log(
+        "FRAMES GENERADOS:",
+        frames.length
+    );
+    
+    renderOverlay.style.display = "none";
+    
+    createVideoFromFrames(
+        frames,
+        fps
+    );
+}
+async function createVideoFromFrames(
+    frames,
+    fps
+) {
+    
+    const canvas =
+        document.createElement("canvas");
+    
+    canvas.width =
+        renderer.domElement.width;
+    
+    canvas.height =
+        renderer.domElement.height;
+    
+    const ctx =
+        canvas.getContext("2d");
+    
+    const stream =
+        canvas.captureStream(fps);
+    
+    const recorder =
+        new MediaRecorder(stream);
+    
+    const chunks = [];
+    
+    recorder.ondataavailable = e => {
+        
+        if (e.data.size > 0) {
+            
+            chunks.push(e.data);
+        }
+    };
+    
+    recorder.start();
+    
+    for (let i = 0; i < frames.length; i++) {
+        
+        const img = new Image();
+        
+        img.src = frames[i];
+        
+        await new Promise(resolve => {
+            
+            img.onload = () => {
+                
+                ctx.drawImage(
+                    img,
+                    0,
+                    0,
+                    canvas.width,
+                    canvas.height
+                );
+                
+                resolve();
+            };
+        });
+        
+        await new Promise(resolve =>
+            setTimeout(
+                resolve,
+                1000 / fps
+            )
+        );
+    }
+    
+    recorder.stop();
+    
+    recorder.onstop = () => {
+        
+        const blob =
+            new Blob(chunks, {
+                type: "video/webm"
+            });
+        
+        const url =
+            URL.createObjectURL(blob);
+        
+        renderVideoPreview.src =
+            url;
+        
+        downloadRenderBtn.href =
+            url;
+        
+        renderResult.style.display =
+            "flex";
+    };
+}
 async function unlockAudio() {
 
     if (audioUnlocked) return;
@@ -4562,18 +5036,15 @@ function setViewportMode(mode) {
             
             if (!child.isMesh || !child.material) return;
             
-            // guardar original
-            if (!child.userData.originalMaterial) {
-                
-                if (!child.userData.originalMaterial) {
+if (!child.userData.originalMaterial) {
     
     child.userData.originalMaterial =
         child.material.clone();
 }
 
-child.userData.originalMaterial.map = texture;
-            }
-            
+// guardar mapa correcto
+child.userData.originalMaterial.map =
+    child.material.map || null;
             // =====================
             // WIREFRAME
             // =====================
@@ -5689,7 +6160,31 @@ document.getElementById(
 /* ========================= */
 /* UPDATE RANGE */
 /* ========================= */
+function updateTimelineFrame(){
 
+    // aplicar timeline
+    if(typeof setFrame === "function"){
+
+        setFrame(currentFrame);
+    }
+
+    // elegir cámara
+    const renderCamera =
+        (
+            usingSceneCamera &&
+            activeSceneCamera &&
+            activeSceneCamera.userData &&
+            activeSceneCamera.userData.camera
+        )
+        ? activeSceneCamera.userData.camera
+        : camera;
+
+    // renderizar escena
+    renderer.render(
+        scene,
+        renderCamera
+    );
+}
 function updateTimelineRange(){
 
     startFrame =
@@ -5901,6 +6396,122 @@ window.addEventListener("resize", () => {
         innerHeight
     );
 });
+document.getElementById("renderImageBtn")
+.onclick = () => {
+
+    renderMenu.style.display = "none";
+
+    renderer.render(scene, camera);
+
+    const a =
+    document.createElement("a");
+
+    a.href =
+    renderer.domElement.toDataURL("image/png");
+
+    a.download = "render.png";
+
+    a.click();
+};
+
+renderVideoBtn.onclick = async () => {
+    
+    await renderVideoFrames();
+};
+renderOverlay.addEventListener("click", (e) => {
+
+    if(e.target === renderOverlay){
+
+        renderOverlay.style.display = "none";
+    }
+});
+document.getElementById("renderVideoBtn")
+.onclick = async () => {
+
+    renderMenu.style.display = "none";
+
+    renderOverlay.style.display = "flex";
+
+    const fps =
+    parseInt(fpsInput.value) || 30;
+
+    const start =
+    parseInt(startFrame.value) || 0;
+
+    const end =
+    parseInt(endFrame.value) || 100;
+
+    const totalFrames =
+    end - start + 1;
+
+    // cambiar viewport
+    setViewportMode("render");
+
+    const stream =
+    renderer.domElement.captureStream(fps);
+
+    const recorder =
+    new MediaRecorder(stream, {
+
+        mimeType:"video/webm"
+    });
+
+    const chunks = [];
+
+    recorder.ondataavailable = e => {
+
+        if(e.data.size > 0){
+
+            chunks.push(e.data);
+        }
+    };
+
+    recorder.start();
+
+    for(let i = start; i <= end; i++){
+
+        currentFrame = i;
+
+        updateTimelineFrame();
+
+        const percent =
+        Math.floor(
+            ((i - start + 1) / totalFrames) * 100
+        );
+
+        renderPercent.textContent =
+        percent + "%";
+
+        renderBarFill.style.width =
+        percent + "%";
+
+        await new Promise(r =>
+            setTimeout(r, 1000 / fps)
+        );
+    }
+
+    recorder.stop();
+
+    recorder.onstop = () => {
+
+        renderOverlay.style.display = "none";
+
+        const blob =
+        new Blob(chunks, {
+
+            type:"video/webm"
+        });
+
+        const url =
+        URL.createObjectURL(blob);
+
+        renderVideoPreview.src = url;
+
+        downloadRenderBtn.href = url;
+
+        renderResult.style.display = "flex";
+    };
+};
 /* LOOP */
 function animate(){
     spawn.lookAt(camera.position);
