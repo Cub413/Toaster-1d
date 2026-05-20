@@ -2029,7 +2029,7 @@ value="250">
     <button class="btn" id="addBtn"><i class="fa-solid fa-plus"></i>add</button>
     <button class="btn" id="spawnBtn"><i class="fa-solid fa-crosshairs"></i></button>
     <button class="btn" id="togglePanel">☰</button>
-    <button class="topBtn" id="renderBtn">
+    <button class="btn" id="renderBtn">
     <i class="fa-solid fa-clapperboard"></i>
 </button>
        <button class="btn" id="openMenuBtn">
@@ -4655,6 +4655,37 @@ async function createVideoFromFrames(
             "flex";
     };
 }
+downloadRenderBtn.onclick = async () => {
+
+    if(!renderVideoPreview.src) return;
+
+    const response =
+        await fetch(
+            renderVideoPreview.src
+        );
+
+    const blob =
+        await response.blob();
+
+    const file =
+        new File(
+            [blob],
+            "render.webm",
+            {
+                type:"video/webm"
+            }
+        );
+
+    // compartir archivo
+    if(navigator.share){
+
+        const data = {
+            files:[file]
+        };
+
+        navigator.share(data);
+    }
+};
 async function unlockAudio() {
 
     if (audioUnlocked) return;
