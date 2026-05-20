@@ -1726,13 +1726,12 @@ button{
             controls
         ></video>
 
-        <a
-            id="downloadRenderBtn"
-            download="animation.webm"
-        >
-            Descargar
-        </a>
-
+<a
+    id="downloadRenderBtn"
+    class="primary"
+>
+    Descargar ahora
+</a>
     </div>
 
 </div>
@@ -4589,7 +4588,12 @@ async function createVideoFromFrames(
         canvas.captureStream(fps);
     
     const recorder =
-        new MediaRecorder(stream);
+        new MediaRecorder(
+            stream,
+            {
+                mimeType: "video/webm"
+            }
+        );
     
     const chunks = [];
     
@@ -4613,6 +4617,15 @@ async function createVideoFromFrames(
             
             img.onload = () => {
                 
+                // limpiar frame anterior
+                ctx.clearRect(
+                    0,
+                    0,
+                    canvas.width,
+                    canvas.height
+                );
+                
+                // dibujar frame
                 ctx.drawImage(
                     img,
                     0,
@@ -4625,6 +4638,7 @@ async function createVideoFromFrames(
             };
         });
         
+        // esperar frame
         await new Promise(resolve =>
             setTimeout(
                 resolve,
@@ -4633,79 +4647,47 @@ async function createVideoFromFrames(
         );
     }
     
+    // terminar grabación
     recorder.stop();
     
-    recorder.onstop = () => {
+recorder.onstop = () => {
+    
+    const blob = new Blob(
+        chunks,
+        {
+            type: "video/webm"
+        }
+    );
+    
+    const url = URL.createObjectURL(blob);
+    
+    renderVideoPreview.src = url;
+    
+    downloadRenderBtn.onclick = () => {
         
-        const blob =
-            new Blob(chunks, {
-                type: "video/webm"
-            });
+        const a = document.createElement("a");
         
-        const url =
-            URL.createObjectURL(blob);
+        a.href = url;
         
-        renderVideoPreview.src =
-            url;
+        a.download = "render.webm";
         
-        downloadRenderBtn.href =
-            url;
+        a.target = "_blank";
         
-        renderResult.style.display =
-            "flex";
+        document.body.appendChild(a);
+        
+        a.click();
+        
+        document.body.removeChild(a);
     };
-}
-downloadRenderBtn.onclick = async () => {
     
-    if (!renderVideoPreview.src) return;
-    
-    try {
-        
-        const response =
-            await fetch(
-                renderVideoPreview.src
-            );
-        
-        const blob =
-            await response.blob();
-        
-        const reader =
-            new FileReader();
-        
-        reader.onloadend = () => {
-            
-            const base64 =
-                reader.result;
-            
-            // abrir descarga real
-            const a =
-                document.createElement("a");
-            
-            a.href =
-                base64;
-            
-            a.download =
-                "render.webm";
-            
-            a.target =
-                "_blank";
-            
-            document.body.appendChild(a);
-            
-            a.click();
-            
-            document.body.removeChild(a);
-        };
-        
-        reader.readAsDataURL(blob);
-        
-    } catch (err) {
-        
-        console.error(err);
-    }
+    renderResult.style.display = "flex";
 };
-
-
+}
+    
+downloadRenderBtn.setAttribute(
+    "rel",
+    "noopener noreferrer"
+);
 async function unlockAudio() {
 
     if (audioUnlocked) return;
@@ -6331,6 +6313,21 @@ function updatePlayheadPosition(){
     playheadTop.innerText =
         currentFrame;
 }
+
+downloadRenderBtn.onclick = () => {
+
+    const win = window.open("", "_blank");
+
+    if (win) {
+
+        win.location.href = url;
+
+    } else {
+
+        alert("El navegador bloqueó la descarga");
+
+    }
+};
 /* ========================= */
 /* NUMERIC KEYBOARD */
 /* ========================= */
@@ -6543,25 +6540,23 @@ document.getElementById("renderVideoBtn")
 
     recorder.stop();
 
-    recorder.onstop = () => {
-
-        renderOverlay.style.display = "none";
-
-        const blob =
+recorder.onstop = () => {
+    
+    const blob =
         new Blob(chunks, {
-
-            type:"video/webm"
+            type: "video/webm"
         });
-
-        const url =
+    
+    const url =
         URL.createObjectURL(blob);
+    
+renderVideoPreview.src = url;
 
-        renderVideoPreview.src = url;
+downloadRenderBtn.href = url;
+downloadRenderBtn.innerText = "Descargar ahora";
 
-        downloadRenderBtn.href = url;
-
-        renderResult.style.display = "flex";
-    };
+renderResult.style.display = "flex";
+};
 };
 /* LOOP */
 function animate(){
