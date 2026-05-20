@@ -1452,6 +1452,44 @@ button{
 
     transform:scale(0.95);
 }
+#cameraViewBtn{
+
+    position:fixed;
+
+    top:182px;
+    right:46px;
+
+    width:34px;
+    height:34px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#00000024;
+
+    color:white;
+
+    cursor:pointer;
+
+    z-index:20;
+
+    border:1px solid #3a3a3a;
+
+    transition:0.15s;
+}
+
+#cameraViewBtn:hover{
+
+    background:#2d2d2d;
+}
+
+#cameraViewBtn.active{
+
+    background:#3d3d3d;
+
+    border-color:#6a6a6a;
+}
 </style>
 </head>
 
@@ -1693,6 +1731,11 @@ value="250">
   <img id="orientationImage" src="" alt="">
 </div>
     <canvas id="axisGizmo"></canvas>
+    <button id="cameraViewBtn">
+
+    <i class="fa-solid fa-video"></i>
+
+</button>
 <div id="overlay">
     <div id="addPanel">
         
@@ -1724,9 +1767,16 @@ value="250">
 <button class="itemBtn" onclick="createLight('spot')">Spot</button>
     </div>
     
-    <div id="cameraPanel" style="display:none">
-        <button class="itemBtn">Cámara (no funcional)</button>
-    </div>
+<div id="cameraPanel" style="display:none">
+
+    <button
+        class="itemBtn"
+        onclick="createCamera()"
+    >
+        Cámara
+    </button>
+
+</div>
     
 </div>
         </div>
@@ -2407,6 +2457,16 @@ function updateTexturePanelVisibility(obj) {
         return;
     }
     
+    // OCULTAR PARA SPAWN
+    if (obj.userData.type === "spawn") {
+        
+        texturePanel.style.display = "none";
+        lightSettingsPanel.style.display = "none";
+        materialPanel.style.display = "none";
+        
+        return;
+    }
+    
     // LUCES
     if (obj.userData.type === "light") {
         
@@ -2549,16 +2609,43 @@ const lightTexture = new THREE.TextureLoader().load("archivos/light.png");
 function faceCamera(obj){
     obj.lookAt(camera.position);
 }
-const tex = new THREE.TextureLoader().load("archivos/crosshairs-solid-full.svg");
+const texLoader = new THREE.TextureLoader();
+
+const tex = texLoader.load(
+    "archivos/spawn.png",
+    
+    // LOAD OK
+    () => {
+        console.log("spawn texture loaded");
+    },
+    
+    undefined,
+    
+    // ERROR
+    () => {
+        console.warn("spawn texture missing");
+    }
+);
 
 const spawn = new THREE.Mesh(
-    new THREE.PlaneGeometry(1,1),
-    new THREE.MeshBasicMaterial({map:tex,transparent:true})
     
+    new THREE.PlaneGeometry(1, 1),
+    
+    new THREE.MeshBasicMaterial({
+        map: tex,
+        transparent: true,
+        color: 0xffffff,
+        side: THREE.DoubleSide
+    })
 );
+
+spawn.renderOrder = 999;
+
+spawn.position.set(0, 0, 0);
+
 spawn.userData.type = "spawn";
-spawn.position.set(0,0,0);
 spawn.userData.editorUI = true;
+
 scene.add(spawn);
 markEditorUI(spawn);
 function updateSpawn(){
@@ -2646,7 +2733,11 @@ renderer.domElement.addEventListener("pointerdown", (e) => {
         isBoxSelecting = true;
         
         // bloquear cámara
-        orbit.enabled = false;
+        orbit.enabled = true;
+
+orbit.target.copy(
+    activeSceneCamera.position
+);
         
         selectionStartX = e.clientX;
         selectionStartY = e.clientY;
@@ -2926,7 +3017,13 @@ window.create = create;
 }
 let lightIconModel = null;
 
+let cameraIconModel = null;
 
+let sceneCameras = [];
+
+let activeSceneCamera = null;
+
+let usingSceneCamera = false;
 
 loader.load("archivos/light.gltf", (gltf) => {
     lightIconModel = gltf.scene;
@@ -2953,6 +3050,115 @@ loader.load("archivos/light.gltf", (gltf) => {
     }
 });
 });
+loader.load("archivos/camera.glb", (gltf) => {
+
+    cameraIconModel = gltf.scene;
+
+    cameraIconModel.scale.set(2,2,2);
+
+    cameraIconModel.traverse((child) => {
+
+        child.userData.type = "camera";
+
+        if(child.isMesh){
+
+            child.castShadow = false;
+            child.receiveShadow = false;
+        }
+    });
+});
+window.createCamera = function(){
+
+    if(!cameraIconModel)
+    return;
+
+    const camGroup = new THREE.Group();
+
+    const icon =
+        cameraIconModel.clone(true);
+
+    camGroup.add(icon);
+icon.position.z = -0.01;
+    const cam =
+        new THREE.PerspectiveCamera(
+            75,
+            innerWidth / innerHeight,
+            0.1,
+            1000
+        );
+
+    cam.position.set(0,0,0);
+
+    camGroup.add(cam);
+
+    camGroup.position.copy(spawn.position);
+
+    camGroup.userData.type = "camera";
+
+    camGroup.userData.camera = cam;
+
+    camGroup.name =
+        "Cámara";
+
+    scene.add(camGroup);
+
+    objects.push(camGroup);
+
+    sceneCameras.push(camGroup);
+
+    select(camGroup);
+
+    refreshOutliner();
+
+    closeAddMenu();
+};
+const cameraViewBtn =
+    document.getElementById(
+        "cameraViewBtn"
+    );
+
+cameraViewBtn.onclick = () => {
+    
+    // SALIR DE CÁMARA
+    if (usingSceneCamera) {
+        
+        usingSceneCamera = false;
+        
+        activeSceneCamera = null;
+        
+        orbit.enabled = true;
+        
+        cameraViewBtn.classList.remove("active");
+        
+        transform.visible = true;
+        
+        if (selected) {
+            transform.attach(selected);
+        }
+        
+        return;
+    }
+    
+    // ENTRAR EN CÁMARA
+    if (!selected) return;
+    
+    if (selected.userData.type !== "camera") return;
+    
+    activeSceneCamera = selected;
+    
+    usingSceneCamera = true;
+    
+    orbit.enabled = true;
+
+orbit.target.copy(
+    activeSceneCamera.position
+);
+    transform.detach();
+    
+    transform.visible = false;
+    
+    cameraViewBtn.classList.add("active");
+};
 function createAxis(color, axis, labelText) {
     
     const group = new THREE.Group();
@@ -3251,12 +3457,22 @@ scene.add(sprite.userData.dir);
 document.getElementById("togglePanel").onclick = () => {
     rightPanel.classList.toggle("closed");
     updateGizmoPosition();
-
+updateGizmoPositionCamera();
 };
 const rightPanel = document.getElementById("rightPanel");
 
 const gizmo = document.getElementById("axisGizmo");
+function updateGizmoPositionCamera() {
+    const btn = document.getElementById("cameraViewBtn");
 
+    if (!btn) return;
+
+    if (rightPanel.classList.contains("closed")) {
+        btn.style.right = "10px";
+    } else {
+        btn.style.right = "190px";
+    }
+}
 function updateGizmoPosition(){
     if(rightPanel.classList.contains("closed")){
         gizmo.style.right = "10px";
@@ -5658,9 +5874,37 @@ document
 
     activeNumericInput = null;
 };
+
+window.addEventListener("resize", () => {
+
+    camera.aspect =
+        innerWidth / innerHeight;
+
+    camera.updateProjectionMatrix();
+
+    sceneCameras.forEach(c => {
+
+        const cam =
+            c.userData.camera;
+
+        if(cam){
+
+            cam.aspect =
+                innerWidth / innerHeight;
+
+            cam.updateProjectionMatrix();
+        }
+    });
+
+    renderer.setSize(
+        innerWidth,
+        innerHeight
+    );
+});
 /* LOOP */
 function animate(){
-    
+    spawn.lookAt(camera.position);
+    spawn.material.depthTest = false;
     gizmoGroup.traverse((child)=>{
     if(child.isMesh && child.material.map){
         child.lookAt(gizmoCamera.position);
@@ -5670,6 +5914,7 @@ function animate(){
 
 gizmoGroup.quaternion.copy(camera.quaternion).invert();
 updateGizmoPosition();
+updateGizmoPositionCamera();
 gizmoRenderer.render(gizmoScene,gizmoCamera);
  function updateBillboards() {
     
@@ -5700,8 +5945,26 @@ lights.forEach(obj => {
         target.updateMatrixWorld();
     }
 });
+objects.forEach(obj => {
 
-    renderer.render(scene,camera);
+    if (obj.userData.type === "camera") {
+
+        obj.visible =
+            viewportMode !== "render";
+    }
+});
+if (usingSceneCamera && activeSceneCamera) {
+    
+    renderer.render(
+        scene,
+        activeSceneCamera.userData.camera
+    );
+    
+} else {
+    
+    renderer.render(scene, camera);
+}
+    
 }
 animate();
 
