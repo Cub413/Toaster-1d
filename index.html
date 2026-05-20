@@ -935,10 +935,687 @@ button{
 
     z-index:9999;
 }
+#workspaceBar{
+
+    position:fixed;
+
+    top:30px;
+    left:0;
+
+    width:100%;
+    height:20px;
+
+    background:#111;
+
+    display:flex;
+    align-items:center;
+
+    gap:6px;
+
+    padding:0 8px;
+
+    z-index:25;
+}
+
+.workspaceBtn{
+
+    height:10px;
+
+    padding:0 12px;
+
+    border:none;
+
+    border-radius:6px;
+
+    background:#00000000;
+
+    color:white;
+
+    font-size:11px;
+
+    cursor:pointer;
+}
+
+.workspaceBtn:hover{
+
+    background:#00000000;
+}
+
+.activeWorkspace{
+
+    background:#00000000;
+}
+#timeline {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    left:0;
+    bottom:0;
+
+    width:100%;
+    height:240px;
+
+    background:#2b2b2b;
+
+    border-top:1px solid #444;
+
+    display:flex;
+
+    flex-direction:column;
+}
+
+/* ========================= */
+/* TOPBAR */
+/* ========================= */
+
+.timelineTopbar{
+
+    height:30px;
+
+    background:#1E1E1E;
+
+    border-bottom:1px solid #222;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:4px;
+}
+
+.timelineBtn{
+
+    width:28px;
+    height:18px;
+
+    border:none;
+
+    border-radius:4px;
+
+    background:#4b4b4b;
+
+    color:white;
+
+    cursor:pointer;
+
+    font-size:12px;
+}
+
+.timelineBtn:hover{
+
+    background:#5b5b5b;
+}
+
+.activeAutoKey{
+
+    background:#d84d4d;
+}
+
+/* ========================= */
+/* VIEWPORT */
+/* ========================= */
+
+#timelineViewport{
+
+    position:relative;
+
+    flex:1;
+
+    overflow-x:auto;
+
+    overflow-y:hidden;
+
+    background:#2d2d2d;
+}
+
+/* ========================= */
+/* TRACK */
+/* ========================= */
+
+#timelineTrack{
+
+    position:relative;
+
+    height:100%;
+}
+
+/* ========================= */
+/* RULER */
+/* ========================= */
+
+#timelineRuler{
+
+    position:relative;
+
+    height:20px;
+
+    background:#313131;
+
+    border-bottom:1px solid #222;
+}
+
+/* ========================= */
+/* FRAMES */
+/* ========================= */
+
+.frameContainer{
+
+    position:absolute;
+
+    top:0;
+    left:0;
+
+    height:100%;
+
+    display:flex;
+}
+
+.frame{
+
+    width:60px;
+
+    height:100%;
+
+    border-right:1px solid #3b3b3b;
+
+    flex-shrink:0;
+
+    position:relative;
+
+    color:#d0d0d0;
+
+    font-size:12px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:flex-start;
+
+    padding-top:4px;
+
+    cursor:pointer;
+}
+
+.frame:hover{
+
+    background:#404040;
+}
+
+.frame::after{
+
+    content:"";
+
+    position:absolute;
+
+    bottom:0;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:1px;
+    height:8px;
+
+    background:#777;
+}
+
+/* ========================= */
+/* CONTENT */
+/* ========================= */
+
+#timelineContent{
+
+    position:relative;
+
+    height:calc(100% - 32px);
+}
+
+/* ========================= */
+/* GRID */
+/* ========================= */
+
+.grid{
+
+    position:absolute;
+
+    inset:0;
+
+    display:flex;
+}
+
+.gridLine{
+
+    width:60px;
+
+    height:100%;
+
+    border-right:1px solid #383838;
+
+    flex-shrink:0;
+}
+
+/* ========================= */
+/* PLAYHEAD */
+/* ========================= */
+
+#playhead{
+
+    position:absolute;
+
+    top:0;
+
+    width:2px;
+
+    height:100%;
+
+    background:#4ea1ff;
+
+    cursor:ew-resize;
+
+    z-index:10;
+}
+
+#playheadTop{
+
+    position:absolute;
+
+    top:4px;
+
+    background:#4ea1ff;
+
+    color:white;
+
+    font-size:12px;
+
+    padding:2px 8px;
+
+    border-radius:6px;
+
+    transform:translateX(-50%);
+
+    z-index:11;
+}
+
+/* ========================= */
+/* KEYFRAMES */
+/* ========================= */
+
+.keyframe{
+
+    position:absolute;
+
+    width:10px;
+    height:10px;
+
+    background:white;
+
+    transform:rotate(45deg);
+
+    top:20px;
+
+    cursor:pointer;
+}
+#timelineRange{
+
+    position:absolute;
+
+    left:10px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+}
+
+#timelineRange label{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:4px;
+
+    color:#cfcfcf;
+
+    font-size:12px;
+}
+
+#timelineRange input{
+
+    width:55px;
+
+    height:22px;
+
+    border:none;
+
+    outline:none;
+
+    border-radius:4px;
+
+    background:#4a4a4a;
+
+    color:white;
+
+    padding:0 6px;
+
+    font-size:12px;
+}
+#fpsContainer{
+
+    position:absolute;
+
+    right:12px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    color:#d0d0d0;
+
+    font-size:12px;
+}
+
+#fpsContainer i{
+
+    font-size:13px;
+
+    color:#bdbdbd;
+}
+
+#fpsInput{
+
+    width:48px;
+
+    height:22px;
+
+    border:none;
+
+    outline:none;
+
+    border-radius:4px;
+
+    background:#4a4a4a;
+
+    color:white;
+
+    padding:0 6px;
+
+    font-size:12px;
+}
+#timelinePanel {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    
+    width: 100%;
+    height: 100px;
+    
+    background: #181818;
+    
+    border-top: 1px solid #333;
+    
+    z-index: 50;
+    
+    display: none;
+}
+#editTopPanel {
+    
+    position: fixed;
+    
+    left: 0;
+    bottom: 0;
+    
+    width: 100%;
+    height: 20px;
+    
+    background: #181818;
+    
+    border-top: 1px solid #333;
+    
+    display: none;
+    
+    z-index: 50;
+    
+    align-items: flex-start;
+    
+    gap: 8px;
+    
+    padding: 10px;
+}
+.keyframe{
+    cursor:pointer;
+}
+#numericKeyboard {
+    
+    position: fixed;
+    
+    left: 50%;
+    top: 50%;
+    
+    transform: translate(-50%, -50%);
+    
+    background: #1c1c1c;
+    
+    border: 1px solid #444;
+    
+    border-radius: 12px;
+    
+    padding: 8px;
+    
+    display: none;
+    
+    z-index: 99999;
+    
+    box-shadow:
+        0 0 20px rgba(0, 0, 0, 0.5);
+}
+.numRow{
+
+    display:flex;
+
+    gap:5px;
+
+    margin-bottom:5px;
+}
+
+.numRow:last-child{
+
+    margin-bottom:0;
+}
+
+#numericKeyboard button {
+    
+    width: 42px;
+    height: 38px;
+    
+    border: none;
+    
+    border-radius: 8px;
+    
+    background: #2b2b2b;
+    
+    color: white;
+    
+    font-size: 15px;
+    
+    cursor: pointer;
+}
+
+#numericKeyboard button:active{
+
+    transform:scale(0.95);
+}
 </style>
 </head>
 
 <body>
+    <div id="numericKeyboard">
+
+    <div class="numRow">
+
+        <button class="numKey">1</button>
+        <button class="numKey">2</button>
+        <button class="numKey">3</button>
+
+    </div>
+
+    <div class="numRow">
+
+        <button class="numKey">4</button>
+        <button class="numKey">5</button>
+        <button class="numKey">6</button>
+
+    </div>
+
+    <div class="numRow">
+
+        <button class="numKey">7</button>
+        <button class="numKey">8</button>
+        <button class="numKey">9</button>
+
+    </div>
+
+    <div class="numRow">
+
+        <button id="numBackspace">
+            ←
+        </button>
+
+        <button class="numKey">0</button>
+
+        <button id="numOk">
+            OK
+        </button>
+
+    </div>
+
+</div>
+<div id="timelinePanel">
+
+<div id="timeline">
+
+    <!-- TOPBAR -->
+    <div class="timelineTopbar">
+
+        <button class="timelineBtn" id="firstFrameBtn">
+            <i class="fa-solid fa-backward-step"></i>
+        </button>
+
+        <button class="timelineBtn" id="prevFrameBtn">
+            <i class="fa-solid fa-backward"></i>
+        </button>
+
+        <button class="timelineBtn" id="playBtn">
+            <i class="fa-solid fa-play"></i>
+        </button>
+
+        <button class="timelineBtn" id="nextFrameBtn">
+            <i class="fa-solid fa-forward"></i>
+        </button>
+
+        <button class="timelineBtn" id="lastFrameBtn">
+            <i class="fa-solid fa-forward-step"></i>
+        </button>
+
+        <button class="timelineBtn" id="saveKeyBtn">
+            <i class="fa-solid fa-key"></i>
+        </button>
+<button class="timelineBtn" id="deleteKeyBtn">
+    <i class="fa-solid fa-trash"></i>
+</button>
+        <button class="timelineBtn" id="autoKeyBtn">
+            <i class="fa-solid fa-circle"></i>
+        </button>
+
+        <div id="fpsContainer">
+
+            <i class="fa-regular fa-clock"></i>
+
+<input
+type="text"
+readonly
+inputmode="none"
+class="timelineInput"
+id="fpsInput"
+value="24">
+
+            <span>fps</span>
+
+        </div>
+
+        <div id="timelineRange">
+
+            <label>
+                Start
+<input
+type="text"
+readonly
+id="startFrame"
+value="0">
+            </label>
+
+            <label>
+                End
+<input
+type="text"
+readonly
+id="endFrame"
+value="250">
+            </label>
+
+        </div>
+
+    </div>
+
+    <!-- VIEWPORT -->
+
+    <div id="timelineViewport">
+
+        <div id="timelineTrack">
+
+            <div id="timelineRuler">
+
+                <div class="frameContainer"
+                id="frameContainer"></div>
+
+                <div id="playheadTop">0</div>
+
+            </div>
+
+            <div id="timelineContent">
+
+                <div class="grid" id="grid"></div>
+
+                <div id="playhead"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+<div id="editTopPanel">
+
+    <button class="itemBtn">boton</button>
+
+    <button class="itemBtn">boton</button>
+
+    <button class="itemBtn">botón</button>
+
+    <button class="itemBtn">boton?</button>
+
+</div>
     <div id="selectionBox"></div>
 <div id="customKeyboard" class="hidden">
 
@@ -1063,10 +1740,29 @@ button{
        <button class="btn" id="openMenuBtn">
     <i class="fa-solid fa-magnifying-glass"></i>
 </button>
+<div id="workspaceBar">
+
+    <button class="workspaceBtn activeWorkspace"
+        onclick="setWorkspace('object')">
+
+        Objeto
+    </button>
+
+    <button class="workspaceBtn"
+        onclick="setWorkspace('animation')">
+
+        Animación
+    </button>
+
+    <button class="workspaceBtn"
+        onclick="setWorkspace('edit')">
+
+        Edición
+    </button>
+
+</div>
 
 
-        <button class="btn" >ㅤ</button>
-            <button class="btn" >ㅤ</button>
         <button class="btn" >ㅤ</button>
             <button class="btn" >ㅤ</button>
         <button class="btn" >ㅤ</button>
@@ -1421,7 +2117,7 @@ button{
         <img src="archivos/toastertext.png">
       </div>
 
-      <div class="version2">v 1.00.0</div>
+      <div class="version2">v 1.00.1</div>
     </div>
 
     <div class="content2">
@@ -1547,6 +2243,31 @@ const loader = new GLTFLoader();
 /* TRANSFORM */
 const transform = new TransformControls(camera,renderer.domElement);
 scene.add(transform);
+/* ========================= */
+/* AUTOKEY */
+/* ========================= */
+
+transform.addEventListener(
+    "dragging-changed",
+    (e) => {
+
+        /* terminó mover */
+
+        if(e.value === false){
+
+            if(!autoKey)
+            return;
+
+            const object =
+                getSelectedObject();
+
+            if(!object)
+            return;
+
+            saveKeyframe();
+        }
+    }
+);
 transform.addEventListener("objectChange", () => {
 
     if (
@@ -1631,6 +2352,7 @@ function filterButtons() {
     });
 }
 /* variables */
+let workspaceMode = "object";
 let viewportMode = "solid";
 let selectedMaterialTarget = null;
 let currentTexture = null;
@@ -1868,12 +2590,21 @@ function select(obj) {
         selectionBox.style.display = "none";
     }
 });
+    if (viewportMode !== "render") {
+    
+    transform.visible = true;
     transform.attach(obj);
+    
+} else {
+    
+    transform.detach();
+    transform.visible = false;
+}
     selectedMaterialTarget = obj; // 👈 clave para textura
 
     loadTextureFromObject(obj); 
     refreshOutliner();
-    
+    renderObjectKeyframes();
     if (lights.includes(obj)) {
         transform.setMode("translate");
         updateTexturePanelVisibility(obj);
@@ -2411,6 +3142,10 @@ window.createLight = function(type) {
         obj.receiveShadow = false;
     }
 });
+if (viewportMode === "render") {
+
+    icon.visible = false;
+}
     icon.position.copy(spawn.position);
     scene.add(icon);
     markEditorUI(icon);
@@ -2678,17 +3413,47 @@ document.getElementById("renameBtn").onclick = () => {
 window.addEventListener("click",(e)=>{
     if(!menu.contains(e.target)) menu.style.display="none";
 });
+/* ========================= */
+/* OPEN NUMERIC KEYBOARD */
+/* ========================= */
+
+function openNumericKeyboard(input){
+
+    closeKeyboard();
+
+    activeNumericInput =
+        input;
+
+    numericKeyboard
+    .style.display =
+        "block";
+}
 function openKeyboard(input) {
-
-    const keyboard = document.getElementById("customKeyboard");
-
-    if (!keyboard || !input) return;
-
+    
+    /* ignorar timeline */
+    
+    if (
+        input.classList.contains(
+            "timelineInput"
+        )
+    ) return;
+    
+    const keyboard =
+        document.getElementById(
+            "customKeyboard"
+        );
+    
+    if (!keyboard || !input)
+        return;
+    
     activeInput = input;
-
-    keyboard.classList.remove("hidden");
-
-    keyboard.style.display = "block";
+    
+    keyboard.classList.remove(
+        "hidden"
+    );
+    
+    keyboard.style.display =
+        "block";
 }
 function closeKeyboard() {
     
@@ -2913,27 +3678,64 @@ document.getElementById("textureInput").addEventListener("change", (e) => {
 });
 });
 
-function applyTextureToSelected(tex){
-
+function applyTextureToSelected(tex) {
+    
     if (!selectedMaterialTarget) return;
-tex.needsUpdate = true;
+    
+    tex.needsUpdate = true;
+    
     selectedMaterialTarget.traverse((child) => {
-        if (child.isMesh) {
-
-            child.material = new THREE.MeshStandardMaterial({
-    
-    map: tex,
-    
-    color: 0xffffff,
-    
-    transparent: true
-});
-child.userData.originalMaterial =
-    child.material.clone();
-child.userData.renderMaterial = child.material;
-
-            child.material.needsUpdate = true;
+        
+        if (!child.isMesh) return;
+        
+        // crear material original solo una vez
+        if (!child.userData.originalMaterial) {
+            
+            child.userData.originalMaterial =
+                child.material.clone();
         }
+        
+        // guardar textura REAL
+        child.userData.originalMaterial.map = tex;
+        
+        // =========================
+        // VIEWPORT SOLID
+        // =========================
+        
+        if (viewportMode === "solid") {
+            
+            child.material.map = null;
+            
+            child.material.wireframe = false;
+        }
+        
+        // =========================
+        // WIREFRAME
+        // =========================
+        
+        else if (viewportMode === "wireframe") {
+            
+            child.material.map = null;
+            
+            child.material.wireframe = true;
+        }
+        
+        // =========================
+        // TEXTURE / RENDER
+        // =========================
+        
+        else {
+    
+    child.material.map = tex;
+    
+    child.material.wireframe = false;
+}
+        
+        child.material.color.set(0xffffff);
+        
+        child.material.transparent = true;
+        
+        child.material.needsUpdate = true;
     });
 }
 document.getElementById("removeTextureBtn").onclick = () => {
@@ -2950,8 +3752,13 @@ document.getElementById("removeTextureBtn").onclick = () => {
     
     transparent: true
 });
-child.userData.originalMaterial =
-    child.material.clone();
+if (!child.userData.originalMaterial) {
+
+    child.userData.originalMaterial =
+        child.material.clone();
+}
+
+child.userData.originalMaterial.map = texture;
             child.userData.renderMaterial = child.material;
         }
     });
@@ -3490,97 +4297,142 @@ disableSystemKeyboard(input, (el) => {
     keyboard.classList.remove("hidden");
 });
 function setViewportMode(mode) {
-// sombras en solid y render
-renderer.shadowMap.enabled =
     
-    mode === "solid" ||
-    
-    mode === "render";
-    // ocultar helpers/gizmos en render
-const isRenderMode = mode === "render";
-
-// transform controls
-transform.visible = !isRenderMode;
-
-// spawn/icon
-spawn.visible = !isRenderMode;
-
-// grid
-grid.visible = !isRenderMode;
     viewportMode = mode;
+    renderer.shadowMap.enabled = (mode === "render");
+    const isRender = mode === "render";
+    const isSolid = mode === "solid";
+    const isWire = mode === "wireframe";
+    const isTexture = mode === "texture";
     
-    scene.traverse((obj) => {
-        scene.traverse((obj) => {
+    // =========================
+    // TRANSFORM CONTROLS
+    // =========================
+    
+    transform.visible = !isRender;
+    
+    // =========================
+    // GRID
+    // =========================
+    
+    grid.visible = !isRender;
+    
+    // =========================
+    // SPAWN
+    // =========================
+    
+    spawn.visible = !isRender;
+    
+    // =========================
+    // ICONOS / HELPERS
+    // =========================
+    
+    objects.forEach(obj => {
+        
+        // ocultar iconos editor
+        if (obj.userData.editorUI) {
+            
+            obj.visible = !isRender;
+        }
+        
+        // luces
+        if (obj.userData.type === "light") {
+            
+            obj.visible = !isRender;
+        }
+        
+        // materiales
+        obj.traverse(child => {
+            
+            if (!child.isMesh || !child.material) return;
+            
+            // guardar original
+            if (!child.userData.originalMaterial) {
+                
+                if (!child.userData.originalMaterial) {
+    
+    child.userData.originalMaterial =
+        child.material.clone();
+}
 
-    // ocultar iconos de luz
-    if (obj.userData.isLightIcon) {
-
-        obj.visible = mode !== "render";
-    }
-});
-        if (!obj.isMesh) return;
-        
-        // ignorar UI editor
-        if (obj.userData.editorUI) return;
-        
-        // guardar material original UNA sola vez
-        if (!obj.userData.originalMaterial) {
+child.userData.originalMaterial.map = texture;
+            }
             
-            obj.userData.originalMaterial =
-                obj.material.clone();
-        }
-        
-        // ========= WIREFRAME =========
-        if (mode === "wireframe") {
+            // =====================
+            // WIREFRAME
+            // =====================
             
-            obj.material = new THREE.MeshBasicMaterial({
+            if (isWire) {
                 
-                color: 0xffffff,
+                child.material.wireframe = true;
+                child.material.map = null;
+            }
+            
+            // =====================
+            // SOLID
+            // =====================
+            
+            else if (isSolid) {
                 
-                wireframe: true
-            });
-            
-            return;
-        }
-        
-        // ========= SOLID =========
-        if (mode === "solid") {
-            
-            const old = obj.userData.originalMaterial;
-            
-            obj.material = new THREE.MeshStandardMaterial({
+                child.material.wireframe = false;
                 
-                color: old.color?.clone?.() || new THREE.Color(0xaaaaaa),
+                // quitar textura
+                child.material.map = null;
                 
-                transparent: old.transparent || false,
+                child.material.needsUpdate = true;
+            }
+            
+            // =====================
+            // TEXTURE
+            // =====================
+            
+            else if (isTexture) {
                 
-                opacity: old.opacity ?? 1,
+                child.material.wireframe = false;
                 
-                alphaTest: old.alphaTest || 0
-            });
+                const original =
+                    child.userData.originalMaterial;
+                
+                if (original?.map) {
+                    
+                    child.material.map = original.map;
+                }
+                
+                child.material.needsUpdate = true;
+            }
             
-            return;
-        }
-        
-        // ========= TEXTURE =========
-        if (mode === "texture") {
+            // =====================
+            // RENDER
+            // =====================
             
-            obj.material =
-                obj.userData.originalMaterial.clone();
-            
-            return;
-        }
-        
-        // ========= RENDER =========
-        if (mode === "render") {
-            
-            obj.material =
-                obj.userData.originalMaterial.clone();
-            
-            return;
-        }
+            else if (isRender) {
+                
+                child.material.wireframe = false;
+                
+                const original =
+                    child.userData.originalMaterial;
+                
+                if (original) {
+                    
+                    child.material.map = original.map || null;
+                    
+                    child.material.color.copy(
+                        original.color
+                    );
+                    
+                    child.material.opacity =
+                        original.opacity;
+                    
+                    child.material.transparent =
+                        original.transparent;
+                }
+                
+                child.material.needsUpdate = true;
+            }
+        });
     });
 }
+
 
 window.setViewportMode = setViewportMode;
 function markEditorUI(obj) {
@@ -3778,6 +4630,1034 @@ pixelRatioSelect.addEventListener("change", (e) => {
         window.innerHeight
     );
 });
+window.setWorkspace = function(mode){
+
+    workspaceMode = mode;
+
+    const timeline =
+        document.getElementById("timelinePanel");
+
+    const editPanel =
+        document.getElementById("editTopPanel");
+
+    timeline.style.display = "none";
+    editPanel.style.display = "none";
+
+    document
+    .querySelectorAll(".workspaceBtn")
+    .forEach(btn => {
+
+        btn.classList.remove("activeWorkspace");
+    });
+
+    if(mode === "object"){
+
+        document
+        .querySelectorAll(".workspaceBtn")[0]
+        .classList.add("activeWorkspace");
+    }
+
+    if(mode === "animation"){
+
+        timeline.style.display = "block";
+
+        document
+        .querySelectorAll(".workspaceBtn")[1]
+        .classList.add("activeWorkspace");
+    }
+
+    if(mode === "edit"){
+
+        editPanel.style.display = "flex";
+
+timeline.style.display = "none";
+
+        document
+        .querySelectorAll(".workspaceBtn")[2]
+        .classList.add("activeWorkspace");
+    }
+};
+/* ========================= */
+/* CONFIG */
+/* ========================= */
+
+let startFrame = 0;
+let fps = 24;
+let endFrame = 250;
+
+const totalFrames = 500;
+
+const frameWidth = 60;
+
+/* ========================= */
+/* ELEMENTS */
+/* ========================= */
+
+const frameContainer =
+document.getElementById(
+    "frameContainer"
+);
+
+const timelineGrid =
+document.getElementById(
+    "grid"
+);
+
+const playhead =
+document.getElementById(
+    "playhead"
+);
+
+const playheadTop =
+document.getElementById(
+    "playheadTop"
+);
+
+const viewport =
+document.getElementById(
+    "timelineViewport"
+);
+
+const track =
+document.getElementById(
+    "timelineTrack"
+);
+
+const content =
+document.getElementById(
+    "timelineContent"
+);
+
+/* ========================= */
+/* BUILD TIMELINE */
+/* ========================= */
+
+function buildTimeline() {
+    
+    frameContainer.innerHTML = "";
+    
+    timelineGrid.innerHTML = "";
+    
+    const visibleFrames =
+        endFrame - startFrame + 1;
+    
+    const totalWidth =
+        visibleFrames * frameWidth;
+    
+    track.style.width =
+        totalWidth + "px";
+    
+    for (
+        let i = startFrame;
+        i <= endFrame;
+        i++
+    ) {
+        
+        /* RULER */
+        
+        const frame =
+            document.createElement("div");
+        
+        frame.className = "frame";
+        
+        frame.innerText = i;
+        
+        frame.dataset.frame = i;
+        
+        frame.onclick = () => {
+            
+            setFrame(i);
+        };
+        
+        frameContainer.appendChild(frame);
+        
+        /* GRID */
+        
+        const line =
+            document.createElement("div");
+        
+        line.className = "gridLine";
+        
+        timelineGrid.appendChild(line);
+    }
+    
+    updatePlayheadPosition();
+}
+
+/* ========================= */
+/* PLAYHEAD */
+/* ========================= */
+
+let currentFrame = 0;
+
+function setFrame(frame) {
+    
+    currentFrame = Math.max(
+        startFrame,
+        Math.min(endFrame, frame)
+    );
+    
+    updatePlayheadPosition();
+    applyAnimationFrame();
+}
+
+buildTimeline();
+
+setFrame(startFrame);
+
+/* ========================= */
+/* CLICK TIMELINE */
+/* ========================= */
+
+viewport.addEventListener(
+    "click",
+    (e) => {
+
+        if(
+            e.target !== viewport &&
+            !e.target.classList.contains(
+                "gridLine"
+            )
+        ) return;
+
+        const rect =
+            viewport.getBoundingClientRect();
+
+        const x =
+            e.clientX -
+            rect.left +
+            viewport.scrollLeft;
+
+        const frame =
+            Math.floor(
+                x / frameWidth
+            );
+
+        setFrame(frame);
+    }
+);
+
+/* ========================= */
+/* PLAYHEAD DRAG */
+/* ========================= */
+
+let draggingPlayhead = false;
+
+playhead.addEventListener(
+    "mousedown",
+    (e) => {
+
+        draggingPlayhead = true;
+
+        e.stopPropagation();
+    }
+);
+
+window.addEventListener(
+    "mouseup",
+    () => {
+
+        draggingPlayhead = false;
+    }
+);
+
+window.addEventListener(
+    "mousemove",
+    (e) => {
+
+        if(!draggingPlayhead)
+        return;
+
+        const rect =
+            viewport.getBoundingClientRect();
+
+        const x =
+            e.clientX -
+            rect.left +
+            viewport.scrollLeft;
+
+        const frame =
+            Math.floor(
+                x / frameWidth
+            );
+
+        setFrame(frame);
+    }
+);
+
+/* ========================= */
+/* CONTROLS */
+/* ========================= */
+
+document
+.getElementById(
+    "firstFrameBtn"
+)
+.onclick = () => {
+
+    setFrame(startFrame);
+
+    viewport.scrollLeft = 0;
+};
+
+document
+.getElementById(
+    "lastFrameBtn"
+)
+.onclick = () => {
+
+    setFrame(endFrame);
+
+    viewport.scrollLeft =
+        track.scrollWidth;
+};
+
+document
+.getElementById(
+    "prevFrameBtn"
+)
+.onclick = () => {
+
+    setFrame(currentFrame - 1);
+};
+
+document
+.getElementById(
+    "nextFrameBtn"
+)
+.onclick = () => {
+
+    let next =
+        currentFrame + 1;
+
+    if (next > endFrame) {
+        
+        next = startFrame;
+    }
+
+    setFrame(next);
+};
+
+/* ========================= */
+/* PLAY */
+/* ========================= */
+
+/* ========================= */
+/* PLAY */
+/* ========================= */
+
+let playing = false;
+
+let playInterval = null;
+
+const playBtn =
+    document.getElementById(
+        "playBtn"
+    );
+
+function startPlayback() {
+    
+    clearInterval(playInterval);
+    
+    playInterval =
+        setInterval(() => {
+            
+            let next =
+                currentFrame + 1;
+            
+            if (next > endFrame) {
+                
+                next = startFrame;
+            }
+            
+            setFrame(next);
+            
+        }, 1000 / fps);
+}
+
+function stopPlayback() {
+    
+    clearInterval(playInterval);
+}
+
+playBtn.onclick = () => {
+    
+    playing = !playing;
+    
+    if (playing) {
+        
+        playBtn.innerHTML =
+            `<i class="fa-solid fa-pause"></i>`;
+        
+        startPlayback();
+        
+    } else {
+        
+        playBtn.innerHTML =
+            `<i class="fa-solid fa-play"></i>`;
+        
+        stopPlayback();
+    }
+};
+/* ========================= */
+/* KEYFRAMES */
+/* ========================= */
+
+/* ========================= */
+/* OBJECT ANIMATION SYSTEM */
+/* ========================= */
+
+function getSelectedObject() {
+    
+    return selected || null;
+}
+
+/* crear estructura animation */
+
+function ensureAnimationData(object){
+
+    if(!object.userData.animation){
+
+        object.userData.animation = {
+
+            keyframes:[]
+        };
+    }
+}
+
+/* obtener keyframe */
+
+function getKeyframe(
+    object,
+    frame
+){
+
+    ensureAnimationData(object);
+
+    return object
+    .userData
+    .animation
+    .keyframes
+    .find(k => k.frame === frame);
+}
+
+/* guardar keyframe */
+
+function saveKeyframe(){
+
+    const object =
+        getSelectedObject();
+
+    if(!object) return;
+
+    ensureAnimationData(object);
+
+    const existing =
+        getKeyframe(
+            object,
+            currentFrame
+        );
+
+    const data = {
+
+        frame: currentFrame,
+
+        position: {
+            x: object.position.x,
+            y: object.position.y,
+            z: object.position.z
+        },
+
+        rotation: {
+            x: object.rotation.x,
+            y: object.rotation.y,
+            z: object.rotation.z
+        },
+
+        scale: {
+            x: object.scale.x,
+            y: object.scale.y,
+            z: object.scale.z
+        }
+    };
+
+    if(existing){
+
+        Object.assign(
+            existing,
+            data
+        );
+
+    }else{
+
+        object
+        .userData
+        .animation
+        .keyframes
+        .push(data);
+    }
+
+    renderObjectKeyframes();
+}
+/* ========================= */
+/* APPLY ANIMATION */
+/* ========================= */
+
+/* ========================= */
+/* APPLY INTERPOLATED ANIMATION */
+/* ========================= */
+
+/* ========================= */
+/* APPLY ALL ANIMATIONS */
+/* ========================= */
+
+function applyAnimationFrame(){
+
+    scene.traverse(object => {
+
+        if(
+            !object.userData.animation
+        ) return;
+
+        const keyframes =
+            object
+            .userData
+            .animation
+            .keyframes;
+
+        if(
+            !keyframes ||
+            keyframes.length === 0
+        ) return;
+
+        /* ordenar */
+
+        keyframes.sort(
+            (a,b) =>
+            a.frame - b.frame
+        );
+
+        /* key exacto */
+
+        const exact =
+            keyframes.find(
+                k =>
+                k.frame === currentFrame
+            );
+
+        if(exact){
+
+            applyKeyframe(
+                object,
+                exact
+            );
+
+            return;
+        }
+
+        /* buscar anterior/siguiente */
+
+        let previous = null;
+        let next = null;
+
+        for(
+            let i = 0;
+            i < keyframes.length;
+            i++
+        ){
+
+            const kf =
+                keyframes[i];
+
+            if(
+                kf.frame < currentFrame
+            ){
+
+                previous = kf;
+            }
+
+            if(
+                kf.frame > currentFrame
+            ){
+
+                next = kf;
+
+                break;
+            }
+        }
+
+        /* extremos */
+
+        if(!previous && next){
+
+            applyKeyframe(
+                object,
+                next
+            );
+
+            return;
+        }
+
+        if(previous && !next){
+
+            applyKeyframe(
+                object,
+                previous
+            );
+
+            return;
+        }
+
+        if(
+            !previous ||
+            !next
+        ) return;
+
+        /* interpolación */
+
+        const range =
+            next.frame -
+            previous.frame;
+
+        const t =
+            (
+                currentFrame -
+                previous.frame
+            ) / range;
+
+        /* POSITION */
+
+        object.position.set(
+
+            lerp(
+                previous.position.x,
+                next.position.x,
+                t
+            ),
+
+            lerp(
+                previous.position.y,
+                next.position.y,
+                t
+            ),
+
+            lerp(
+                previous.position.z,
+                next.position.z,
+                t
+            )
+        );
+
+        /* ROTATION */
+
+        object.rotation.set(
+
+            lerp(
+                previous.rotation.x,
+                next.rotation.x,
+                t
+            ),
+
+            lerp(
+                previous.rotation.y,
+                next.rotation.y,
+                t
+            ),
+
+            lerp(
+                previous.rotation.z,
+                next.rotation.z,
+                t
+            )
+        );
+
+        /* SCALE */
+
+        object.scale.set(
+
+            lerp(
+                previous.scale.x,
+                next.scale.x,
+                t
+            ),
+
+            lerp(
+                previous.scale.y,
+                next.scale.y,
+                t
+            ),
+
+            lerp(
+                previous.scale.z,
+                next.scale.z,
+                t
+            )
+        );
+
+    });
+}
+function applyKeyframe(
+    object,
+    keyframe
+){
+
+    object.position.set(
+        keyframe.position.x,
+        keyframe.position.y,
+        keyframe.position.z
+    );
+
+    object.rotation.set(
+        keyframe.rotation.x,
+        keyframe.rotation.y,
+        keyframe.rotation.z
+    );
+
+    object.scale.set(
+        keyframe.scale.x,
+        keyframe.scale.y,
+        keyframe.scale.z
+    );
+}
+
+/* ========================= */
+/* LERP */
+/* ========================= */
+
+function lerp(a,b,t){
+
+    return a + (b - a) * t;
+}
+/* borrar keyframe */
+
+function deleteKeyframe(){
+
+    const object =
+        getSelectedObject();
+
+    if(!object) return;
+
+    ensureAnimationData(object);
+
+    object.userData.animation.keyframes =
+    object.userData.animation.keyframes.filter(
+        k => k.frame !== currentFrame
+    );
+
+    renderObjectKeyframes();
+}
+/* ========================= */
+/* DRAW OBJECT KEYFRAMES */
+/* ========================= */
+
+function renderObjectKeyframes(){
+
+    document
+    .querySelectorAll(".keyframe")
+    .forEach(k => k.remove());
+
+    const object =
+        getSelectedObject();
+
+    if(!object) return;
+
+    ensureAnimationData(object);
+
+    object.userData.animation.keyframes
+    .forEach(kf => {
+
+        const key =
+            document.createElement("div");
+
+        key.className =
+            "keyframe";
+
+        key.dataset.frame =
+            kf.frame;
+
+        key.style.left =
+            (
+                (kf.frame - startFrame)
+                * frameWidth
+            ) - 5 + "px";
+
+        key.onclick = () => {
+
+            setFrame(
+                kf.frame
+            );
+        };
+
+        content.appendChild(key);
+    });
+}
+/* SAVE KEYFRAME */
+
+document
+    .getElementById(
+        "saveKeyBtn"
+    )
+    .onclick = () => {
+        
+        saveKeyframe();
+    };
+/* CREATE KEYFRAME */
+
+function createKeyframe(frame) {
+    
+    const key =
+        document.createElement("div");
+    key.onclick = () => {
+    
+    currentFrame = frame;
+    
+    updatePlayheadPosition();
+};
+    key.className = "keyframe";
+    
+    key.dataset.frame = frame;
+    
+    key.style.left =
+        (
+            (frame - startFrame) *
+            frameWidth
+        ) - 5 + "px";
+    
+    content.appendChild(key);
+}
+
+/* DELETE KEYFRAME */
+
+document
+    .getElementById(
+        "deleteKeyBtn"
+    )
+    .onclick = () => {
+        
+        deleteKeyframe();
+    };
+/* ========================= */
+/* AUTOKEY */
+/* ========================= */
+
+let autoKey = false;
+
+const autoKeyBtn =
+document.getElementById(
+    "autoKeyBtn"
+);
+
+autoKeyBtn.onclick = () => {
+
+    autoKey = !autoKey;
+
+    autoKeyBtn.classList.toggle(
+        "activeAutoKey"
+    );
+};
+
+/* ========================= */
+/* RANGE */
+/* ========================= */
+
+const startInput =
+document.getElementById(
+    "startFrame"
+);
+
+const endInput =
+document.getElementById(
+    "endFrame"
+);
+
+/* ========================= */
+/* UPDATE RANGE */
+/* ========================= */
+
+function updateTimelineRange(){
+
+    startFrame =
+        parseInt(startInput.value);
+
+    endFrame =
+        parseInt(endInput.value);
+
+    /* evitar rango invertido */
+
+    if(startFrame > endFrame){
+
+        [
+            startFrame,
+            endFrame
+        ] =
+        [
+            endFrame,
+            startFrame
+        ];
+    }
+
+    /* limitar frame actual */
+
+    if(currentFrame < startFrame){
+
+        currentFrame = startFrame;
+    }
+
+    if(currentFrame > endFrame){
+
+        currentFrame = endFrame;
+    }
+
+    /* reconstruir */
+
+    buildTimeline();
+
+    setFrame(currentFrame);
+}
+
+startInput.addEventListener(
+    "change",
+    updateTimelineRange
+);
+
+endInput.addEventListener(
+    "change",
+    updateTimelineRange
+);
+
+/* ========================= */
+/* FPS */
+/* ========================= */
+
+const fpsInput =
+document.getElementById(
+    "fpsInput"
+);
+
+fpsInput.addEventListener(
+    "input",
+    () => {
+        
+        fps = parseInt(
+            fpsInput.value
+        ) || 24;
+        
+        // actualizar playback en tiempo real
+        
+        if (playing) {
+            
+            startPlayback();
+        }
+    }
+);
+/* ========================= */
+/* PLAYHEAD POSITION */
+/* ========================= */
+
+function updatePlayheadPosition(){
+
+    const x =
+        (currentFrame - startFrame)
+        * frameWidth;
+
+    playhead.style.left =
+        x + "px";
+
+    playheadTop.style.left =
+        x + "px";
+
+    playheadTop.innerText =
+        currentFrame;
+}
+/* ========================= */
+/* NUMERIC KEYBOARD */
+/* ========================= */
+
+const numericKeyboard =
+document.getElementById(
+    "numericKeyboard"
+);
+
+let activeNumericInput =
+    null;
+
+/* abrir teclado */
+
+[
+    startInput,
+    endInput,
+    fpsInput
+]
+.forEach(input => {
+
+    input.addEventListener(
+        "click",
+        () => {
+
+            openNumericKeyboard(input);
+        }
+    );
+});
+
+/* teclas */
+
+document
+.querySelectorAll(".numKey")
+.forEach(btn => {
+
+    btn.onclick = () => {
+
+        if(!activeNumericInput)
+        return;
+
+        activeNumericInput.value +=
+            btn.innerText;
+    };
+});
+
+/* borrar */
+
+document
+.getElementById(
+    "numBackspace"
+)
+.onclick = () => {
+
+    if(!activeNumericInput)
+    return;
+
+    activeNumericInput.value =
+    activeNumericInput.value.slice(
+        0,
+        -1
+    );
+};
+
+/* OK */
+
+document
+.getElementById(
+    "numOk"
+)
+.onclick = () => {
+
+    if(!activeNumericInput)
+    return;
+
+    numericKeyboard.style.display =
+        "none";
+
+    /* actualizar timeline */
+
+    updateTimelineRange();
+
+    fps =
+        parseInt(
+            fpsInput.value
+        ) || 24;
+
+    activeNumericInput = null;
+};
 /* LOOP */
 function animate(){
     
