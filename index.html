@@ -2822,7 +2822,7 @@ value="250">
         <img src="archivos/toastertext.png">
       </div>
 
-      <div class="version2">v 1.00.4</div>
+      <div class="version2">v 1.00.5</div>
     </div>
 
     <div class="content2">
@@ -7173,8 +7173,16 @@ function renderPresets(){
                 presetPreviewName.textContent =
                     item.name;
 
-                presetDownloadBtn.href =
-                    item.file;
+                presetDownloadBtn.onclick = () => {
+    
+    const a = document.createElement("a");
+    a.href = item.file;
+    a.download = item.name + (item.file.includes(".png") ? ".png" : ".jpg");
+    
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+};
 
                 presetAddSceneBtn.style.display =
                     "none";
