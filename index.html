@@ -6,11 +6,7 @@
 <title>toaster1d</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link rel="manifest" href="manifest.json">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#000000">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
+
 <style>
 body{
     margin:0;
@@ -2391,7 +2387,6 @@ value="250">
 
             <button class="menuBtn">Animación</button>
             <button class="menuBtn">Audio</button>
-            <button class="menuBtn" id="installBtn">Instalar App</button>
             <button class="menuBtn">Bloques</button>
             <button class="menuBtn">Cámara</button>
             <button class="menuBtn">Círculo</button>
@@ -2937,7 +2932,7 @@ value="250">
         <img src="archivos/toastertext.png">
       </div>
 
-<div class="version2" id="appVersion">v 1.00.6</div>
+<div class="version2" id="appVersion">v 1.00.5</div>
 
 <div id="updateModal" class="updateModal hidden">
     <div class="updateBox">
@@ -5609,12 +5604,22 @@ disableSystemKeyboard(input, (el) => {
 function setViewportMode(mode) {
     
     viewportMode = mode;
-    renderer.shadowMap.enabled = (mode === "render");
-    const isRender = mode === "render";
-    const isSolid = mode === "solid";
-    const isWire = mode === "wireframe";
-    const isTexture = mode === "texture";
-    
+
+    renderer.shadowMap.enabled =
+        (mode === "render");
+
+    const isRender =
+        mode === "render";
+
+    const isSolid =
+        mode === "solid";
+
+    const isWire =
+        mode === "wireframe";
+
+    const isTexture =
+        mode === "texture";
+
     // =========================
     // TRANSFORM CONTROLS
     // =========================
@@ -5638,6 +5643,9 @@ function setViewportMode(mode) {
     // =========================
     
     objects.forEach(obj => {
+
+        // guardar materiales originales
+        saveOriginalMaterials(obj);
         
         // ocultar iconos editor
         if (obj.userData.editorUI) {
@@ -5654,25 +5662,26 @@ function setViewportMode(mode) {
         // materiales
         obj.traverse(child => {
             
-            if (!child.isMesh || !child.material) return;
-            
-if (!child.userData.originalMaterial) {
-    
-    child.userData.originalMaterial =
-        child.material.clone();
-}
+            if (!child.isMesh)
+            return;
 
-// guardar mapa correcto
-child.userData.originalMaterial.map =
-    child.material.map || null;
+            const original =
+                child.userData.originalMaterial;
+
             // =====================
             // WIREFRAME
             // =====================
             
             if (isWire) {
-                
-                child.material.wireframe = true;
-                child.material.map = null;
+
+                child.material =
+                    new THREE.MeshBasicMaterial({
+
+                        color:0xffffff,
+                        wireframe:true
+                    });
+
+                child.material.needsUpdate = true;
             }
             
             // =====================
@@ -5680,12 +5689,15 @@ child.userData.originalMaterial.map =
             // =====================
             
             else if (isSolid) {
-                
-                child.material.wireframe = false;
-                
-                // quitar textura
-                child.material.map = null;
-                
+
+                child.material =
+                    new THREE.MeshStandardMaterial({
+
+                        color:
+                        original?.color ||
+                        new THREE.Color(0xaaaaaa)
+                    });
+
                 child.material.needsUpdate = true;
             }
             
@@ -5694,21 +5706,14 @@ child.userData.originalMaterial.map =
             // =====================
             
             else if (isTexture) {
-                
-                child.material.wireframe = false;
-                
-                const original =
-                    child.userData.originalMaterial;
-                
-                if (original?.map) {
-                    
-                    child.material.map = original.map;
-                }
-                objects.forEach(obj => {
 
-    restoreOriginalMaterials(obj);
-});
-                child.material.needsUpdate = true;
+                if(original){
+
+                    child.material =
+                        original.clone();
+
+                    child.material.needsUpdate = true;
+                }
             }
             
             // =====================
@@ -5716,34 +5721,20 @@ child.userData.originalMaterial.map =
             // =====================
             
             else if (isRender) {
-                
-                child.material.wireframe = false;
-                
-                const original =
-                    child.userData.originalMaterial;
-                
-                if (original) {
-                    
-                    child.material.map = original.map || null;
-                    
-                    child.material.color.copy(
-                        original.color
-                    );
-                    
-                    child.material.opacity =
-                        original.opacity;
-                    
-                    child.material.transparent =
-                        original.transparent;
+
+                if(original){
+
+                    child.material =
+                        original.clone();
+
+                    child.material.wireframe = false;
+
+                    child.material.needsUpdate = true;
                 }
-                
-                child.material.needsUpdate = true;
             }
         });
     });
 }
-
-
 window.setViewportMode = setViewportMode;
 function markEditorUI(obj) {
 
@@ -7443,61 +7434,32 @@ function renderPresets(){
         });
     }
 }
-function saveOriginalMaterials(obj){
-
-    obj.traverse((child) => {
-
-        if(child.isMesh && child.material){
-
-            if(
-                !child.userData.originalMaterial
-            ){
-
-                child.userData.originalMaterial =
-                    child.material.clone();
-            }
+function saveOriginalMaterials(obj) {
+    
+    obj.traverse(child => {
+        
+        if (!child.isMesh) return;
+        
+        if (!child.userData.originalMaterial) {
+            
+            child.userData.originalMaterial = child.material;
         }
     });
 }
 
-function restoreOriginalMaterials(obj){
-
-    obj.traverse((child) => {
-
-        if(
-            child.isMesh &&
-            child.userData.originalMaterial
-        ){
-
+function restoreOriginalMaterials(obj) {
+    
+    obj.traverse(child => {
+        
+        if (!child.isMesh) return;
+        
+        if (child.userData.originalMaterial) {
+            
             child.material =
-                child.userData.originalMaterial.clone();
+                child.userData.originalMaterial;
         }
     });
 }
-let deferredPrompt;
-
-window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-});
-const btn = document.getElementById("installBtn");
-
-btn.addEventListener("click", async () => {
-  if (!deferredPrompt) {
-    alert("No se puede instalar en este momento");
-    return;
-  }
-
-  deferredPrompt.prompt();
-
-  const choice = await deferredPrompt.userChoice;
-
-  if (choice.outcome === "accepted") {
-    console.log("App instalada");
-  }
-
-  deferredPrompt = null;
-});
 /* LOOP */
 function animate(){
     spawn.lookAt(camera.position);
