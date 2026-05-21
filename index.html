@@ -551,7 +551,7 @@ button{
   filter: drop-shadow(0 0 8px #000);
 }
 
-/* VERSION */
+
 .version2 {
   position: absolute;
   top: 6px;
@@ -628,35 +628,71 @@ button{
 }
 
 .panel-box2 {
-  width: 200px;
-  background: #2a2a2a;
-  padding: 10px;
-  border-radius: 6px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-  color: #ddd;
+    width: 220px;
+    background: linear-gradient(180deg, #2f2f2f, #262626);
+    padding: 12px;
+    border-radius: 8px;
+    
+    border: 1px solid #3d3d3d;
+    box-shadow:
+        0 12px 35px rgba(0, 0, 0, 0.65),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    
+    color: #ddd;
+    font-family: Arial, sans-serif;
+    position: relative;
 }
 
 .panel-box2 h3 {
-  margin: 0 0 6px 0;
-  font-size: 12px;
+    margin: 0 0 8px 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: #f0f0f0;
+    letter-spacing: 0.3px;
+    
+    padding-bottom: 6px;
+    border-bottom: 1px solid #3a3a3a;
 }
 
 .panel-box2 p {
-  margin: 0;
-  font-size: 11px;
-  color: #bbb;
+    margin: 6px 0 0 0;
+    font-size: 11px;
+    color: #b8b8b8;
+    line-height: 1.3;
 }
 
 /* CLOSE BUTTON */
 .close2 {
-  float: right;
-  cursor: pointer;
-  color: #aaa;
-  font-size: 12px;
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    
+    width: 18px;
+    height: 18px;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    background: #2b2b2b;
+    border: 1px solid #444;
+    border-radius: 4px;
+    
+    cursor: pointer;
+    color: #aaa;
+    font-size: 12px;
+    
+    transition: all 0.15s ease;
 }
 
 .close2:hover {
-  color: #fff;
+    background: #3a3a3a;
+    border-color: #555;
+    color: #fff;
+}
+
+.close2:active {
+    transform: scale(0.95);
 }
 #orientationPanel {
     position: fixed;
@@ -1977,10 +2013,84 @@ button{
 
     transform:scale(0.97);
 }
+.updateModal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99;
+    backdrop-filter: blur(6px);
+}
+
+.updateBox {
+    width: 320px;
+    background: #2b2b2b;
+    border: 1px solid #444;
+    border-radius: 10px;
+    padding: 16px;
+    color: #ddd;
+    font-family: Arial;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+}
+
+.updateBox h2 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    color: #fff;
+}
+
+.updateBox p {
+    font-size: 13px;
+    opacity: 0.85;
+}
+
+.hidden {
+    display: none;
+}
+#closeUpdate{
+    margin-top:12px;
+    width:100%;
+    padding:9px 10px;
+
+    background:linear-gradient(180deg, #3a3a3a, #2b2b2b);
+    border:1px solid #555;
+
+    color:#e6e6e6;
+    font-size:13px;
+    letter-spacing:0.3px;
+
+    border-radius:6px;
+    cursor:pointer;
+
+    transition:all 0.15s ease;
+    box-shadow:0 2px 6px rgba(0,0,0,0.35);
+}
+
+#closeUpdate:hover{
+    background:linear-gradient(180deg, #4a4a4a, #343434);
+    border-color:#666;
+}
+
+#closeUpdate:active{
+    transform:scale(0.98);
+    box-shadow:0 1px 3px rgba(0,0,0,0.5);
+}
 </style>
 </head>
 
 <body>
+
+
+<div id="updateModal" class="updateModal hidden">
+    <div class="updateBox">
+        <h2>New update</h2>
+        <p id="updateText"></p>
+        <button id="closeUpdate">Close</button>
+    </div>
+</div>
     <!-- RENDER MENU -->
 
 <div id="renderMenu">
@@ -2822,7 +2932,15 @@ value="250">
         <img src="archivos/toastertext.png">
       </div>
 
-      <div class="version2">v 1.00.5</div>
+<div class="version2" id="appVersion">v 1.00.5</div>
+
+<div id="updateModal" class="updateModal hidden">
+    <div class="updateBox">
+        <h2>New update</h2>
+        <p id="updateText"></p>
+        <button id="closeUpdate">Close</button>
+    </div>
+</div>
     </div>
 
     <div class="content2">
@@ -3067,6 +3185,43 @@ let objects = [];
 let selected = null;
 let selectedLight = null;
 let lights = [];
+window.addEventListener("load", () => {
+    const versionEl = document.getElementById("appVersion");
+    
+    // saca "v 1.00.5" → "1.00.5"
+    const currentVersion = versionEl.textContent.replace("v", "").trim();
+    
+    const savedVersion = localStorage.getItem("app_version");
+    
+    if (!savedVersion) {
+        localStorage.setItem("app_version", currentVersion);
+        return;
+    }
+    
+    if (savedVersion !== currentVersion) {
+        showUpdatePanel(savedVersion, currentVersion);
+        localStorage.setItem("app_version", currentVersion);
+    }
+});
+
+function showUpdatePanel(oldV, newV) {
+    const modal = document.getElementById("updateModal");
+    const text = document.getElementById("updateText");
+    const box = document.querySelector(".updateBox");
+    const btn = document.getElementById("closeUpdate");
+    
+    text.textContent = `Updated from ${oldV} → ${newV}`;
+    modal.classList.remove("hidden");
+    
+    function close() {
+        modal.classList.add("hidden");
+    }
+    
+    btn.onclick = close;
+    modal.onclick = close;
+    box.onclick = (e) => e.stopPropagation();
+}
+
 const hideTexturePanelFor = new Set([
     "light",
     "spawn",
@@ -7314,6 +7469,7 @@ function restoreOriginalMaterials(obj){
         }
     });
 }
+
 /* LOOP */
 function animate(){
     spawn.lookAt(camera.position);
