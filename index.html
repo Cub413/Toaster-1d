@@ -2391,6 +2391,7 @@ value="250">
 
             <button class="menuBtn">Animación</button>
             <button class="menuBtn">Audio</button>
+            <button class="menuBtn" id="installBtn">Instalar App</button>
             <button class="menuBtn">Bloques</button>
             <button class="menuBtn">Cámara</button>
             <button class="menuBtn">Círculo</button>
@@ -2936,7 +2937,7 @@ value="250">
         <img src="archivos/toastertext.png">
       </div>
 
-<div class="version2" id="appVersion">v 1.00.5</div>
+<div class="version2" id="appVersion">v 1.00.6</div>
 
 <div id="updateModal" class="updateModal hidden">
     <div class="updateBox">
@@ -7473,7 +7474,30 @@ function restoreOriginalMaterials(obj){
         }
     });
 }
+let deferredPrompt;
 
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+});
+const btn = document.getElementById("installBtn");
+
+btn.addEventListener("click", async () => {
+  if (!deferredPrompt) {
+    alert("No se puede instalar en este momento");
+    return;
+  }
+
+  deferredPrompt.prompt();
+
+  const choice = await deferredPrompt.userChoice;
+
+  if (choice.outcome === "accepted") {
+    console.log("App instalada");
+  }
+
+  deferredPrompt = null;
+});
 /* LOOP */
 function animate(){
     spawn.lookAt(camera.position);
