@@ -2154,12 +2154,7 @@ button{
         <div class="renderHeader">
 
             <span>Render Complete</span>
-<a
-    id="openRenderBtn"
-    class="btn primary"
->
-    Abrir video
-</a>
+
             <button id="closeRenderResult">
                 ×
             </button>
@@ -3259,8 +3254,6 @@ renderBtn.onclick = () => {
 
     renderMenu.style.display = "flex";
 };
-const openRenderBtn =
-document.getElementById("openRenderBtn");
 document.querySelector(".closeRender")
 .onclick = () => {
 
@@ -5306,7 +5299,7 @@ async function unlockAudio() {
 
 const playlist = [
 
-    "archivos/asu.mp3",
+    "archivos/Midnight_Arcade.mp3",
     "archivos/moon.mp3",
     "archivos/asu.mp3"
 
@@ -7153,94 +7146,25 @@ document.getElementById("renderVideoBtn")
     recorder.stop();
 
     recorder.onstop = () => {
-    
-    const blob = new Blob(
-        chunks,
-        {
-            type: "video/webm"
-        }
-    );
-    
-    const file = new File(
-        [blob],
-        "animation.webm",
-        {
-            type: "video/webm"
-        }
-    );
-    
-    const videoURL =
-        URL.createObjectURL(file);
-    
-    console.log(
-        "VIDEO URL:",
-        videoURL
-    );
-    
-    renderVideoPreview.src =
-        videoURL;
-    
-    downloadRenderBtn.href =
-        videoURL;
-    
-    downloadRenderBtn.download =
-        "animation.webm";
-    
-    openRenderBtn.href =
-        videoURL;
-    
-    openRenderBtn.target =
-        "_blank";
-    
-    renderResult.style.display =
-        "flex";
+
+        renderOverlay.style.display = "none";
+
+        const blob =
+        new Blob(chunks, {
+
+            type:"video/webm"
+        });
+
+        const url =
+        URL.createObjectURL(blob);
+
+        renderVideoPreview.src = url;
+
+        downloadRenderBtn.href = url;
+
+        renderResult.style.display = "flex";
+    };
 };
-
-/* DESCARGAR */
-
-downloadRenderBtn.onclick = () => {
-    
-    console.log(
-        "Descargando video..."
-    );
-};
-
-/* ABRIR NUEVA PESTAÑA */
-
-openRenderBtn.onclick = async (e) => {
-    
-    e.preventDefault();
-    
-    console.log(
-        "Abriendo blob correctamente..."
-    );
-    
-    const blobUrl =
-        renderVideoPreview.src;
-    
-    console.log(blobUrl);
-    
-    try {
-        
-        await navigator.clipboard.writeText(
-            blobUrl
-        );
-        
-        console.log(
-            "Blob URL copiada"
-        );
-        
-    } catch (err) {
-        
-        console.log(err);
-    }
-    
-    window.open(
-        blobUrl,
-        "_blank"
-    );
-};
-}
 const presetsBtn =
     document.getElementById("presetsBtn");
 
