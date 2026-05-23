@@ -3855,6 +3855,7 @@ let objects = [];
 let selected = null;
 let selectedLight = null;
 let lights = [];
+let selectionOutline = null;
 const closeLookPanelBtn =
 document.getElementById(
     "closeLookPanelBtn"
@@ -4642,6 +4643,7 @@ const mouse = new THREE.Vector2();
 /* SELECT */
 function select(obj) {
     selected = obj;
+    updateSelectionOutline();
     selectedInUI = obj;
     updateTexturePanelVisibility(obj);
     transform.addEventListener("dragging-changed", (e) => {
@@ -4737,6 +4739,12 @@ if (pickingTarget) {
 }
 
 function clear() {
+    if(selectionOutline){
+
+    scene.remove(selectionOutline);
+
+    selectionOutline = null;
+}
     selected = null;
     transform.detach();
     updateTexturePanelVisibility(null);
@@ -5079,7 +5087,7 @@ loader.load("archivos/light.gltf", (gltf) => {
     child.userData.isLightIcon = true;
     
     child.userData.type = "light";
-    
+    child.name = "luz";
     if (child.isMesh) {
         
         child.material = child.material.clone();
@@ -5092,21 +5100,31 @@ loader.load("archivos/light.gltf", (gltf) => {
 });
 });
 loader.load("archivos/camera.glb", (gltf) => {
-
+    
     cameraIconModel = gltf.scene;
-
-    cameraIconModel.scale.set(2,2,2);
-
+    
+    cameraIconModel.scale.set(2, 2, 2);
+    
     cameraIconModel.traverse((child) => {
-
+        
         child.userData.type = "camera";
-
-        if(child.isMesh){
-
+        
+        if (child.isMesh) {
+            
             child.castShadow = false;
             child.receiveShadow = false;
+            
+            child.material =
+                new THREE.MeshBasicMaterial({
+                    
+                    color: 0x000000
+                    
+                });
+            
         }
+        
     });
+    
 });
 window.createCamera = function(){
 
@@ -9449,6 +9467,62 @@ window.addEventListener(
 
     endScriptDrag
 );
+
+
+function updateSelectionOutline(){
+
+    if(selectionOutline){
+
+        scene.remove(selectionOutline);
+
+        selectionOutline.traverse((c)=>{
+
+            if(c.geometry)
+            c.geometry.dispose();
+
+            if(c.material)
+            c.material.dispose();
+
+        });
+
+        selectionOutline = null;
+    }
+
+    const obj =
+        getSelectedObject?.();
+
+    if(!obj)
+    return;
+
+    selectionOutline =
+        obj.clone();
+
+    selectionOutline.traverse((c)=>{
+
+        if(c.isMesh){
+
+            c.material =
+                new THREE.MeshBasicMaterial({
+
+                    color: 0xff9900,
+
+                    side: THREE.BackSide
+
+                });
+
+        }
+
+    });
+
+    selectionOutline.scale.multiplyScalar(
+        1.1
+    );
+
+    selectionOutline.renderOrder = 999;
+
+    scene.add(selectionOutline);
+
+}
 /* LOOP */
 function animate(){
     spawn.lookAt(camera.position);
@@ -9458,6 +9532,32 @@ function animate(){
         child.lookAt(gizmoCamera.position);
     }
 });
+if (selectionOutline) {
+    
+    const obj =
+        getSelectedObject?.();
+    
+    if (obj) {
+        
+        selectionOutline.position.copy(
+            obj.position
+        );
+        
+        selectionOutline.rotation.copy(
+            obj.rotation
+        );
+        
+        selectionOutline.scale.set(
+            
+            obj.scale.x * 1.08,
+            obj.scale.y * 1.08,
+            obj.scale.z * 1.08
+            
+        );
+        
+    }
+    
+}
 scene.traverse(obj => {
     
     const target =
