@@ -239,7 +239,7 @@ body{
     padding:18px;
     border-radius:14px;
     display:grid;
-    grid-template-columns:repeat(3,120px);
+    grid-template-columns:repeat(2, minmax(90px, 1fr));
     gap:10px;
     border:1px solid #444;
     box-shadow:0 10px 30px rgba(0,0,0,0.5);
@@ -1826,30 +1826,45 @@ button{
     color:#888;
 }
 
-#presetContent{
+#presetContent {
+    
+    flex: 1;
+    
+    overflow-y: auto;
+    overflow-x: hidden;
+    
+    padding: 6px;
+    
+    display: grid;
+    
+    grid-template-columns: repeat(2, 1fr);
+    
+    gap: 6px;
+    
+    align-content: start;
+    
+    scrollbar-width: none;
+    
+    -webkit-overflow-scrolling: touch;
+    
+    touch-action: pan-y;
+    
+    overscroll-behavior: contain;
+}
+.presetCard{
 
-    flex:1;
+    min-width:0;
 
-    overflow-y:auto;
+    width:100%;
 
-    padding:6px;
-
-    display:grid;
-
-    grid-template-columns:1fr 1fr;
-
-    gap:6px;
-
-    align-content:start;
-
-    scrollbar-width:none;
+    flex-shrink:0;
 }
 
-#presetContent::-webkit-scrollbar{
-
-    display:none;
+#presetContent::-webkit-scrollbar {
+    
+    width: 0;
+    height: 0;
 }
-
 .presetCard{
 
     background:#202020;
@@ -2274,10 +2289,248 @@ cursor:move;
 
     background:#666;
 }
+#scriptPanel{
+
+    position:fixed;
+
+    top:120px;
+    left:120px;
+
+    width:220px;
+height:260px;
+
+    background:#1e1e1e;
+
+    border:1px solid #444;
+
+    border-radius:12px;
+
+    overflow:hidden;
+
+    z-index:999999;
+
+    display:none;
+
+    flex-direction:column;
+
+    box-shadow:0 0 25px #0008;
+}
+
+#scriptHeader{
+
+    height:36px;
+
+    background:#2a2a2a;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:0 10px;
+
+    color:white;
+
+    cursor:move;
+
+    user-select:none;
+}
+
+#closeScriptPanel{
+
+    width:24px;
+    height:24px;
+
+    border:none;
+
+    border-radius:6px;
+
+    background:#444;
+
+    color:white;
+
+    cursor:pointer;
+}
+
+#scriptEditor{
+    min-height:70px;
+
+    font-size:10px;
+    flex:1;
+
+    resize:none;
+
+    border:none;
+    outline:none;
+
+    background:#111;
+
+    color:#6dff8b;
+
+    padding:10px;
+
+    font-family:monospace;
+
+    font-size:12px;
+
+    overflow:auto;
+}
+
+#scriptActions{
+
+    padding:8px;
+
+    border-top:1px solid #333;
+}
+
+#runScriptBtn{
+
+    width:100%;
+    height:34px;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:#3a3a3a;
+
+    color:white;
+
+    cursor:pointer;
+}
+
+#runScriptBtn:hover{
+
+    background:#4a4a4a;
+}
+
+#scriptHelp{
+
+    height:75px;
+
+    overflow:auto;
+
+    border-top:1px solid #333;
+
+    background:#161616;
+
+    padding:8px;
+
+    font-size:11px;
+
+    color:#ccc;
+}
+
+.scriptHelpTitle{
+
+    color:white;
+
+    margin-top:6px;
+
+    margin-bottom:4px;
+
+    font-weight:bold;
+}
+
+#scriptHelp pre{
+
+    margin:0;
+
+    padding:6px;
+
+    background:#101010;
+
+    border-radius:6px;
+
+    overflow:auto;
+
+    color:#8cff9a;
+}
 </style>
 </head>
 
 <body>
+    <!-- SCRIPT PANEL -->
+
+<div id="scriptPanel">
+
+    <div id="scriptHeader">
+
+        <span>
+            Script Editor
+        </span>
+
+        <button id="closeScriptPanel">
+            ✕
+        </button>
+
+    </div>
+
+    <!-- EDITOR -->
+
+    <textarea
+        id="scriptEditor"
+        spellcheck="false"
+    ></textarea>
+
+    <!-- ACTIONS -->
+
+    <div id="scriptActions">
+
+        <button id="runScriptBtn">
+            Ejecutar
+        </button>
+
+    </div>
+
+    <!-- HELP -->
+
+    <div id="scriptHelp">
+
+<div class="scriptHelpTitle">
+    selectedObject
+</div>
+
+<pre>
+selectedObject.position.x += 1;
+selectedObject.rotation.y += 0.5;
+</pre>
+
+<div class="scriptHelpTitle">
+    scene
+</div>
+
+<pre>
+scene.background =
+new THREE.Color(0xff0000);
+</pre>
+
+<div class="scriptHelpTitle">
+    transformControls
+</div>
+
+<pre>
+transform.setMode("rotate");
+</pre>
+
+<div class="scriptHelpTitle">
+    crear objeto
+</div>
+
+<pre>
+const cube =
+new THREE.Mesh(
+    new THREE.BoxGeometry(),
+    new THREE.MeshStandardMaterial()
+);
+
+scene.add(cube);
+</pre>
+
+    </div>
+
+</div>
     <div id="lookConstraintPanel">
 
     <div id="lookConstraintHeader">
@@ -2707,24 +2960,9 @@ value="250">
     Look Constraint
 
 </button>
-            <button class="menuBtn">Animación</button>
-            <button class="menuBtn">Audio</button>
-            <button class="menuBtn">Bloques</button>
-            <button class="menuBtn">Cámara</button>
-            <button class="menuBtn">Círculo</button>
-            <button class="menuBtn">Color</button>
-            <button class="menuBtn">Editor</button>
-            <button class="menuBtn">Exportar</button>
-            <button class="menuBtn">Imagen</button>
-            <button class="menuBtn">Importar</button>
-            <button class="menuBtn">Luz</button>
-            <button class="menuBtn">Material</button>
-            <button class="menuBtn">Objeto</button>
-            <button class="menuBtn">Partículas</button>
-            <button class="menuBtn">Render</button>
+
             <button class="menuBtn">Script</button>
-            <button class="menuBtn">Texto</button>
-            <button class="menuBtn">Video</button>
+
 
         </div>
 
@@ -3363,7 +3601,7 @@ style="
         <img src="archivos/toastertext.png">
       </div>
 
-<div class="version2" id="appVersion">v 1.00.7</div>
+<div class="version2" id="appVersion">v 1.00.8</div>
 
 <div id="updateModal" class="updateModal hidden">
     <div class="updateBox">
@@ -8260,6 +8498,11 @@ const imagePresets = [
         image:"store/night360.jpg",
         file:"store/night360.jpg"
     },
+            {
+        name:"night360",
+        image:"store/night360.jpg",
+        file:"store/night360.jpg"
+    },
     {
         name:"sky360",
         image:"store/sky360.jpg",
@@ -8453,6 +8696,34 @@ function renderPresets(){
             };
 
             presetContent.appendChild(card);
+            requestAnimationFrame(() => {
+
+    presetContent.style.display =
+    "flex";
+
+    presetContent.style.flexWrap =
+    "wrap";
+
+    presetContent.style.alignContent =
+    "flex-start";
+
+    presetContent.style.overflowY =
+    "auto";
+
+    presetContent.style.gap =
+    "6px";
+
+    [...presetContent.children]
+    .forEach(card => {
+
+        card.style.width = "90px";
+
+        card.style.minWidth = "90px";
+
+        card.style.flexShrink = "0";
+    });
+
+});
         });
     }
 
@@ -8831,6 +9102,353 @@ removeLookBtn.onclick = () => {
     removeLookBtn.style.display =
         "none";
 };
+
+/* FORZAR SCROLL */
+
+presetContent.style.overflowY =
+"auto";
+
+presetContent.style.overflowX =
+"hidden";
+
+presetContent.style.display =
+"grid";
+
+presetContent.style.gridTemplateColumns =
+"repeat(auto-fill,minmax(90px,1fr))";
+
+/* SCROLL TÁCTIL */
+
+
+
+
+
+let startScroll = 0;
+
+presetContent.addEventListener(
+    "touchstart",
+    e => {
+
+        isDragging = true;
+
+        startY =
+        e.touches[0].clientY;
+
+        startScroll =
+        presetContent.scrollTop;
+    },
+    { passive:true }
+);
+
+presetContent.addEventListener(
+    "touchmove",
+    e => {
+
+        if(!isDragging)
+        return;
+
+        const delta =
+        e.touches[0].clientY
+        - startY;
+
+        presetContent.scrollTop =
+        startScroll - delta;
+    },
+    { passive:true }
+);
+
+presetContent.addEventListener(
+    "touchend",
+    () => {
+
+        isDragging = false;
+    }
+);
+/* SCRIPT PANEL */
+
+const scriptPanel =
+document.getElementById(
+    "scriptPanel"
+);
+
+const scriptHeader =
+document.getElementById(
+    "scriptHeader"
+);
+
+const closeScriptPanel =
+document.getElementById(
+    "closeScriptPanel"
+);
+
+const runScriptBtn =
+document.getElementById(
+    "runScriptBtn"
+);
+
+const scriptEditor =
+document.getElementById(
+    "scriptEditor"
+);
+
+/* ABRIR PANEL */
+
+document
+.querySelectorAll(".menuBtn")
+.forEach(btn => {
+
+    if(
+        btn.innerText.trim()
+        === "Script"
+    ){
+
+        btn.onclick = () => {
+
+            scriptPanel.style.display =
+            "flex";
+        };
+    }
+});
+
+/* CERRAR */
+
+closeScriptPanel.onclick =
+() => {
+
+    scriptPanel.style.display =
+    "none";
+};
+
+/* EJECUTAR */
+
+runScriptBtn.onclick =
+() => {
+
+    try{
+
+        const selectedObject =
+        window.selected;
+
+        const fn =
+        new Function(
+
+            "scene",
+            "camera",
+            "renderer",
+            "THREE",
+            "selectedObject",
+            "transform",
+
+            scriptEditor.value
+        );
+
+        fn(
+
+            scene,
+            camera,
+            renderer,
+            THREE,
+            selectedObject,
+            transform
+        );
+
+        console.log(
+            "Script ejecutado"
+        );
+
+    }catch(err){
+
+        console.error(err);
+
+        alert(err.message);
+    }
+};
+/* ====================== */
+/* SCRIPT PANEL DRAG */
+/* ====================== */
+
+
+
+
+
+let draggingScriptPanel =
+false;
+
+let scriptDragOffsetX = 0;
+let scriptDragOffsetY = 0;
+
+/* ====================== */
+/* START DRAG */
+/* ====================== */
+
+function startScriptDrag(
+    clientX,
+    clientY
+){
+
+    draggingScriptPanel =
+    true;
+
+    scriptDragOffsetX =
+        clientX -
+        scriptPanel.offsetLeft;
+
+    scriptDragOffsetY =
+        clientY -
+        scriptPanel.offsetTop;
+}
+
+/* ====================== */
+/* MOVE DRAG */
+/* ====================== */
+
+function moveScriptDrag(
+    clientX,
+    clientY
+){
+
+    if(!draggingScriptPanel)
+        return;
+
+    let x =
+        clientX -
+        scriptDragOffsetX;
+
+    let y =
+        clientY -
+        scriptDragOffsetY;
+
+    /* ===================== */
+    /* LIMITES PANTALLA */
+    /* ===================== */
+
+    const maxX =
+        window.innerWidth -
+        scriptPanel.offsetWidth;
+
+    const maxY =
+        window.innerHeight -
+        scriptPanel.offsetHeight;
+
+    /* LEFT */
+
+    if(x < 0)
+        x = 0;
+
+    /* TOP */
+
+    if(y < 0)
+        y = 0;
+
+    /* RIGHT */
+
+    if(x > maxX)
+        x = maxX;
+
+    /* BOTTOM */
+
+    if(y > maxY)
+        y = maxY;
+
+    /* APPLY */
+
+    scriptPanel.style.left =
+        x + "px";
+
+    scriptPanel.style.top =
+        y + "px";
+}
+
+/* ====================== */
+/* END DRAG */
+/* ====================== */
+
+function endScriptDrag(){
+
+    draggingScriptPanel =
+    false;
+}
+
+/* ====================== */
+/* MOUSE */
+/* ====================== */
+
+scriptHeader.addEventListener(
+    "mousedown",
+
+    e => {
+
+        startScriptDrag(
+            e.clientX,
+            e.clientY
+        );
+    }
+);
+
+window.addEventListener(
+    "mousemove",
+
+    e => {
+
+        moveScriptDrag(
+            e.clientX,
+            e.clientY
+        );
+    }
+);
+
+window.addEventListener(
+    "mouseup",
+
+    endScriptDrag
+);
+
+/* ====================== */
+/* TOUCH */
+/* ====================== */
+
+scriptHeader.addEventListener(
+    "touchstart",
+
+    e => {
+
+        const touch =
+            e.touches[0];
+
+        startScriptDrag(
+            touch.clientX,
+            touch.clientY
+        );
+    },
+
+    { passive:true }
+);
+
+window.addEventListener(
+    "touchmove",
+
+    e => {
+
+        const touch =
+            e.touches[0];
+
+        if(!touch)
+            return;
+
+        moveScriptDrag(
+            touch.clientX,
+            touch.clientY
+        );
+    },
+
+    { passive:true }
+);
+
+window.addEventListener(
+    "touchend",
+
+    endScriptDrag
+);
 /* LOOP */
 function animate(){
     spawn.lookAt(camera.position);
