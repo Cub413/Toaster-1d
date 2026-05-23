@@ -2447,6 +2447,213 @@ height:260px;
 
     color:#8cff9a;
 }
+.customScalePanel{
+
+    width:100%;
+
+    padding:4px 6px;
+
+    box-sizing:border-box;
+
+}
+
+.customScaleLabel{
+
+    color:white;
+
+    font-size:10px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    margin-bottom:4px;
+
+    opacity:.8;
+
+}
+
+.customSliderWrap {
+    
+    width: 55px;
+    
+    height: 12px;
+    
+    display: flex;
+    
+    align-items: center;
+    
+}
+
+#scaleSlider{
+
+    -webkit-appearance:none;
+    appearance:none;
+
+    width:100%;
+
+    height:3px;
+
+    border-radius:999px;
+
+    background:#2a2a2a;
+
+    outline:none;
+
+    border:none;
+
+}
+
+/* linea */
+
+#scaleSlider::-webkit-slider-runnable-track{
+
+    height:3px;
+
+    background:#2a2a2a;
+
+    border-radius:999px;
+
+}
+
+/* circulo */
+
+#scaleSlider::-webkit-slider-thumb{
+
+    -webkit-appearance:none;
+
+    width:10px;
+    height:10px;
+
+    border-radius:50%;
+
+    background:#ff9900;
+
+    margin-top:-3.5px;
+
+    border:none;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 0 4px rgba(255,153,0,.35);
+
+}
+
+#scaleSlider::-moz-range-thumb{
+
+    width:10px;
+    height:10px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:#ff9900;
+}
+#projectMenu{
+
+    position:absolute;
+
+    top:50px;
+    left:10px;
+
+    width:160px;
+
+    background:#1a1a1a;
+
+    border:1px solid #333;
+
+    border-radius:10px;
+
+    overflow:hidden;
+
+    display:none;
+
+    z-index:99999;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.4);
+
+}
+
+.projectMenuItem{
+
+    padding:12px;
+
+    color:white;
+
+    font-size:13px;
+
+    cursor:pointer;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    transition:.15s;
+
+}
+
+.projectMenuItem:hover{
+
+    background:#2a2a2a;
+
+}
+
+#settingsPanel{
+
+    position:fixed;
+
+    top:0;
+    right:-320px;
+
+    width:300px;
+    height:100%;
+
+    background:#111;
+
+    z-index:999999;
+
+    transition:.25s;
+
+    border-left:1px solid #333;
+
+    overflow-y:auto;
+
+}
+
+#settingsPanel.active{
+
+    right:0;
+
+}
+
+.settingsHeader{
+
+    padding:16px;
+
+    font-size:14px;
+
+    color:white;
+
+    border-bottom:1px solid #333;
+
+}
+
+.settingsContent{
+
+    padding:12px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+
+}
 </style>
 </head>
 
@@ -2882,7 +3089,49 @@ value="250">
 </div>
 
 <div id="editTopPanel">
+<button
+class="itemBtn"
+onclick="window.scaleUp()">
 
+Scale +
+
+</button>
+
+<button
+class="itemBtn"
+onclick="window.scaleDown()">
+
+Scale -
+
+</button>
+<div class="customScalePanel">
+
+    <div class="customScaleLabel">
+
+        Scale
+
+        <span id="scaleValue">
+            1.0
+        </span>
+
+    </div>
+
+    <div class="customSliderWrap">
+
+        <input
+            type="range"
+            min="0.1"
+            max="10"
+            step="0.1"
+            value="1"
+            id="scaleSlider"
+
+            oninput="window.updateScaleSlider(this.value)"
+        >
+
+    </div>
+
+</div>
     <button class="itemBtn">boton</button>
 
     <button class="itemBtn">boton</button>
@@ -3578,7 +3827,71 @@ style="
     </div>
 
 </div>
+<div class="extraPanel" id="communityPanel">
 
+    <div style="
+        padding:8px;
+        color:#aaa;
+        font-size:12px;
+        border-bottom:1px solid #333;
+    ">
+        Comunidad
+    </div>
+
+    <div style="
+        padding:12px;
+        display:flex;
+        flex-direction:column;
+        gap:10px;
+    ">
+
+        <button
+            class="itemBtn"
+
+            onclick="
+                window.open(
+                    'https://youtube.com/@c.i_studios?si=QrQf63cLIvkdGW6u',
+                    '_blank'
+                );
+            "
+
+            style="
+                height:42px;
+                font-size:12px;
+            "
+        >
+
+            <i class="fa-brands fa-youtube"></i>
+
+            YouTube
+
+        </button>
+
+        <button
+            class="itemBtn"
+
+            onclick="
+                window.open(
+                    'https://www.instagram.com/c.i_studios?igsh=MTVjOWFjZ2Nod3hwdw==',
+                    '_blank'
+                );
+            "
+
+            style="
+                height:42px;
+                font-size:12px;
+            "
+        >
+
+            <i class="fa-brands fa-instagram"></i>
+
+            Instagram
+
+        </button>
+
+    </div>
+
+</div>
 </div>
 
 <!-- CONTEXT MENU -->
@@ -3617,14 +3930,82 @@ style="
       <div class="col2">
         <h3>Nuevo archivo</h3>
 
-        <div class="item2" onclick="openPanel2('Genérico','Proyecto base estándar')">
-          <i class="fa-solid fa-file"></i> Genérico
-        </div>
+  <div class="item2" onclick="window.toggleProjectMenu()">
 
-        <div class="item2" onclick="openPanel2('3D','Proyecto 3D optimizado')">
-          <i class="fa-solid fa-clone"></i> 3D
-        </div>
+    <i class="fa-solid fa-folder"></i>
 
+    Proyecto
+
+</div>
+
+<div id="projectMenu" style="display: none;">
+
+    <div
+        class="projectMenuItem"
+        onclick="window.createNewProject()"
+    >
+
+        <i class="fa-solid fa-file-circle-plus"></i>
+
+        New Project
+
+    </div>
+
+    <div
+        class="projectMenuItem"
+        onclick="window.toggleSettingsPanel()"
+    >
+
+        <i class="fa-solid fa-gear"></i>
+
+        Settings
+
+    </div>
+
+</div>
+
+<div id="settingsPanel" class="settingsPanel">
+
+    <div class="settingsHeader">
+
+        Settings
+
+    </div>
+
+    <div class="settingsContent">
+<div class="item2" onclick="window.toggleMusic()">
+
+    <i class="fa-solid fa-music"></i>
+
+    <span id="musicText">Música: Sí</span>
+
+</div>
+<div class="item2" onclick="window.toggleOutline()">
+
+    <i class="fa-solid fa-border-all"></i>
+
+    <span id="outlineText">Outline: Sí</span>
+
+</div>
+<div class="item2" onclick="window.toggleGrid()">
+
+    <i class="fa-solid fa-border-none"></i>
+
+    <span id="gridText">Grid: Sí</span>
+
+</div>
+<div class="item2" onclick="window.toggleGrid()">
+    
+    <i class="fa-solid fa-border-none"></i>
+    
+    <span id="gridModeText">Grid: 20x20</span>
+    
+</div>
+        <!-- aquí añadirás cosas -->
+
+    </div>
+
+</div>
         <div class="item2" onclick="openPanel2('modelos','distintos objetos 3d')">
           <i class="fa-solid fa-cubes"></i> objetos
         </div>
@@ -3807,7 +4188,56 @@ const grid = new THREE.GridHelper(20, 20);
 grid.userData.editorUI = true;
 
 scene.add(grid);
-markEditorUI(grid);
+let gridEnabled =
+    localStorage.getItem("gridEnabled");
+
+if (gridEnabled === null) {
+
+    gridEnabled = true;
+    localStorage.setItem("gridEnabled", "true");
+
+} else {
+
+    gridEnabled = gridEnabled === "true";
+}
+function updateGridText() {
+
+    const text =
+        document.getElementById("gridText");
+
+    if (!text) return;
+
+    text.innerText =
+        gridEnabled ? "Grid: Sí" : "Grid: No";
+}
+window.toggleGrid = function () {
+
+    // 🔴 PROTECCIÓN contra undefined
+    if (!scene) {
+
+        console.warn("scene aún no está lista");
+        return;
+    }
+
+    gridEnabled = !gridEnabled;
+
+    localStorage.setItem("gridEnabled", gridEnabled);
+
+    if (gridEnabled) {
+
+        if (!scene.children.includes(grid)) {
+
+            scene.add(grid);
+        }
+
+    } else {
+
+        scene.remove(grid);
+    }
+
+    updateGridText();
+};
+updateGridText();
 const openMenuBtn = document.getElementById("openMenuBtn");
 const menuOverlay = document.getElementById("menuOverlay");
 const searchInput = document.getElementById("searchInput");
@@ -3856,6 +4286,128 @@ let selected = null;
 let selectedLight = null;
 let lights = [];
 let selectionOutline = null;
+
+/* ================= OUTLINE SYSTEM ================= */
+
+window.outlineEnabled =
+    localStorage.getItem("outlineEnabled");
+
+if (window.outlineEnabled === null) {
+
+    window.outlineEnabled = true;
+    localStorage.setItem("outlineEnabled", "true");
+
+} else {
+
+    window.outlineEnabled =
+        window.outlineEnabled === "true";
+}
+
+/* SIEMPRE GLOBAL */
+
+window.selectionOutline = null;
+
+/* ================= UI UPDATE ================= */
+
+window.updateOutlineText = function () {
+
+    const text =
+        window.document.getElementById("outlineText");
+
+    if (!text) return;
+
+    text.innerText =
+        window.outlineEnabled
+            ? "Outline: Sí"
+            : "Outline: No";
+};
+
+/* ================= TOGGLE ================= */
+
+window.toggleOutline = function () {
+
+    window.outlineEnabled =
+        !window.outlineEnabled;
+
+    localStorage.setItem(
+        "outlineEnabled",
+        window.outlineEnabled
+    );
+
+    window.updateOutlineText();
+
+    if (!window.outlineEnabled) {
+
+        if (window.selectionOutline) {
+
+            window.selectionOutline.visible = false;
+        }
+
+        window.selectionOutline = null;
+
+        console.log("outline desactivado");
+
+    } else {
+
+        console.log("outline activado");
+    }
+};
+
+/* INIT */
+window.updateOutlineText();
+/* ================= MUSIC TOGGLE ================= */
+
+let musicEnabled =
+    localStorage.getItem("musicEnabled");
+
+if (musicEnabled === null) {
+
+    musicEnabled = "true";
+    localStorage.setItem("musicEnabled", "true");
+
+} else {
+
+    musicEnabled = musicEnabled === "true";
+}
+
+function updateMusicText() {
+
+    const text =
+        document.getElementById("musicText");
+
+    if (!text) return;
+
+    text.innerText =
+        musicEnabled ? "Música: Sí" : "Música: No";
+}
+
+/* TOGGLE BUTTON */
+
+window.toggleMusic = function () {
+
+    musicEnabled = !musicEnabled;
+
+    localStorage.setItem("musicEnabled", musicEnabled);
+
+    updateMusicText();
+
+    if (!musicEnabled) {
+
+        bgMusic.pause();
+        bgMusic.currentTime = 0;
+
+        console.log("música desactivada");
+
+    } else {
+
+        console.log("música activada");
+
+        startPlaylist();
+    }
+};
+
+/* INIT TEXT */
+updateMusicText();
 const closeLookPanelBtn =
 document.getElementById(
     "closeLookPanelBtn"
@@ -4743,7 +5295,12 @@ function clear() {
 
     scene.remove(selectionOutline);
 
-    selectionOutline = null;
+    if (!window.outlineEnabled) {
+    
+    window.selectionOutline = null;
+    transform.detach();
+    return;
+}
 }
     selected = null;
     transform.detach();
@@ -5515,6 +6072,7 @@ scene.add(sprite.userData.dir);
 
     select(sprite);
 }
+
 /* PANEL TOGGLE */
 document.getElementById("togglePanel").onclick = () => {
     rightPanel.classList.toggle("closed");
@@ -6577,6 +7135,7 @@ async function unlockAudio() {
         console.log(err);
     }
 }
+
 /* ================= MUSIC PLAYER ================= */
 
 const playlist = [
@@ -6708,21 +7267,24 @@ async function playTrack(index) {
 /* START PLAYLIST */
 
 function startPlaylist() {
-
-    // espera aleatoria inicial
+    
+    if (!musicEnabled) return;
+    
     const firstDelay =
         randomDelay(30000, 60000);
-
+    
     console.log(
         "playlist inicia en:",
         Math.floor(firstDelay / 1000),
         "seg"
     );
-
+    
     setTimeout(() => {
-
+        
+        if (!musicEnabled) return;
+        
         playTrack(0);
-
+        
     }, firstDelay);
 }
 function updateOrientationPanel() {
@@ -9485,7 +10047,12 @@ function updateSelectionOutline(){
 
         });
 
-        selectionOutline = null;
+        if (!window.outlineEnabled) {
+    
+    window.selectionOutline = null;
+    
+    return;
+}
     }
 
     const obj =
@@ -9523,6 +10090,106 @@ function updateSelectionOutline(){
     scene.add(selectionOutline);
 
 }
+window.scaleUp = function() {
+    
+    const obj =
+        getSelectedObject?.();
+    
+    if (!obj)
+        return;
+    
+    obj.scale.x += 0.5;
+    
+    obj.scale.y += 0.5;
+    
+    obj.scale.z += 0.5;
+    
+};
+
+window.scaleDown = function() {
+    
+    const obj =
+        getSelectedObject?.();
+    
+    if (!obj)
+        return;
+    
+    obj.scale.x -= 0.5;
+    
+    obj.scale.y -= 0.5;
+    
+    obj.scale.z -= 0.5;
+    
+    obj.scale.x =
+        Math.max(0.1, obj.scale.x);
+    
+    obj.scale.y =
+        Math.max(0.1, obj.scale.y);
+    
+    obj.scale.z =
+        Math.max(0.1, obj.scale.z);
+    
+};
+window.updateScaleSlider = function(value){
+
+    const obj =
+        getSelectedObject?.();
+
+    if(!obj)
+    return;
+
+    const scale =
+        parseFloat(value);
+
+    obj.scale.set(
+        scale,
+        scale,
+        scale
+    );
+
+    document.getElementById(
+        "scaleValue"
+    ).innerText =
+        scale.toFixed(1);
+
+};
+window.toggleProjectMenu = function (){
+
+    const menu =
+        window.document.getElementById(
+            "projectMenu"
+        );
+
+    if(menu.style.display === "block"){
+
+        menu.style.display =
+            "none";
+
+    }else{
+
+        menu.style.display =
+            "block";
+    }
+};
+
+window.createNewProject = function (){
+
+    window.location.reload();
+
+};
+
+window.toggleSettingsPanel = function (){
+
+    const panel =
+        window.document.getElementById(
+            "settingsPanel"
+        );
+
+    panel.classList.toggle(
+        "active"
+    );
+
+};
 /* LOOP */
 function animate(){
     spawn.lookAt(camera.position);
