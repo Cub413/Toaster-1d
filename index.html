@@ -2078,11 +2078,314 @@ button{
     transform:scale(0.98);
     box-shadow:0 1px 3px rgba(0,0,0,0.5);
 }
+#consolePanel{
+
+    position:absolute;
+
+    bottom:0;
+
+    left:0;
+
+    width:100%;
+
+    height:180px;
+
+    background:#111;
+
+    border-top:1px solid #333;
+
+    display:none;
+
+    flex-direction:column;
+
+    z-index:99999;
+}
+
+#consoleHeader{
+
+    height:32px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:0 10px;
+
+    background:#1a1a1a;
+
+    border-bottom:1px solid #333;
+
+    color:white;
+
+    font-size:12px;
+}
+
+#consoleContent{
+
+    flex:1;
+
+    overflow:auto;
+
+    font-family:monospace;
+
+    font-size:11px;
+
+    padding:8px;
+
+    color:white;
+}
+
+.consoleLine{
+
+    margin-bottom:4px;
+
+    word-break:break-word;
+}
+
+.consoleError{
+
+    color:#ff5555;
+}
+
+.consoleWarn{
+
+    color:#ffcc55;
+}
+
+.consoleLog{
+
+    color:#ccc;
+}
+#lookConstraintPanel{
+
+    position:absolute;
+user-select:none;
+    top:120px;
+
+    left:120px;
+
+    width:240px;
+
+    background:#1f1f1f;
+
+    border:1px solid #444;
+
+    border-radius:10px;
+
+    z-index:999999;
+
+    display:none;
+
+    overflow:hidden;
+
+    box-shadow:0 0 20px #0008;
+}
+
+#lookConstraintHeader{
+cursor:move;
+    height:34px;
+
+    background:#2a2a2a;
+
+    display:flex;
+
+    align-items:center;
+
+    padding:0 10px;
+
+    cursor:move;
+
+    color:white;
+
+    font-size:13px;
+
+    user-select:none;
+}
+
+.lookSection{
+
+    padding:10px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:6px;
+}
+
+#watcherLabel,
+#targetLabel{
+
+    background:#111;
+
+    border:1px solid #333;
+
+    border-radius:6px;
+
+    padding:6px;
+
+    color:#ccc;
+
+    font-size:12px;
+}
+#lookConstraintHeader{
+
+    height:34px;
+
+    background:#2a2a2a;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:0 10px;
+
+    cursor:move;
+
+    color:white;
+
+    font-size:13px;
+
+    user-select:none;
+}
+
+#closeLookPanelBtn{
+
+    width:24px;
+
+    height:24px;
+
+    border:none;
+
+    background:#444;
+
+    color:white;
+
+    border-radius:5px;
+
+    cursor:pointer;
+}
+
+#closeLookPanelBtn:hover{
+
+    background:#666;
+}
 </style>
 </head>
 
 <body>
+    <div id="lookConstraintPanel">
 
+    <div id="lookConstraintHeader">
+<button id="closeLookPanelBtn">
+
+    <i class="fa-solid fa-xmark"></i>
+
+</button>
+        <span>
+            Look Constraint
+        </span>
+
+    </div>
+
+    <div class="lookSection">
+
+        <button
+            id="pickWatcherBtn"
+            class="itemBtn"
+        >
+
+            <i class="fa-solid fa-eye"></i>
+
+            Mirador
+
+        </button>
+
+        <div id="watcherLabel">
+            Ninguno
+        </div>
+
+    </div>
+
+    <div class="lookSection">
+
+        <button
+            id="pickTargetBtn"
+            class="itemBtn"
+        >
+
+            <i class="fa-solid fa-bullseye"></i>
+
+            Mirado
+
+        </button>
+
+        <div id="targetLabel">
+            Ninguno
+        </div>
+
+    </div>
+
+    <button
+        id="applyLookBtn"
+        class="itemBtn"
+        style="display:none;"
+    >
+
+        <i class="fa-solid fa-check"></i>
+
+        Aplicar
+
+    </button>
+
+    <button
+        id="removeLookBtn"
+        class="itemBtn"
+        style="display:none;"
+    >
+
+        <i class="fa-solid fa-link-slash"></i>
+
+        Disyunción
+
+    </button>
+
+</div>
+<!-- CONSOLE -->
+
+<div id="consolePanel">
+
+    <div id="consoleHeader">
+
+        <span>
+            Console
+        </span>
+
+   <button
+    id="clearConsoleBtn"
+
+    style="
+        background:white;
+        color:black;
+        border:none;
+        border-radius:4px;
+        padding:4px 10px;
+        font-size:11px;
+        cursor:pointer;
+    "
+>
+    Limpiar
+</button>
+
+    </div>
+
+    <div id="consoleContent"></div>
+
+</div>
 
 <div id="updateModal" class="updateModal hidden">
     <div class="updateBox">
@@ -2384,7 +2687,26 @@ value="250">
         <input type="text" id="searchInput" placeholder="Buscar...">
 
         <div id="buttonContainer">
+<button
+    id="billboardBtn"
+    class="menuBtn"
+>
 
+  
+
+    Mirar camara
+
+</button>
+<button
+    id="openLookConstraintBtn"
+    class="menuBtn"
+>
+
+
+
+    Look Constraint
+
+</button>
             <button class="menuBtn">Animación</button>
             <button class="menuBtn">Audio</button>
             <button class="menuBtn">Bloques</button>
@@ -2467,7 +2789,24 @@ value="250">
 </div>
 <div class="topbar">
 
+<button
+    id="openSplashBtn"
+    class="topBarBtn"
+    title="Mostrar Splash Screen"
+>
 
+    <img
+        src="archivos/iconT.png"
+
+        style="
+            width:18px;
+            height:18px;
+            object-fit:contain;
+            pointer-events:none;
+        "
+    >
+
+</button>
 <div id="presetsOverlay">
 
     <div id="presetsPanel">
@@ -2528,7 +2867,12 @@ value="250">
             >
                 Descargar ahora
             </a>
-
+<button
+    class="primary"
+    id="presetUseTextureBtn"
+>
+    Usar textura
+</button>
             <button
                 class="primary"
                 id="presetAddSceneBtn"
@@ -2554,6 +2898,24 @@ value="250">
     <button class="btn" id="presetsBtn">
     <i class="fa-solid fa-box-open"></i>
     
+</button>
+<button
+    id="consoleBtn"
+    class="topBarBtn"
+    title="Consola"
+>
+
+ <i
+    id="consoleIcon"
+    class="fa-solid fa-terminal"
+
+    style="
+        color:white;
+        font-size:12px;
+        pointer-events:none;
+    "
+></i>
+
 </button>
 <div id="workspaceBar">
 
@@ -2636,10 +2998,50 @@ value="250">
         Texturas
     </div>
 
-<label class="textureBtn">
+<div
+    class="textureBtn"
+    id="textureMenuBtn"
+>
     Importar textura
-    <input type="file" id="textureInput" accept="image/*">
-</label>
+</div>
+
+<div id="textureOptions"
+style="
+    display:none;
+    flex-direction:column;
+    gap:6px;
+    padding:0 8px 8px 8px;
+">
+
+<button
+    class="itemBtn"
+    id="textureDeviceBtn"
+>
+
+    <i class="fa-solid fa-mobile-screen-button"></i>
+
+    Desde dispositivo
+
+</button>
+
+<button
+    class="itemBtn"
+    id="textureAssetsBtn"
+>
+
+    <i class="fa-solid fa-box-open"></i>
+
+    Desde tienda de assets
+
+</button>
+</div>
+
+<input
+    type="file"
+    id="textureInput"
+    accept="image/*"
+    style="display:none;"
+>
 
 <button class="textureBtn dangerBtn" id="removeTextureBtn">Sin material</button>
 
@@ -2793,7 +3195,38 @@ value="250">
     </div>
 
 <!-- SKYBOX -->
+<!-- SKYBOX OPTIONS -->
 
+<div id="skyboxOptions"
+style="
+    display:none;
+    flex-direction:column;
+    gap:8px;
+    padding:10px;
+">
+<button
+    class="itemBtn"
+    id="skyboxDeviceBtn"
+>
+
+    <i class="fa-solid fa-mobile-screen-button"></i>
+
+    Desde dispositivo
+
+</button>
+
+<button
+    class="itemBtn"
+    id="skyboxAssetsBtn"
+>
+
+    <i class="fa-solid fa-box-open"></i>
+
+    Desde tienda de assets
+
+</button>
+
+</div>
 <div style="
     padding:10px;
     display:flex;
@@ -2810,9 +3243,7 @@ value="250">
         Imagen 360
     </label>
 
-    <label
-        for="skyboxInput"
-
+<button id="openSkyboxOptions"
         style="
             background:#1f1f1f;
             border:1px solid #3a3a3a;
@@ -2839,7 +3270,7 @@ value="250">
 
         🌌 Importar imagen 360
 
-    </label>
+</button>
 
     <input
         type="file"
@@ -2932,7 +3363,7 @@ value="250">
         <img src="archivos/toastertext.png">
       </div>
 
-<div class="version2" id="appVersion">v 1.00.5</div>
+<div class="version2" id="appVersion">v 1.00.7</div>
 
 <div id="updateModal" class="updateModal hidden">
     <div class="updateBox">
@@ -3176,6 +3607,7 @@ function filterButtons() {
 }
 /* variables */
 let workspaceMode = "object";
+let currentPreviewPreset = null;
 let viewportMode = "solid";
 let selectedMaterialTarget = null;
 let currentTexture = null;
@@ -3185,6 +3617,366 @@ let objects = [];
 let selected = null;
 let selectedLight = null;
 let lights = [];
+const closeLookPanelBtn =
+document.getElementById(
+    "closeLookPanelBtn"
+);
+
+closeLookPanelBtn.onclick = () => {
+
+    lookConstraintPanel.style.display =
+        "none";
+};
+const lookConstraintPanel =
+document.getElementById(
+    "lookConstraintPanel"
+);
+
+const openLookConstraintBtn =
+document.getElementById(
+    "openLookConstraintBtn"
+);
+
+const pickWatcherBtn =
+document.getElementById(
+    "pickWatcherBtn"
+);
+
+const pickTargetBtn =
+document.getElementById(
+    "pickTargetBtn"
+);
+
+const applyLookBtn =
+document.getElementById(
+    "applyLookBtn"
+);
+
+const removeLookBtn =
+document.getElementById(
+    "removeLookBtn"
+);
+
+const watcherLabel =
+document.getElementById(
+    "watcherLabel"
+);
+
+const targetLabel =
+document.getElementById(
+    "targetLabel"
+);
+const lookHeader =
+    document.getElementById(
+        "lookConstraintHeader"
+    );
+
+let draggingLookPanel =
+    false;
+
+let dragOffsetX = 0;
+let dragOffsetY = 0;
+
+/* ====================== */
+/* START DRAG */
+/* ====================== */
+
+function startLookDrag(
+    clientX,
+    clientY
+) {
+    
+    draggingLookPanel = true;
+    
+    dragOffsetX =
+        clientX -
+        lookConstraintPanel.offsetLeft;
+    
+    dragOffsetY =
+        clientY -
+        lookConstraintPanel.offsetTop;
+}
+
+/* ====================== */
+/* MOVE DRAG */
+/* ====================== */
+
+function moveLookDrag(
+    clientX,
+    clientY
+) {
+    
+    if (!draggingLookPanel)
+        return;
+    
+    let x =
+    clientX -
+    dragOffsetX;
+
+let y =
+    clientY -
+    dragOffsetY;
+
+/* ===================== */
+/* LIMITES PANTALLA */
+/* ===================== */
+
+const maxX =
+    window.innerWidth -
+    lookConstraintPanel.offsetWidth;
+
+const maxY =
+    window.innerHeight -
+    lookConstraintPanel.offsetHeight;
+
+/* LEFT */
+
+if (x < 0)
+    x = 0;
+
+/* TOP */
+
+if (y < 0)
+    y = 0;
+
+/* RIGHT */
+
+if (x > maxX)
+    x = maxX;
+
+/* BOTTOM */
+
+if (y > maxY)
+    y = maxY;
+
+/* APPLY */
+
+lookConstraintPanel.style.left =
+    x + "px";
+
+lookConstraintPanel.style.top =
+    y + "px";
+}
+
+/* ====================== */
+/* END DRAG */
+/* ====================== */
+
+function endLookDrag() {
+    
+    draggingLookPanel = false;
+}
+
+/* ====================== */
+/* MOUSE */
+/* ====================== */
+
+lookHeader.addEventListener(
+    "mousedown",
+    
+    e => {
+        
+        startLookDrag(
+            e.clientX,
+            e.clientY
+        );
+    }
+);
+
+window.addEventListener(
+    "mousemove",
+    
+    e => {
+        
+        moveLookDrag(
+            e.clientX,
+            e.clientY
+        );
+    }
+);
+
+window.addEventListener(
+    "mouseup",
+    
+    endLookDrag
+);
+
+/* ====================== */
+/* TOUCH */
+/* ====================== */
+
+lookHeader.addEventListener(
+    "touchstart",
+    
+    e => {
+        
+        const touch =
+            e.touches[0];
+        
+        startLookDrag(
+            touch.clientX,
+            touch.clientY
+        );
+    },
+    
+    { passive: true }
+);
+
+window.addEventListener(
+    "touchmove",
+    
+    e => {
+        
+        const touch =
+            e.touches[0];
+        
+        if (!touch)
+            return;
+        
+        moveLookDrag(
+            touch.clientX,
+            touch.clientY
+        );
+    },
+    
+    { passive: true }
+);
+
+window.addEventListener(
+    "touchend",
+    
+    endLookDrag
+);
+let pickingWatcher =
+    false;
+
+let pickingTarget =
+    false;
+
+let watcherObject =
+    null;
+
+let targetObject =
+    null;
+    openLookConstraintBtn.onclick = () => {
+
+    lookConstraintPanel.style.display =
+        "block";
+};
+pickWatcherBtn.onclick = () => {
+    
+    if (!selected)
+        return;
+    
+    watcherObject = selected;
+    
+    watcherLabel.innerText =
+        selected.name;
+    
+    if (
+        watcherObject &&
+        targetObject
+    ) {
+        
+        applyLookBtn.style.display =
+            "flex";
+    }
+};
+pickTargetBtn.onclick = () => {
+    
+    if (!selected)
+        return;
+    
+    targetObject = selected;
+    
+    targetLabel.innerText =
+        selected.name;
+    
+    if (
+        watcherObject &&
+        targetObject
+    ) {
+        
+        applyLookBtn.style.display =
+            "flex";
+    }
+    
+    if (selected.userData.lookWatchers) {
+        
+        removeLookBtn.style.display =
+            "flex";
+    }
+};
+const billboardBtn =
+document.getElementById(
+    "billboardBtn"
+);
+
+let billboardObjects =
+    [];
+const consoleBtn =
+document.getElementById(
+    "consoleBtn"
+);
+
+const consolePanel =
+document.getElementById(
+    "consolePanel"
+);
+
+const consoleContent =
+document.getElementById(
+    "consoleContent"
+);
+
+const consoleIcon =
+document.getElementById(
+    "consoleIcon"
+);
+
+const clearConsoleBtn =
+document.getElementById(
+    "clearConsoleBtn"
+);
+
+let consoleVisible = false;
+consoleBtn.onclick = () => {
+
+    consoleVisible =
+        !consoleVisible;
+
+    consolePanel.style.display =
+        consoleVisible
+        ? "flex"
+        : "none";
+};
+clearConsoleBtn.onclick = () => {
+
+    consoleContent.innerHTML = "";
+
+    consoleIcon.style.color =
+        "white";
+};
+const openSplashBtn =
+document.getElementById(
+    "openSplashBtn"
+);
+openSplashBtn.onclick = () => {
+    
+    const overlay =
+        document.getElementById(
+            "overlay2"
+        );
+    
+    overlay.style.display =
+        "flex";
+    
+    overlay.style.opacity =
+        "1";
+    
+    overlay.style.pointerEvents =
+        "all";
+};
 window.addEventListener("load", () => {
     const versionEl = document.getElementById("appVersion");
     
@@ -3276,6 +4068,109 @@ const ambientIntensity =
 
 const pixelRatioSelect =
     document.getElementById("pixelRatioSelect");
+    const openSkyboxOptions =
+document.getElementById(
+    "openSkyboxOptions"
+);
+const presetUseTextureBtn =
+document.getElementById(
+    "presetUseTextureBtn"
+);
+const textureMenuBtn =
+document.getElementById(
+    "textureMenuBtn"
+);
+
+const textureOptions =
+document.getElementById(
+    "textureOptions"
+);
+
+const textureDeviceBtn =
+document.getElementById(
+    "textureDeviceBtn"
+);
+
+const textureAssetsBtn =
+document.getElementById(
+    "textureAssetsBtn"
+);
+textureMenuBtn.onclick = () => {
+
+    textureOptions.style.display =
+    textureOptions.style.display === "flex"
+    ? "none"
+    : "flex";
+};
+
+textureDeviceBtn.onclick = () => {
+
+    assetTarget = "material";
+
+    document.getElementById(
+        "textureInput"
+    ).click();
+
+    textureOptions.style.display = "none";
+};
+
+textureAssetsBtn.onclick = () => {
+
+    assetTarget = "material";
+
+    document.getElementById(
+        "presetsOverlay"
+    ).style.display = "flex";
+
+    openPresetTab("images");
+
+    textureOptions.style.display = "none";
+};
+const skyboxOptions =
+document.getElementById(
+    "skyboxOptions"
+);
+
+const skyboxDeviceBtn =
+document.getElementById(
+    "skyboxDeviceBtn"
+);
+
+const skyboxAssetsBtn =
+document.getElementById(
+    "skyboxAssetsBtn"
+);
+
+let assetTarget = null;
+openSkyboxOptions.onclick = () => {
+
+    skyboxOptions.style.display =
+    skyboxOptions.style.display === "flex"
+    ? "none"
+    : "flex";
+};
+
+skyboxDeviceBtn.onclick = () => {
+
+    assetTarget = "skybox";
+
+    skyboxInput.click();
+
+    skyboxOptions.style.display = "none";
+};
+
+skyboxAssetsBtn.onclick = () => {
+
+    assetTarget = "skybox";
+
+    document.getElementById(
+        "presetsOverlay"
+    ).style.display = "flex";
+
+    openPresetTab("images");
+
+    skyboxOptions.style.display = "none";
+};
 let multiSelectMode = false;
 let selectionGroup = null;
 
@@ -3455,7 +4350,9 @@ window.addEventListener("load", () => {
 /* SPAWN */
 const lightTexture = new THREE.TextureLoader().load("archivos/light.png");
 function faceCamera(obj){
-    obj.lookAt(camera.position);
+    obj.quaternion.copy(
+    camera.quaternion
+);
 }
 const texLoader = new THREE.TextureLoader();
 
@@ -3536,7 +4433,62 @@ function select(obj) {
     transform.visible = false;
 }
     selectedMaterialTarget = obj; // 👈 clave para textura
+if(
+    obj?.userData?.billboard
+){
 
+    billboardBtn.style.background =
+        "#3a6df0";
+}
+
+else {
+
+    billboardBtn.style.background =
+        "";
+}
+if (pickingWatcher) {
+    
+    watcherObject = obj;
+    
+    watcherLabel.innerText =
+        obj.name;
+    
+    pickingWatcher = false;
+    
+    if (
+        watcherObject &&
+        targetObject
+    ) {
+        
+        applyLookBtn.style.display =
+            "flex";
+    }
+}
+
+if (pickingTarget) {
+    
+    targetObject = obj;
+    
+    targetLabel.innerText =
+        obj.name;
+    
+    pickingTarget = false;
+    
+    if (
+        watcherObject &&
+        targetObject
+    ) {
+        
+        applyLookBtn.style.display =
+            "flex";
+    }
+    
+    if (obj.userData.lookWatchers) {
+        
+        removeLookBtn.style.display =
+            "flex";
+    }
+}
     loadTextureFromObject(obj); 
     refreshOutliner();
     renderObjectKeyframes();
@@ -4430,7 +5382,14 @@ document.getElementById("copyBtn").onclick=()=>{
 };
 
 document.getElementById("deleteBtn").onclick = () => {
+    if (selected) {
     
+    transform.detach();
+    
+    scene.remove(selected);
+    
+    selected = null;
+}
     if (!target || target === spawn) return;
     
     // eliminar luz
@@ -4449,7 +5408,74 @@ document.getElementById("deleteBtn").onclick = () => {
     // limpiar arrays
     objects = objects.filter(o => o !== target);
     lights = lights.filter(o => o !== target);
-    
+    scene.traverse(child => {
+
+const deletedObject =
+    selected;
+
+/* LIMPIAR LOOK TARGETS */
+
+scene.traverse(child => {
+
+    /* SI EL OBJETO BORRADO
+       ERA EL TARGET */
+
+    if(
+        child.userData.lookTarget ===
+        deletedObject
+    ){
+
+        child.userData.lookTarget =
+            null;
+
+        child.rotation.set(
+            0,
+            0,
+            0
+        );
+
+        child.quaternion.identity();
+    }
+});
+
+/* SI EL OBJETO BORRADO
+   TENÍA WATCHERS */
+
+if(
+    deletedObject?.userData
+    ?.lookWatchers
+){
+
+    deletedObject.userData
+    .lookWatchers
+    .forEach(watcher => {
+
+        watcher.userData.lookTarget =
+            null;
+
+        watcher.rotation.set(
+            0,
+            0,
+            0
+        );
+
+        watcher.quaternion.identity();
+    });
+}
+
+/* DETACH */
+
+transform.detach();
+
+/* BORRAR */
+
+scene.remove(deletedObject);
+
+/* LIMPIAR */
+
+selected = null;
+});
+
     clear();
     refreshOutliner();
     
@@ -7238,6 +8264,16 @@ const imagePresets = [
         name:"sky360",
         image:"store/sky360.jpg",
         file:"store/sky360.jpg"
+    },
+        {
+        name:"texture",
+        image:"store/texture.jpg",
+        file:"store/texture.jpg"
+    },
+        {
+        name:"asphalt",
+        image:"store/asphalt.png",
+        file:"store/asphalt.png"
     }
 ];
 
@@ -7248,7 +8284,16 @@ const modelPresets = [
         preview:"store/tree.png",
         model:"store/arbol.gltf"
     },
-
+        {
+        name:"stone",
+        preview:"store/piedra.jpg",
+        model:"store/piedra.gltf"
+    },
+{
+        name:"car",
+        preview:"store/car.png",
+        model:"store/car.gltf"
+    },
     {
         name:"House",
         preview:"store/hause.png",
@@ -7314,7 +8359,10 @@ window.openPresetTab = function(tab){
 function openPresetTab(tab){
 
     currentPresetTab = tab;
-
+presetUseTextureBtn.style.display =
+tab === "images"
+? "flex"
+: "none";
     document
     .querySelectorAll(".presetTab")
     .forEach(btn => {
@@ -7376,15 +8424,18 @@ function renderPresets(){
             `;
 
             card.onclick = () => {
+    
+    currentPreviewPreset = item;
+    
+    presetPreviewOverlay.style.display =
+        "flex";
+    
+    presetPreviewImg.src =
+        item.image;
+    
+    presetPreviewName.textContent =
+        item.name;
 
-                presetPreviewOverlay.style.display =
-                    "flex";
-
-                presetPreviewImg.src =
-                    item.image;
-
-                presetPreviewName.textContent =
-                    item.name;
 
                 presetDownloadBtn.onclick = () => {
     
@@ -7429,7 +8480,7 @@ function renderPresets(){
             `;
 
             card.onclick = () => {
-
+currentPreviewPreset = item;
                 presetPreviewOverlay.style.display =
                     "flex";
 
@@ -7444,7 +8495,8 @@ function renderPresets(){
 
                 presetAddSceneBtn.style.display =
                     "flex";
-
+presetUseTextureBtn.style.display =
+    "none";
                 presetAddSceneBtn.onclick = () => {
 
                     gltfLoader.load(
@@ -7496,6 +8548,74 @@ function renderPresets(){
         });
     }
 }
+presetUseTextureBtn.onclick = () => {
+
+    if(!currentPreviewPreset)
+    return;
+
+    const texLoader =
+    new THREE.TextureLoader();
+
+    texLoader.load(
+        currentPreviewPreset.image ||
+        currentPreviewPreset.file,
+        (tex) => {
+
+            /* ===================== */
+            /* SKYBOX */
+            /* ===================== */
+
+            if(assetTarget === "skybox"){
+
+                tex.mapping =
+                THREE.EquirectangularReflectionMapping;
+
+                scene.background = tex;
+                scene.environment = tex;
+            }
+
+            /* ===================== */
+            /* MATERIAL */
+            /* ===================== */
+
+            if(assetTarget === "material"){
+
+                const obj =
+                getSelectedObject();
+
+                if(!obj)
+                return;
+
+                obj.traverse(child => {
+
+                    if(child.isMesh){
+
+                        child.material.map = tex;
+
+                        child.material.needsUpdate = true;
+                    }
+                });
+
+                currentTexture = tex;
+
+                if(tex.image){
+
+                    
+                }
+            }
+
+            /* cerrar preview */
+
+            document.getElementById(
+                "presetPreviewOverlay"
+            ).style.display = "none";
+
+            document.getElementById(
+                "presetsOverlay"
+            ).style.display = "none";
+        }
+    );
+};
 function saveOriginalMaterials(obj) {
     
     obj.traverse(child => {
@@ -7522,6 +8642,195 @@ function restoreOriginalMaterials(obj) {
         }
     });
 }
+function addConsoleLine(
+    text,
+    type = "log"
+){
+
+    const line =
+        document.createElement("div");
+
+    line.className =
+        "consoleLine console" +
+        (
+            type.charAt(0)
+            .toUpperCase() +
+            type.slice(1)
+        );
+
+    line.textContent = text;
+
+    consoleContent.appendChild(line);
+
+    consoleContent.scrollTop =
+        consoleContent.scrollHeight;
+
+    if(type === "error"){
+
+        consoleIcon.style.color =
+            "#ff4444";
+    }
+}
+/* LOG */
+
+const originalLog =
+    console.log;
+
+console.log = (...args) => {
+
+    originalLog(...args);
+
+    addConsoleLine(
+        args.join(" "),
+        "log"
+    );
+};
+
+/* WARN */
+
+const originalWarn =
+    console.warn;
+
+console.warn = (...args) => {
+
+    originalWarn(...args);
+
+    addConsoleLine(
+        args.join(" "),
+        "warn"
+    );
+};
+
+/* ERROR */
+
+const originalError =
+    console.error;
+
+console.error = (...args) => {
+
+    originalError(...args);
+
+    addConsoleLine(
+        args.join(" "),
+        "error"
+    );
+};
+
+/* ALERT */
+
+const originalAlert =
+    window.alert;
+
+window.alert = (msg) => {
+
+    addConsoleLine(
+        "ALERT: " + msg,
+        "warn"
+    );
+
+    originalAlert(msg);
+};
+window.onerror = (
+    message,
+    source,
+    line,
+    col,
+    error
+) => {
+
+    addConsoleLine(
+
+        `${message}
+        (${line}:${col})`,
+
+        "error"
+    );
+};
+billboardBtn.onclick = () => {
+
+    const obj =
+    selected;
+
+    if(!obj)
+    return;
+
+    obj.userData.billboard =
+        !obj.userData.billboard;
+
+    if(
+        obj.userData.billboard
+    ){
+
+        if(
+            !billboardObjects
+            .includes(obj)
+        ){
+
+            billboardObjects
+            .push(obj);
+        }
+
+        billboardBtn.style.background =
+            "#3a6df0";
+    }
+
+    else {
+
+        billboardObjects =
+            billboardObjects
+            .filter(o => o !== obj);
+
+        billboardBtn.style.background =
+            "";
+    }
+};
+applyLookBtn.onclick = () => {
+
+    if(
+        !watcherObject ||
+        !targetObject
+    ) return;
+
+    watcherObject.userData.lookTarget =
+        targetObject;
+
+    if(
+        !targetObject.userData
+        .lookWatchers
+    ){
+
+        targetObject.userData
+        .lookWatchers = [];
+    }
+
+    targetObject.userData
+    .lookWatchers
+    .push(watcherObject);
+};
+removeLookBtn.onclick = () => {
+
+    if(!targetObject)
+    return;
+
+    const watchers =
+        targetObject.userData
+        .lookWatchers;
+
+    if(!watchers)
+    return;
+
+    watchers.forEach(obj => {
+
+        obj.userData.lookTarget =
+            null;
+    });
+
+    targetObject.userData
+    .lookWatchers = [];
+
+    removeLookBtn.style.display =
+        "none";
+};
 /* LOOP */
 function animate(){
     spawn.lookAt(camera.position);
@@ -7529,6 +8838,50 @@ function animate(){
     gizmoGroup.traverse((child)=>{
     if(child.isMesh && child.material.map){
         child.lookAt(gizmoCamera.position);
+    }
+});
+scene.traverse(obj => {
+    
+    const target =
+        obj.userData.lookTarget;
+    
+    /* TARGET ELIMINADO */
+    
+    if (
+        target &&
+        !target.parent
+    ) {
+        
+        obj.userData.lookTarget =
+            null;
+        
+        return;
+    }
+    
+    /* LOOK ACTIVE */
+    
+    if (
+        target &&
+        target.parent
+    ) {
+        
+        const pos =
+            new THREE.Vector3();
+        
+        target.getWorldPosition(pos);
+        
+        obj.lookAt(pos);
+    }
+});
+scene.traverse(obj => {
+
+    if(
+        obj.userData?.billboard
+    ){
+
+        obj.quaternion.copy(
+            camera.quaternion
+        );
     }
 });
     /* ACTUALIZAR GIZMO */
@@ -7575,7 +8928,15 @@ objects.forEach(obj => {
     }
 });
 if (usingSceneCamera && activeSceneCamera) {
-    
+    billboardObjects.forEach(obj => {
+
+    if(!obj.parent)
+    return;
+
+    obj.quaternion.copy(
+    camera.quaternion
+);
+});
     renderer.render(
         scene,
         activeSceneCamera.userData.camera
