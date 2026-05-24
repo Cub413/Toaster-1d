@@ -8630,76 +8630,70 @@ async function createVideoFromFrames(
     recorder.stop();
     
     recorder.onstop = () => {
-        
-        const blob =
-            new Blob(chunks, {
-                type: "video/webm"
-            });
-        
-        const url =
-            URL.createObjectURL(blob);
-        
-        renderVideoPreview.src =
-            url;
-        
-        downloadRenderBtn.href =
-            url;
-        
-        renderResult.style.display =
-            "flex";
-    };
+    
+    renderOverlay.style.display = "none";
+    
+    const blob = new Blob(chunks, {
+        type: "video/webm"
+    });
+    
+    const url = URL.createObjectURL(blob);
+    
+    renderVideoPreview.src = url;
+    
+    renderVideoPreview.style.position = "fixed";
+    renderVideoPreview.style.top = "0";
+    renderVideoPreview.style.left = "0";
+    renderVideoPreview.style.width = "100vw";
+    renderVideoPreview.style.height = "100vh";
+    renderVideoPreview.style.zIndex = "999999";
+    renderVideoPreview.style.background = "#000";
+    renderVideoPreview.style.objectFit = "contain";
+    
+    renderVideoPreview.play();
+    
+    renderResult.style.display = "flex";
+};
 }
-downloadRenderBtn.onclick = async () => {
+renderVideoPreview.addEventListener("click", function(){
+
+    this.pause();
+
+    this.style.position = "";
+    this.style.top = "";
+    this.style.left = "";
+    this.style.width = "";
+    this.style.height = "";
+    this.style.zIndex = "";
+    this.style.background = "";
+    this.style.objectFit = "";
+
+    renderResult.style.display = "none";
+});
+downloadRenderBtn.innerHTML = '<i class="fas fa-expand"></i>';
+
+downloadRenderBtn.onclick = () => {
     
-    if (!renderVideoPreview.src) return;
+    const preview = document.getElementById("renderResult");
     
-    try {
-        
-        const response =
-            await fetch(
-                renderVideoPreview.src
-            );
-        
-        const blob =
-            await response.blob();
-        
-        const reader =
-            new FileReader();
-        
-        reader.onloadend = () => {
-            
-            const base64 =
-                reader.result;
-            
-            // abrir descarga real
-            const a =
-                document.createElement("a");
-            
-            a.href =
-                base64;
-            
-            a.download =
-                "render.webm";
-            
-            a.target =
-                "_blank";
-            
-            document.body.appendChild(a);
-            
-            a.click();
-            
-            document.body.removeChild(a);
-        };
-        
-        reader.readAsDataURL(blob);
-        
-    } catch (err) {
-        
-        console.error(err);
+    if (!preview) return;
+    
+    // fullscreen real si existe
+    if (preview.requestFullscreen) {
+        preview.requestFullscreen();
+    }
+    
+    // fallback simulando fullscreen
+    else {
+        preview.style.position = "fixed";
+        preview.style.inset = "0";
+        preview.style.width = "100vw";
+        preview.style.height = "100vh";
+        preview.style.zIndex = "999999";
+        preview.style.objectFit = "contain";
+        preview.style.background = "#000";
     }
 };
-
-
 async function unlockAudio() {
 
     if (audioUnlocked) return;
@@ -10519,24 +10513,34 @@ window.addEventListener("resize", () => {
         innerHeight
     );
 });
-document.getElementById("renderImageBtn")
-.onclick = () => {
-
+document.getElementById("renderImageBtn").onclick = () => {
+    
     renderMenu.style.display = "none";
-
+    
     renderer.render(scene, camera);
-
-    const a =
-    document.createElement("a");
-
-    a.href =
-    renderer.domElement.toDataURL("image/png");
-
-    a.download = "render.png";
-
-    a.click();
+    
+    const canvas = renderer.domElement;
+    
+    canvas.style.position = "fixed";
+    canvas.style.top = "0";
+    canvas.style.left = "0";
+    canvas.style.width = "100vw";
+    canvas.style.height = "100vh";
+    canvas.style.zIndex = "999999";
+    canvas.style.background = "#000";
+    canvas.style.objectFit = "contain";
+    
 };
-
+renderer.domElement.addEventListener("click", function () {
+    this.style.position = "";
+    this.style.top = "";
+    this.style.left = "";
+    this.style.width = "";
+    this.style.height = "";
+    this.style.zIndex = "";
+    this.style.background = "";
+    this.style.objectFit = "";
+});
 renderVideoBtn.onclick = async () => {
     
     await renderVideoFrames();
@@ -12968,6 +12972,50 @@ document.getElementById("pixelFusionToggle")
         }
     });
 });
+/* ===== DETECTOR GLOBAL ANTI-CRASH ===== */
+
+(function () {
+
+    const warn = (type, err) => {
+        console.warn(`⚠ ${type}:`, err?.message || err);
+
+        // opcional: mostrar aviso visual
+        if (window.showWarning) {
+            showWarning(err?.message || String(err));
+        }
+    };
+
+    // errores JS
+    window.onerror = function (msg, src, line, col, err) {
+        warn("Error detectado", err || msg);
+        return true; // bloquea crash
+    };
+
+    // promesas
+    window.onunhandledrejection = function (e) {
+        warn("Promesa rechazada", e.reason);
+        e.preventDefault();
+    };
+
+    // envolver automáticamente timers
+    const wrap = fn => function (...args) {
+        try {
+            return fn.apply(this, args);
+        } catch (err) {
+            warn("Auto-detectado", err);
+        }
+    };
+
+    const _setTimeout = window.setTimeout;
+    const _setInterval = window.setInterval;
+
+    window.setTimeout = (fn, ...args) =>
+        _setTimeout(typeof fn === "function" ? wrap(fn) : fn, ...args);
+
+    window.setInterval = (fn, ...args) =>
+        _setInterval(typeof fn === "function" ? wrap(fn) : fn, ...args);
+
+})();
 /* LOOP */
 function animate(){
     spawn.lookAt(camera.position);
