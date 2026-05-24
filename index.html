@@ -4890,7 +4890,12 @@ function filterButtons() {
     });
 }
 /* variables */
+let holdTargetParent = null;
+let holdChildrenToAdd = [];
+let holdTimer = null;
 const boneHelpers = [];
+let dragParentTarget = null;
+let dragChildrenTargets = [];
 const fireSystems = [];
 let boneDisplayScale = 0.02;
 let workspaceMode = "object";
@@ -4905,7 +4910,22 @@ let selected = null;
 let selectedLight = null;
 let lights = [];
 let selectionOutline = null;
+const confirmNestBtn = document.createElement("button");
 
+confirmNestBtn.textContent = "Confirmar";
+confirmNestBtn.style.position = "fixed";
+confirmNestBtn.style.bottom = "20px";
+confirmNestBtn.style.left = "50%";
+confirmNestBtn.style.transform = "translateX(-50%)";
+confirmNestBtn.style.padding = "12px 20px";
+confirmNestBtn.style.background = "#1e88e5";
+confirmNestBtn.style.color = "white";
+confirmNestBtn.style.border = "none";
+confirmNestBtn.style.borderRadius = "10px";
+confirmNestBtn.style.display = "none";
+confirmNestBtn.style.zIndex = "99999";
+
+document.body.appendChild(confirmNestBtn);
 /* ================= OUTLINE SYSTEM ================= */
 
 window.outlineEnabled =
@@ -7240,22 +7260,22 @@ let draggedOutlinerObject = null;
 // REFRESH OUTLINER
 // ======================================
 
+// ======================================
+// REFRESH OUTLINER
+// ======================================
+
 function refreshOutliner(){
 
     outliner.innerHTML = "";
 
-    // SOLO OBJETOS ROOT
+    renderConfirmButton();
+
     const rootObjects =
     [...objects, spawn]
     .filter(obj => {
 
-        // ocultar bones
-        if(obj.type === "Bone")
-            return false;
-
-        // ocultar helpers de huesos
-        if(obj.userData.isBoneHelper)
-            return false;
+        if(obj.type === "Bone") return false;
+        if(obj.userData.isBoneHelper) return false;
 
         return (
             !obj.parent ||
@@ -7264,14 +7284,251 @@ function refreshOutliner(){
 
     });
 
-    rootObjects.forEach(obj => {
+    rootObjects.forEach(obj=>{
+        renderOutlinerItem(obj,0);
+    });
 
-        renderOutlinerItem(
-            obj,
-            0
+}
+
+// ======================================
+// BOTÓN CONFIRMAR
+// ======================================
+
+function renderConfirmButton() {
+    
+    let panel =
+        document.getElementById(
+            "outlinerConfirmPanel"
+        );
+    
+    if (!panel) {
+        
+        panel =
+            document.createElement("div");
+        
+        panel.id =
+            "outlinerConfirmPanel";
+        
+        panel.style.position =
+            "fixed";
+        
+        panel.style.bottom =
+            "180px";
+        
+        // MÁS A LA IZQUIERDA
+        panel.style.right =
+            "200px";
+        
+        panel.style.display =
+            "none";
+        
+        panel.style.flexDirection =
+            "column";
+        
+        panel.style.gap =
+            "8px";
+        
+        panel.style.padding =
+            "12px";
+        
+        panel.style.background =
+            "#2a2a2a";
+        
+        panel.style.border =
+            "1px solid #3f3f3f";
+        
+        panel.style.borderRadius =
+            "10px";
+        
+        panel.style.boxShadow =
+            "0 4px 16px rgba(0,0,0,0.35)";
+        
+        panel.style.zIndex =
+            "99999";
+        
+        document.body.appendChild(
+            panel
+        );
+        
+    }
+    
+    panel.innerHTML = "";
+    
+    if (
+        holdTargetParent &&
+        holdChildrenToAdd.length > 0
+    ) {
+        
+        panel.style.display =
+            "flex";
+        
+        function createBtn(text, action) {
+            
+            const btn =
+                document.createElement("button");
+                panel.innerHTML = "";
+            const title =
+    document.createElement("div");
+
+title.textContent =
+    "AGRUPAMIENTO";
+
+title.style.color =
+    "#bdbdbd";
+
+title.style.fontSize =
+    "12px";
+
+title.style.fontWeight =
+    "700";
+
+title.style.letterSpacing =
+    "1px";
+
+title.style.marginBottom =
+    "6px";
+
+title.style.textAlign =
+    "center";
+
+panel.appendChild(title);
+            btn.textContent =
+                text;
+            
+            btn.style.padding =
+                "10px 18px";
+            
+            btn.style.background =
+                "#4b5563";
+            
+            btn.style.color =
+                "#fff";
+            
+            btn.style.border =
+                "1px solid #6b7280";
+            
+            btn.style.cursor =
+                "pointer";
+            
+            btn.style.borderRadius =
+                "8px";
+            
+            btn.style.fontSize =
+                "13px";
+            
+            btn.style.fontWeight =
+                "600";
+            
+            btn.style.minWidth =
+                "140px";
+            
+            btn.style.transition =
+                "0.15s";
+            
+            btn.onmouseenter = () =>
+                btn.style.background =
+                "#6b7280";
+            
+            btn.onmouseleave = () =>
+                btn.style.background =
+                "#4b5563";
+            
+            btn.onclick = action;
+            
+            return btn;
+        }
+        
+        const confirm =
+            createBtn(
+                "CONFIRMAR",
+                confirmOutlinerGroup
+            );
+        
+        const cancel =
+            createBtn(
+                "CANCELAR",
+                () => {
+                    
+                    holdTargetParent = null;
+                    holdChildrenToAdd = [];
+                    
+                    refreshOutliner();
+                }
+            );
+        
+        panel.appendChild(confirm);
+        panel.appendChild(cancel);
+        
+    } else {
+        
+        panel.style.display =
+            "none";
+    }
+}
+// ======================================
+// CONFIRMAR
+// ======================================
+
+function confirmOutlinerGroup(){
+
+    holdChildrenToAdd.forEach(child=>{
+
+        if(
+            child === holdTargetParent
+        ) return;
+
+        let current =
+            holdTargetParent;
+
+        while(current){
+
+            if(current === child)
+                return;
+
+            current =
+                current.parent;
+        }
+
+        const worldPos =
+            new THREE.Vector3();
+
+        const worldQuat =
+            new THREE.Quaternion();
+
+        const worldScale =
+            new THREE.Vector3();
+
+        child.updateMatrixWorld(true);
+
+        child.matrixWorld.decompose(
+            worldPos,
+            worldQuat,
+            worldScale
         );
 
+        if(child.parent){
+            child.parent.remove(child);
+        }
+
+        holdTargetParent.add(child);
+
+        child.position.copy(
+            holdTargetParent.worldToLocal(
+                worldPos.clone()
+            )
+        );
+
+        child.quaternion.copy(worldQuat);
+        child.scale.copy(worldScale);
+
     });
+
+    holdTargetParent.userData.expanded = true;
+
+    holdTargetParent = null;
+    holdChildrenToAdd = [];
+
+    refreshOutliner();
 
 }
 
@@ -7288,97 +7545,75 @@ function renderOutlinerItem(
         document.createElement("div");
 
     item.className =
-        "item" +
-        (
-            obj === selectedInUI ||
-            selectedObjects.includes(obj)
-            ? " active"
-            : ""
-        );
+        "item";
 
-    // ======================================
-    // DRAG
-    // ======================================
+    if(
+        obj === selectedInUI ||
+        selectedObjects.includes(obj)
+    ){
+        item.classList.add("active");
+    }
 
-    setupOutlinerDrag(
+    // Verde
+    if(obj === holdTargetParent){
+        item.style.background =
+            "#16a34a";
+    }
+
+    // Azul
+    if(
+        holdChildrenToAdd.includes(obj)
+    ){
+        item.style.background =
+            "#2563eb";
+    }
+
+    setupOutlinerHold(
         item,
         obj
     );
 
-    // ======================================
-    // LEFT
-    // ======================================
-
     const left =
         document.createElement("div");
 
-    left.className =
-        "left";
+    left.className = "left";
+    left.style.paddingLeft = "4px";
 
-    // indentación visual
-    left.style.paddingLeft =
-    "4px";
+    if(depth > 0){
 
-const indent =
-    Math.min(depth, 6);
+        const tree =
+            document.createElement("span");
 
-if (depth > 0) {
-    
-    const tree =
-        document.createElement("span");
-    
-    tree.textContent =
-        "└";
-    
-    tree.style.opacity =
-        "0.4";
-    
-    tree.style.flexShrink =
-        "0";
-    
-    tree.style.width =
-        "10px";
-    
-    tree.style.fontSize =
-        "10px";
-    
-    left.appendChild(tree);
-    
-}
-    // hijos reales
+        tree.textContent = "└";
+        tree.style.opacity = "0.4";
+        tree.style.width = "10px";
+
+        left.appendChild(tree);
+    }
+
     const children =
-    obj.children.filter(c => {
-        
+    obj.children.filter(c=>{
+
         return (
-            
             !c.userData.isBoneHelper &&
-            
             c.type !== "Bone" &&
-            
             c !== transform &&
-            
             c.type !== "TransformControls" &&
             c.type !== "TransformControlsPlane" &&
             c.type !== "TransformControlsGizmo"
-            
         );
-        
+
     });
 
-    // ======================================
-    // FLECHA
-    // ======================================
+    // Flecha
+    if(children.length > 0){
 
-    if (children.length > 0) {
-
-        if (
+        if(
             obj.userData.expanded ===
             undefined
-        ) {
-
+        ){
             obj.userData.expanded =
                 false;
-
         }
 
         const arrow =
@@ -7395,7 +7630,7 @@ if (depth > 0) {
         arrow.style.marginRight =
             "4px";
 
-        arrow.onclick = (e) => {
+        arrow.onclick = e=>{
 
             e.stopPropagation();
 
@@ -7403,44 +7638,32 @@ if (depth > 0) {
                 !obj.userData.expanded;
 
             refreshOutliner();
-
         };
 
-        left.appendChild(
-            arrow
-        );
+        left.appendChild(arrow);
 
-    } else {
+    }else{
 
-        // espacio vacío para alinear
         const spacer =
             document.createElement("span");
 
         spacer.innerHTML = "•";
-
-        spacer.style.opacity =
-            "0.3";
-
-        spacer.style.marginRight =
-            "6px";
+        spacer.style.opacity = "0.3";
+        spacer.style.marginRight = "6px";
 
         left.appendChild(spacer);
-
     }
 
-    // ======================================
-    // OJO
-    // ======================================
-
+    // Ojo
     const eye =
         document.createElement("button");
 
     eye.innerHTML =
         obj.visible
-        ? `<i class="fa-solid fa-eye" style="color:white;"></i>`
-        : `<i class="fa-solid fa-eye-slash" style="color:white;"></i>`;
+        ? `<i class="fa-solid fa-eye"></i>`
+        : `<i class="fa-solid fa-eye-slash"></i>`;
 
-    eye.onclick = (e) => {
+    eye.onclick = e=>{
 
         e.stopPropagation();
 
@@ -7448,329 +7671,154 @@ if (depth > 0) {
             !obj.visible;
 
         refreshOutliner();
-
     };
 
-    // ======================================
-    // NOMBRE
-    // ======================================
-
     const name =
-    document.createElement("span");
+        document.createElement("span");
 
-name.className =
-    "name";
+    name.className = "name";
 
     name.textContent =
-        obj.userData.isBoneHelper ?
-        "🦴 " + obj.name :
-        (
-            obj === spawn ?
-            "SPAWN" :
-            (obj.name || "Objeto")
-        );
+        obj === spawn
+        ? "SPAWN"
+        : (obj.name || "Objeto");
 
     left.appendChild(eye);
     left.appendChild(name);
-
-    // ======================================
-    // FOCUS
-    // ======================================
 
     const focus =
         document.createElement("button");
 
     focus.innerHTML =
-        `<i class="fa-solid fa-crosshairs" style="color:white;"></i>`;
+        `<i class="fa-solid fa-crosshairs"></i>`;
 
-    focus.onclick = (e) => {
+    focus.onclick = e=>{
 
         e.stopPropagation();
-
-        orbit.target.copy(
-            obj.position
-        );
-
+        orbit.target.copy(obj.position);
     };
-
-    // ======================================
-    // DOTS
-    // ======================================
 
     const dots =
         document.createElement("button");
 
     dots.innerHTML =
-        `<i class="fa-solid fa-ellipsis-vertical" style="color:white;"></i>`;
+        `<i class="fa-solid fa-ellipsis-vertical"></i>`;
 
-    dots.onclick = (e) => {
+    dots.onclick = e=>{
 
         e.stopPropagation();
 
-        menu.style.display =
-            "flex";
-
-        menu.style.left =
-            "50%";
-
-        menu.style.top =
-            "50%";
-
+        menu.style.display = "flex";
+        menu.style.left = "50%";
+        menu.style.top = "50%";
         menu.style.transform =
             "translate(-50%, -50%)";
 
         target = obj;
-
     };
 
     item.appendChild(left);
     item.appendChild(focus);
     item.appendChild(dots);
 
-    item.onclick = () => {
-
+    item.onclick = ()=>{
         select(obj);
-
     };
 
     outliner.appendChild(item);
 
-    // ======================================
-    // HIJOS
-    // ======================================
-
-    if (
+    if(
         obj.userData.expanded &&
         children.length > 0
-    ) {
-
-        children.forEach(child => {
-
+    ){
+        children.forEach(child=>{
             renderOutlinerItem(
                 child,
                 depth + 1
             );
-
         });
-
     }
 
 }
+
 // ======================================
-// DRAG SETUP
+// HOLD SYSTEM
 // ======================================
 
-function setupOutlinerDrag(
+function setupOutlinerHold(
     item,
     obj
 ){
 
-    item.draggable = true;
+    let pressing = false;
 
-    // ======================================
-    // START
-    // ======================================
+    function startHold(){
 
-    item.addEventListener(
-        "dragstart",
-        () => {
+        pressing = true;
 
-            draggedOutlinerObject =
-                obj;
+        holdTimer =
+            setTimeout(()=>{
 
-            item.classList.add(
-                "dragging"
-            );
+                if(!pressing) return;
 
-        }
-    );
+                if(!holdTargetParent){
 
-    // ======================================
-    // END
-    // ======================================
+                    holdTargetParent = obj;
 
-    item.addEventListener(
-        "dragend",
-        () => {
+                }else if(
+                    obj !== holdTargetParent &&
+                    !holdChildrenToAdd.includes(obj)
+                ){
 
-            draggedOutlinerObject =
-                null;
-
-            item.classList.remove(
-                "dragging"
-            );
-
-            document
-            .querySelectorAll(
-                ".outliner-drop"
-            )
-            .forEach(el => {
-
-                el.classList.remove(
-                    "outliner-drop"
-                );
-
-            });
-
-        }
-    );
-
-    // ======================================
-    // OVER
-    // ======================================
-
-    item.addEventListener(
-        "dragover",
-        (e) => {
-
-            e.preventDefault();
-
-            if (
-                draggedOutlinerObject &&
-                draggedOutlinerObject !== obj
-            ) {
-
-                item.classList.add(
-                    "outliner-drop"
-                );
-
-            }
-
-        }
-    );
-
-    // ======================================
-    // LEAVE
-    // ======================================
-
-    item.addEventListener(
-        "dragleave",
-        () => {
-
-            item.classList.remove(
-                "outliner-drop"
-            );
-
-        }
-    );
-
-    // ======================================
-    // DROP
-    // ======================================
-
-    item.addEventListener(
-        "drop",
-        (e) => {
-
-            e.preventDefault();
-
-            item.classList.remove(
-                "outliner-drop"
-            );
-
-            if (
-                !draggedOutlinerObject ||
-                draggedOutlinerObject === obj
-            ) return;
-
-            // ======================================
-            // EVITAR  INFINITO
-            // ======================================
-
-            let current = obj;
-
-            while (current) {
-
-                if (
-                    current ===
-                    draggedOutlinerObject
-                ) {
-
-                    return;
+                    holdChildrenToAdd.push(obj);
 
                 }
 
-                current =
-                    current.parent;
+                refreshOutliner();
 
-            }
+            },500);
 
-            // ======================================
-            // GUARDAR WORLD
-            // ======================================
+    }
 
-            const worldPos =
-                new THREE.Vector3();
+    function endHold(){
 
-            const worldQuat =
-                new THREE.Quaternion();
+        pressing = false;
 
-            const worldScale =
-                new THREE.Vector3();
+        clearTimeout(holdTimer);
 
-            draggedOutlinerObject
-            .updateMatrixWorld(true);
+    }
 
-            draggedOutlinerObject
-            .matrixWorld
-            .decompose(
-                worldPos,
-                worldQuat,
-                worldScale
-            );
+    item.addEventListener(
+    "mousedown",
+    startHold
+);
 
-            // ======================================
-            // REMOVER PARENT
-            // ======================================
+item.addEventListener(
+    "mouseup",
+    endHold
+);
 
-            if (
-                draggedOutlinerObject.parent
-            ) {
+item.addEventListener(
+    "mouseleave",
+    endHold
+);
 
-                draggedOutlinerObject
-                .parent
-                .remove(
-                    draggedOutlinerObject
-                );
+// TÁCTIL
+item.addEventListener(
+    "touchstart",
+    startHold,
+    { passive: true }
+);
 
-            }
+item.addEventListener(
+    "touchend",
+    endHold
+);
 
-            // ======================================
-            // NUEVO PARENT
-            // ======================================
-
-            obj.add(
-                draggedOutlinerObject
-            );
-
-            // ======================================
-            // RESTAURAR WORLD
-            // ======================================
-
-            draggedOutlinerObject.position.copy(
-
-                obj.worldToLocal(
-                    worldPos.clone()
-                )
-
-            );
-
-            draggedOutlinerObject.quaternion.copy(
-                worldQuat
-            );
-
-            draggedOutlinerObject.scale.copy(
-                worldScale
-            );
-
-            // expandir parent automáticamente
-            obj.userData.expanded =
-                true;
-
-            refreshOutliner();
-
-        }
-    );
+item.addEventListener(
+    "touchcancel",
+    endHold
+);
 
 }
 /* MENU */
@@ -10517,19 +10565,61 @@ document.getElementById("renderImageBtn").onclick = () => {
     
     renderMenu.style.display = "none";
     
+    document.querySelector(
+        'button[onclick="setViewportMode(\'render\')"]'
+    )?.click();
+    
     renderer.render(scene, camera);
     
-    const canvas = renderer.domElement;
+    const imageData =
+        renderer.domElement.toDataURL("image/png");
     
-    canvas.style.position = "fixed";
-    canvas.style.top = "0";
-    canvas.style.left = "0";
-    canvas.style.width = "100vw";
-    canvas.style.height = "100vh";
-    canvas.style.zIndex = "999999";
-    canvas.style.background = "#000";
-    canvas.style.objectFit = "contain";
+    let preview =
+        document.getElementById("renderPreview");
     
+    if (!preview) {
+        
+        preview =
+            document.createElement("img");
+        
+        preview.id =
+            "renderPreview";
+        
+        preview.style.position =
+            "fixed";
+        
+        preview.style.top =
+            "0";
+        
+        preview.style.left =
+            "0";
+        
+        preview.style.width =
+            "100vw";
+        
+        preview.style.height =
+            "100vh";
+        
+        preview.style.objectFit =
+            "contain";
+        
+        preview.style.background =
+            "#000";
+        
+        preview.style.zIndex =
+            "999999";
+        
+        preview.onclick = () => {
+            preview.remove();
+        };
+        
+        document.body.appendChild(
+            preview
+        );
+    }
+    
+    preview.src =
+        imageData;
 };
 renderer.domElement.addEventListener("click", function () {
     this.style.position = "";
