@@ -179,26 +179,41 @@ body{
     background: #2a2a2a;
     padding: 6px;
     border-radius: 8px;
+    
     display: flex;
     justify-content: space-between;
     align-items: center;
+    
+    gap: 4px;
+    
     color: white;
     font-size: 11px;
-    gap: 4px;
+    
+    width: 100%;
+    box-sizing: border-box;
+    
+    min-height: 28px;
 }
 
 .left {
     display: flex;
-    gap: 4px;
     align-items: center;
+    gap: 1px;
+    
+    flex: 1;
+    min-width: 0;
+    
     overflow: hidden;
 }
 
-.left span {
+.name {
+    
+    flex: 1;
+    
+    min-width:20px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 55px;
 }
 /* CONTEXT MENU */
 #contextMenu {
@@ -2894,10 +2909,112 @@ height:260px;
 
     font-size:10px;
 }
+#bonePanel{
+
+    position:fixed;
+
+    top:140px;
+    left:120px;
+
+    width:220px;
+
+    background:#1f1f1f;
+
+    border:1px solid #444;
+
+    border-radius:10px;
+
+    overflow:hidden;
+
+    z-index:999999;
+
+    display:none;
+
+    box-shadow:0 0 20px #0008;
+}
+
+#bonePanelHeader{
+
+    height:34px;
+
+    background:#2a2a2a;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:0 10px;
+
+    cursor:move;
+
+    color:white;
+
+    font-size:13px;
+
+    user-select:none;
+}
+
+#closeBonePanelBtn{
+
+    width:22px;
+    height:22px;
+
+    border:none;
+
+    border-radius:5px;
+
+    background:#444;
+
+    color:white;
+
+    cursor:pointer;
+}
+
+#closeBonePanelBtn:hover{
+
+    background:#666;
+}
 </style>
 </head>
 
 <body>
+    <!-- BOTÓN -->
+
+
+
+<!-- PANEL -->
+
+<div id="bonePanel">
+
+    <div id="bonePanelHeader">
+
+        <span>
+            Bone Size
+        </span>
+
+        <button id="closeBonePanelBtn">
+            ✕
+        </button>
+
+    </div>
+
+    <div style="padding:10px;">
+
+        <input
+            type="range"
+            id="boneSizeSlider"
+            min="0.001"
+            max="0.1"
+            step="0.001"
+            value="0.02"
+            style="width:100%;"
+        />
+
+    </div>
+
+</div>
     <div id="waterPanel">
 
     <div id="waterPanelHeader">
@@ -2931,8 +3048,8 @@ height:260px;
         <input
             type="range"
             id="waterTransparency"
-            min="0"
-            max="1"
+            min="-10"
+            max="10"
             step="0.01"
             value="0.8"
         >
@@ -2947,7 +3064,7 @@ height:260px;
             type="range"
             id="waterWaveStrength"
             min="0"
-            max="20"
+            max="200"
             step="0.1"
             value="4"
         >
@@ -2991,7 +3108,7 @@ height:260px;
         <input
             type="range"
             id="waterReflection"
-            min="0"
+            min="-10"
             max="20"
             step="0.1"
             value="4"
@@ -3559,14 +3676,7 @@ value="250">
 </div>
 
 <div id="editTopPanel">
-<input
-    type="range"
-    id="boneSizeSlider"
-    min="0.001"
-    max="0.1"
-    step="0.001"
-    value="0.02"
-/>
+
     <button
     class="itemBtn"
     onclick="toggleAlwaysVisibleSelected()"
@@ -3705,7 +3815,13 @@ Scale -
     Look Constraint
 
 </button>
-
+<button
+    id="openBonePanelBtn"
+    class="menuBtn"
+    
+>
+    Bone Size
+</button>
             <button class="menuBtn">Script</button>
 
 
@@ -4147,7 +4263,10 @@ style="
             style="width:100%;"
         >
     </div>
-
+<label>
+    <input type="checkbox" id="pixelFusionToggle">
+    Fusión de píxeles
+</label>
     <!-- TEXTURA TRANSPARENTE -->
     <div style="padding:8px;display:flex;align-items:center;gap:8px;">
 
@@ -4410,7 +4529,7 @@ style="
         <img src="archivos/toastertext.png">
       </div>
 
-<div class="version2" id="appVersion">v 1.00.9</div>
+<div class="version2" id="appVersion">v 1.01.0</div>
 
 <div id="updateModal" class="updateModal hidden">
     <div class="updateBox">
@@ -5591,31 +5710,30 @@ child.userData.originalMaterial =
 /* TEXTURA TRANSPARENTE */
 
 document.getElementById("transparentTextureToggle")
-.addEventListener("change", (e) => {
-
-    if (!selectedMaterialTarget) return;
-
-    const enabled = e.target.checked;
-
-    selectedMaterialTarget.traverse((child) => {
-
-        if (child.isMesh && child.material) {
-
-            child.material.transparent = enabled;
-
-            if (enabled) {
-
-                child.material.alphaTest = 0.1;
-
-            } else {
-
-                child.material.alphaTest = 0;
+    .addEventListener("change", (e) => {
+        
+        if (!selectedMaterialTarget) return;
+        
+        const enabled = e.target.checked;
+        
+        selectedMaterialTarget.traverse((child) => {
+            
+            if (child.isMesh && child.material) {
+                
+                // material actual
+                child.material.transparent = enabled;
+                child.material.alphaTest = enabled ? 0.1 : 0;
+                child.material.needsUpdate = true;
+                
+                // material guardado
+                if (child.userData.originalMaterial) {
+                    child.userData.originalMaterial.transparent = enabled;
+                    child.userData.originalMaterial.alphaTest = enabled ? 0.1 : 0;
+                    child.userData.originalMaterial.needsUpdate = true;
+                }
             }
-
-            child.material.needsUpdate = true;
-        }
+        });
     });
-});
 window.openPanel2 = function(t, txt) {
   document.getElementById("title2").innerText = t;
   document.getElementById("text2").innerText = txt;
@@ -5768,7 +5886,7 @@ gltfLoader.load(
         
         boneHelperTemplate =
             gltf.scene;
-        
+        boneHelperTemplate.userData.isBoneGltf = true;
         // SIEMPRE VISIBLE
         
         boneHelperTemplate.userData.alwaysVisible =
@@ -5780,25 +5898,36 @@ gltfLoader.load(
             true;
         
         boneHelperTemplate.traverse((child) => {
-            
-            if (child.isMesh) {
-                
-                child.material.depthTest =
-                    false;
-                
-                child.renderOrder =
-                    9999;
-                
-                child.material.needsUpdate =
-                    true;
-            }
-        });
+    
+    if (child.isMesh) {
+        
+        child.material =
+            child.material.clone();
+        
+        child.material.depthTest =
+            true;
+        
+        child.material.depthWrite =
+            false;
+        
+        child.renderOrder =
+            999;
+        
+        child.material.needsUpdate =
+            true;
+        
+    }
+    
+});
         
     }
 );
 /* SELECT */
 function select(obj) {
     selected = obj;
+
+transform.attach(selected);
+transform.space = "local";
     updateSelectionOutline();
     selectedInUI = obj;
     updateWaterPanel();
@@ -6055,7 +6184,10 @@ renderer.domElement.addEventListener("pointerup", (e) => {
     
     clearTimeout(holdTimeout);
     
+    // =========================
     // BOX SELECT
+    // =========================
+    
     if (multiSelectMode) {
         
         selectionBox.style.display = "none";
@@ -6078,76 +6210,196 @@ renderer.domElement.addEventListener("pointerup", (e) => {
         return;
     }
     
+    // =========================
+    // IGNORAR DRAG
+    // =========================
+    
     if (isDragging) return;
     
     if (transform.dragging) return;
     
-    mouse.x = (e.clientX / innerWidth) * 2 - 1;
+    // =========================
+    // RAYCAST
+    // =========================
     
-    mouse.y = -(e.clientY / innerHeight) * 2 + 1;
+    mouse.x =
+        (e.clientX / innerWidth) * 2 - 1;
     
-    raycaster.setFromCamera(mouse, camera);
+    mouse.y =
+        -(e.clientY / innerHeight) * 2 + 1;
+    
+    raycaster.setFromCamera(
+        mouse,
+        camera
+    );
     
     let hits =
-    raycaster.intersectObjects(
-        scene.children,
-        true
-    );
-
-// PRIORIDAD A OBJETOS SIEMPRE VISIBLES
-
-const alwaysVisibleHit =
-    hits.find(h => {
-        
-        let obj = h.object;
-        
-        while (obj) {
+        raycaster.intersectObjects(
+            scene.children,
+            true
+        );
+    
+    // =========================
+    // PRIORIDAD OBJETOS VISIBLES
+    // =========================
+    
+    const alwaysVisibleHit =
+        hits.find(h => {
             
-            if (
-                obj.userData.alwaysVisible ||
-                obj.userData.selectPriority
-            ) {
-                return true;
+            let obj = h.object;
+            
+            while (obj) {
+                
+                if (
+                    obj.userData.alwaysVisible ||
+                    obj.userData.selectPriority
+                ) {
+                    
+                    return true;
+                    
+                }
+                
+                obj = obj.parent;
+                
             }
             
-            obj = obj.parent;
+            return false;
+            
+        });
+    
+    if (alwaysVisibleHit) {
+        
+        hits = [alwaysVisibleHit];
+        
+    }
+    
+    // =========================
+    // FILTRAR
+    // =========================
+    
+    const validHits =
+        hits.filter(h => {
+            
+            return h.object !== spawn;
+            
+        });
+    
+    // =========================
+    // PRIMER HIT VÁLIDO
+    // =========================
+    
+    const firstHit =
+        validHits.find(h => {
+            
+            let obj = h.object;
+            
+            while (obj) {
+                
+                // ignorar helpers ocultos
+                if (
+                    obj.userData.isBoneHelper &&
+                    !obj.visible
+                ) {
+                    
+                    return false;
+                    
+                }
+                
+                // válido
+                if (
+                    obj.userData.isBoneHelper ||
+                    getRootObject(obj)
+                ) {
+                    
+                    return true;
+                    
+                }
+                
+                obj = obj.parent;
+                
+            }
+            
+            return false;
+            
+        });
+    
+    // =========================
+    // SELECCIÓN
+    // =========================
+    
+    if (firstHit) {
+        
+        let clicked =
+            firstHit.object;
+        
+        // =====================
+        // BONE HELPERS
+        // =====================
+        
+        while (clicked) {
+            
+            if (
+                clicked.userData.isBoneHelper
+            ) {
+                
+                const bone =
+                    clicked.userData.targetBone;
+                
+                if (bone) {
+                    
+                    clearMultiSelection();
+                    
+                    selectedObjects = [bone];
+                    
+                    updateSelectionGroup();
+                    
+                    select(bone);
+                    
+                    return;
+                    
+                }
+                
+            }
+            
+            clicked =
+                clicked.parent;
+            
         }
         
-        return false;
-    });
-
-if (alwaysVisibleHit) {
-    
-    hits = [alwaysVisibleHit];
-}
-
-const validHits = hits.filter(h => {
-    
-    const obj =
-        getRootObject(h.object);
-    
-    return obj && obj !== spawn;
-});
-    
-    if (validHits.length > 0) {
+        // =====================
+        // SELECCIÓN NORMAL
+        // =====================
         
         const root =
-            getRootObject(validHits[0].object);
+            getRootObject(
+                firstHit.object
+            );
         
-        clearMultiSelection();
+        if (root) {
+            
+            clearMultiSelection();
+            
+            selectedObjects = [root];
+            
+            updateSelectionGroup();
+            
+            select(root);
+            
+        }
         
-        selectedObjects = [root];
+    }
+    else {
         
-        updateSelectionGroup();
-        
-        select(root);
-        
-    } else {
+        // =====================
+        // LIMPIAR
+        // =====================
         
         clear();
         
         clearMultiSelection();
+        
     }
+    
 });
 document.getElementById("spawnBtn").onclick = () => {
     document.getElementById("gltfInputHidden").click();
@@ -6200,7 +6452,16 @@ document.getElementById("gltfInputHidden").addEventListener("change", (e) => {
         model.userData.boneSize = 0.02;
         scene.add(model);
         model.userData.bones = [];
+const helperRoot =
+    new THREE.Group();
 
+helperRoot.name =
+    "BoneHelpers";
+
+model.add(helperRoot);
+
+model.userData.helperRoot =
+    helperRoot;
 model.traverse((child) => {
     
     if (child.isBone) {
@@ -6234,6 +6495,7 @@ if(
             true;
 helper.userData.model =
     model;
+    buildBoneLines(gltf.scene);
     markEditorUI(helper);
         helper.userData.targetBone =
             bone;
@@ -6257,21 +6519,32 @@ helper.traverse((c)=>{
     }
 
 });
-        const bonePos =
-    bone.getWorldPosition(
-        new THREE.Vector3()
-    );
+        
 
-helper.position.copy(
-    bonePos
-);
+const worldPos =
+    new THREE.Vector3();
+
+const worldQuat =
+    new THREE.Quaternion();
+
+bone.getWorldPosition(worldPos);
+bone.getWorldQuaternion(worldQuat);
+
+// convertir world -> local del helperRoot
+helperRoot.worldToLocal(worldPos);
+
+helper.position.set(0, 0, 0);
+helper.rotation.set(0, 0, 0);
+// rotación relativa al modelo
+const parentQuat =
+    new THREE.Quaternion();
+
+helperRoot.getWorldQuaternion(parentQuat);
+
+parentQuat.invert();
 
 helper.quaternion.copy(
-    
-    bone.getWorldQuaternion(
-        new THREE.Quaternion()
-    )
-    
+    worldQuat.premultiply(parentQuat)
 );
 
 // tamaño según distancia al hijo
@@ -6305,9 +6578,7 @@ helper.userData.baseScale =
     helper.scale.clone();
 // limitar tamaños
 
-        scene.add(helper);
-
-        objects.push(helper);
+        helperRoot.add(helper);
 
         model.userData.boneHelpers.push(
             helper
@@ -6634,6 +6905,7 @@ function createAxis(color, axis, labelText) {
     const line = new THREE.Mesh(
         new THREE.CylinderGeometry(0.025, 0.025, 0.7, 16),
         mat
+        
     );
     
     // esfera punta
@@ -6974,11 +7246,23 @@ function refreshOutliner(){
 
     // SOLO OBJETOS ROOT
     const rootObjects =
-        [...objects, spawn]
-        .filter(obj =>
+    [...objects, spawn]
+    .filter(obj => {
+
+        // ocultar bones
+        if(obj.type === "Bone")
+            return false;
+
+        // ocultar helpers de huesos
+        if(obj.userData.isBoneHelper)
+            return false;
+
+        return (
             !obj.parent ||
             obj.parent === scene
         );
+
+    });
 
     rootObjects.forEach(obj => {
 
@@ -7012,9 +7296,6 @@ function renderOutlinerItem(
             : ""
         );
 
-    item.style.marginLeft =
-        (depth * 18) + "px";
-
     // ======================================
     // DRAG
     // ======================================
@@ -7034,20 +7315,55 @@ function renderOutlinerItem(
     left.className =
         "left";
 
+    // indentación visual
+    left.style.paddingLeft =
+    "4px";
+
+const indent =
+    Math.min(depth, 6);
+
+if (depth > 0) {
+    
+    const tree =
+        document.createElement("span");
+    
+    tree.textContent =
+        "└";
+    
+    tree.style.opacity =
+        "0.4";
+    
+    tree.style.flexShrink =
+        "0";
+    
+    tree.style.width =
+        "10px";
+    
+    tree.style.fontSize =
+        "10px";
+    
+    left.appendChild(tree);
+    
+}
     // hijos reales
     const children =
     obj.children.filter(c => {
         
         return (
+            
             !c.userData.isBoneHelper &&
+            
+            c.type !== "Bone" &&
+            
             c !== transform &&
+            
             c.type !== "TransformControls" &&
             c.type !== "TransformControlsPlane" &&
             c.type !== "TransformControlsGizmo"
+            
         );
         
     });
-        
 
     // ======================================
     // FLECHA
@@ -7076,6 +7392,9 @@ function renderOutlinerItem(
         arrow.style.cursor =
             "pointer";
 
+        arrow.style.marginRight =
+            "4px";
+
         arrow.onclick = (e) => {
 
             e.stopPropagation();
@@ -7090,6 +7409,22 @@ function renderOutlinerItem(
         left.appendChild(
             arrow
         );
+
+    } else {
+
+        // espacio vacío para alinear
+        const spacer =
+            document.createElement("span");
+
+        spacer.innerHTML = "•";
+
+        spacer.style.opacity =
+            "0.3";
+
+        spacer.style.marginRight =
+            "6px";
+
+        left.appendChild(spacer);
 
     }
 
@@ -7121,19 +7456,19 @@ function renderOutlinerItem(
     // ======================================
 
     const name =
-        document.createElement("span");
-name.textContent =
-    obj.userData.isBoneHelper ?
-    "🦴 " + obj.name :
-    (
-        obj === spawn ?
-        "SPAWN" :
-        (obj.name || "Objeto")
-    );
+    document.createElement("span");
+
+name.className =
+    "name";
+
     name.textContent =
-        obj === spawn
-        ? "SPAWN"
-        : (obj.name || "Objeto");
+        obj.userData.isBoneHelper ?
+        "🦴 " + obj.name :
+        (
+            obj === spawn ?
+            "SPAWN" :
+            (obj.name || "Objeto")
+        );
 
     left.appendChild(eye);
     left.appendChild(name);
@@ -7221,7 +7556,6 @@ name.textContent =
     }
 
 }
-
 // ======================================
 // DRAG SETUP
 // ======================================
@@ -8803,8 +9137,10 @@ function setViewportMode(mode) {
             
             if (!child.isMesh)
             return;
-if(child.userData.isWater)
-return;
+
+            if (child.userData.isWater)
+            return;
+
             const original =
                 child.userData.originalMaterial;
 
@@ -8874,14 +9210,47 @@ return;
             }
         });
     });
+
+    // =========================
+    // BONES / LINES VISIBILITY
+    // =========================
+
+    const showHelpers =
+        !isRender;
+
+    scene.traverse(obj => {
+
+        if (
+            obj.userData.isBoneHandle ||
+            obj.userData.isBoneGltf
+        ) {
+
+            obj.visible = showHelpers;
+        }
+
+    });
+
+    if (typeof boneLines !== "undefined") {
+
+        boneLines.forEach(line => {
+
+            line.visible = showHelpers;
+
+        });
+
+    }
 }
+
 window.setViewportMode = setViewportMode;
+
 function markEditorUI(obj) {
 
     obj.userData.editorUI = true;
 
     obj.traverse((child) => {
+
         child.userData.editorUI = true;
+
     });
 }
 function clearMultiSelection() {
@@ -12210,6 +12579,395 @@ function(){
     transform.attach(water);
 
 };
+const boneLines = [];
+
+// ======================================
+// CREAR LINEAS
+// ======================================
+
+function buildBoneLines(root){
+
+    // borrar anteriores
+    boneLines.forEach(line => {
+
+        scene.remove(line);
+
+    });
+
+    boneLines.length = 0;
+
+    root.traverse(bone => {
+
+        if(bone.type !== "Bone")
+            return;
+
+        bone.children.forEach(child => {
+
+            if(child.type !== "Bone")
+                return;
+
+            const geometry =
+                new THREE.BufferGeometry();
+
+            const positions =
+                new Float32Array(6);
+
+            geometry.setAttribute(
+                "position",
+                new THREE.BufferAttribute(
+                    positions,
+                    3
+                )
+            );
+
+            const material =
+    new THREE.LineBasicMaterial({
+        
+        color: 0xffffff,
+        
+        transparent: true,
+        opacity: 0.7,
+        
+        depthTest: false,
+        depthWrite: false
+        
+    });
+            const line =
+                new THREE.Line(
+                    geometry,
+                    material
+                );
+line.renderOrder = 9999;
+            line.frustumCulled =
+                false;
+
+            line.userData.boneA =
+                bone;
+
+            line.userData.boneB =
+                child;
+line.userData.isBoneLine = true;
+            boneLines.push(line);
+
+            bone.add(line);
+
+        });
+
+    });
+
+}
+
+// ======================================
+// UPDATE
+// ======================================
+
+function updateBoneLines() {
+    
+    boneLines.forEach(line => {
+        
+        const boneA =
+            line.userData.boneA;
+        
+        const boneB =
+            line.userData.boneB;
+        
+        const pos =
+            line.geometry.attributes.position.array;
+        
+        // inicio SIEMPRE en el hueso padre
+        pos[0] = 0;
+        pos[1] = 0;
+        pos[2] = 0;
+        
+        // posición LOCAL del hijo
+        pos[3] = boneB.position.x;
+        pos[4] = boneB.position.y;
+        pos[5] = boneB.position.z;
+        
+        line.geometry.attributes.position.needsUpdate =
+            true;
+        
+    });
+    
+}
+const tempPos =
+    new THREE.Vector3();
+
+const tempQuat =
+    new THREE.Quaternion();
+
+const parentQuat =
+    new THREE.Quaternion();
+
+function updateBoneHelpers() {
+    
+    boneHelpers.forEach(helper => {
+        
+        const bone =
+            helper.userData.targetBone;
+        bone.add(helper);
+        const helperRoot =
+            helper.parent;
+        
+        // posición mundial del hueso
+        bone.getWorldPosition(tempPos);
+        
+        // convertir a local del helperRoot
+        helperRoot.worldToLocal(tempPos);
+        
+        helper.position.set(0, 0, 0);
+helper.rotation.set(0, 0, 0);
+        
+        // rotación mundial
+        bone.getWorldQuaternion(tempQuat);
+        
+        // convertir a local
+        helperRoot.getWorldQuaternion(parentQuat);
+        
+        parentQuat.invert();
+        
+        helper.quaternion.copy(
+            tempQuat.premultiply(parentQuat)
+        );
+        
+    });
+    
+}
+const bonePanel =
+    document.getElementById("bonePanel");
+
+const bonePanelHeader =
+    document.getElementById("bonePanelHeader");
+
+const openBonePanelBtn =
+    document.getElementById("openBonePanelBtn");
+
+const closeBonePanelBtn =
+    document.getElementById("closeBonePanelBtn");
+
+/* ====================== */
+/* OPEN / CLOSE */
+/* ====================== */
+
+openBonePanelBtn.onclick = () => {
+
+    bonePanel.style.display =
+        "block";
+};
+
+closeBonePanelBtn.onclick = () => {
+
+    bonePanel.style.display =
+        "none";
+};
+
+/* ====================== */
+/* DRAG SYSTEM */
+/* ====================== */
+
+let draggingBonePanel =
+    false;
+
+let boneDragOffsetX =
+    0;
+
+let boneDragOffsetY =
+    0;
+
+/* START */
+
+function startBoneDrag(
+    clientX,
+    clientY
+) {
+
+    draggingBonePanel = true;
+
+    boneDragOffsetX =
+        clientX -
+        bonePanel.offsetLeft;
+
+    boneDragOffsetY =
+        clientY -
+        bonePanel.offsetTop;
+}
+
+/* MOVE */
+
+function moveBoneDrag(
+    clientX,
+    clientY
+) {
+
+    if (!draggingBonePanel)
+        return;
+
+    let x =
+        clientX -
+        boneDragOffsetX;
+
+    let y =
+        clientY -
+        boneDragOffsetY;
+
+    const maxX =
+        window.innerWidth -
+        bonePanel.offsetWidth;
+
+    const maxY =
+        window.innerHeight -
+        bonePanel.offsetHeight;
+
+    if (x < 0)
+        x = 0;
+
+    if (y < 0)
+        y = 0;
+
+    if (x > maxX)
+        x = maxX;
+
+    if (y > maxY)
+        y = maxY;
+
+    bonePanel.style.left =
+        x + "px";
+
+    bonePanel.style.top =
+        y + "px";
+}
+
+/* END */
+
+function endBoneDrag() {
+
+    draggingBonePanel = false;
+}
+
+/* ====================== */
+/* MOUSE */
+/* ====================== */
+
+bonePanelHeader.addEventListener(
+    "mousedown",
+
+    e => {
+
+        startBoneDrag(
+            e.clientX,
+            e.clientY
+        );
+    }
+);
+
+window.addEventListener(
+    "mousemove",
+
+    e => {
+
+        moveBoneDrag(
+            e.clientX,
+            e.clientY
+        );
+    }
+);
+
+window.addEventListener(
+    "mouseup",
+
+    endBoneDrag
+);
+
+/* ====================== */
+/* TOUCH */
+/* ====================== */
+
+bonePanelHeader.addEventListener(
+    "touchstart",
+
+    e => {
+
+        const touch =
+            e.touches[0];
+
+        startBoneDrag(
+            touch.clientX,
+            touch.clientY
+        );
+    },
+
+    { passive:true }
+);
+
+window.addEventListener(
+    "touchmove",
+
+    e => {
+
+        const touch =
+            e.touches[0];
+
+        if (!touch)
+            return;
+
+        moveBoneDrag(
+            touch.clientX,
+            touch.clientY
+        );
+    },
+
+    { passive:true }
+);
+
+window.addEventListener(
+    "touchend",
+
+    endBoneDrag
+);
+document.getElementById("pixelFusionToggle")
+.addEventListener("change", (e) => {
+
+    if (!selectedMaterialTarget) return;
+
+    const enabled = e.target.checked;
+
+    selectedMaterialTarget.traverse((child) => {
+
+        if (
+            child.isMesh &&
+            child.material &&
+            child.material.map
+        ) {
+
+            const tex = child.material.map;
+
+            if (enabled) {
+                // suavizado
+                tex.magFilter = THREE.LinearFilter;
+                tex.minFilter = THREE.LinearMipmapLinearFilter;
+            } else {
+                // pixelado
+                tex.magFilter = THREE.NearestFilter;
+                tex.minFilter = THREE.NearestFilter;
+            }
+
+            tex.needsUpdate = true;
+
+            // guardar también en original
+            if (
+                child.userData.originalMaterial &&
+                child.userData.originalMaterial.map
+            ) {
+                const originalTex =
+                    child.userData.originalMaterial.map;
+
+                originalTex.magFilter = tex.magFilter;
+                originalTex.minFilter = tex.minFilter;
+                originalTex.needsUpdate = true;
+            }
+        }
+    });
+});
 /* LOOP */
 function animate(){
     spawn.lookAt(camera.position);
@@ -12219,7 +12977,24 @@ function animate(){
         child.lookAt(gizmoCamera.position);
     }
 });
+updateBoneHelpers();
+boneHelpers.forEach(helper => {
 
+    const bone =
+        helper.userData.targetBone;
+
+    if(!bone) return;
+
+    bone.updateMatrixWorld(true);
+
+helper.position.set(0, 0, 0);
+helper.rotation.set(0, 0, 0);
+    bone.getWorldQuaternion(
+        helper.quaternion
+    );
+
+});
+updateBoneLines();
 updateWater();
 updateFireParticles();
 boneHelpers.forEach(helper => {
