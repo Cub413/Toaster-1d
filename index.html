@@ -4529,7 +4529,7 @@ style="
         <img src="archivos/toastertext.png">
       </div>
 
-<div class="version2" id="appVersion">v 1.01.0</div>
+<div class="version2" id="appVersion">v 1.01.1</div>
 
 <div id="updateModal" class="updateModal hidden">
     <div class="updateBox">
@@ -13016,6 +13016,42 @@ document.getElementById("pixelFusionToggle")
         _setInterval(typeof fn === "function" ? wrap(fn) : fn, ...args);
 
 })();
+let isDraggingOutliner = false;
+
+document.addEventListener("dragstart", () => {
+    isDraggingOutliner = true;
+});
+
+document.addEventListener("dragend", forceUIReset);
+document.addEventListener("mouseup", forceUIReset);
+document.addEventListener("pointerup", forceUIReset);
+window.addEventListener("blur", forceUIReset);
+
+function forceUIReset() {
+
+    isDraggingOutliner = false;
+
+    document.body.style.pointerEvents = "auto";
+
+    document.querySelectorAll(".dragging").forEach(el => {
+        el.classList.remove("dragging");
+    });
+
+    // quitar overlays fantasmas
+    document.querySelectorAll(".drag-overlay").forEach(el => {
+        el.remove();
+    });
+
+    // liberar selección accidental
+    if (document.activeElement) {
+        document.activeElement.blur();
+    }
+}
+setInterval(() => {
+    if (isDraggingOutliner) {
+        forceUIReset();
+    }
+}, 1000);
 /* LOOP */
 function animate(){
     spawn.lookAt(camera.position);
