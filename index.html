@@ -2768,10 +2768,238 @@ height:260px;
 
     font-size:10px;
 }
+.waterPanel{
+
+    position:fixed;
+
+    top:80px;
+    left:90px;
+
+    width:180px;
+
+    background:#1f1f1f;
+
+    border:1px solid #444;
+
+    border-radius:10px;
+
+    padding:8px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+
+    z-index:999999;
+
+    box-shadow:0 0 20px #0008;
+}
+
+.waterControl{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:4px;
+}
+
+.waterControl label{
+
+    font-size:10px;
+
+    color:#bbb;
+}
+#waterPanel{
+
+    position:fixed;
+
+    top:30px;
+    left:90px;
+
+    width:170px;
+
+    max-height:320px;
+
+    overflow-y:auto;
+
+    background:#1f1f1f;
+
+    border:1px solid #444;
+
+    border-radius:10px;
+
+    padding:8px;
+
+    display:none;
+
+    flex-direction:column;
+
+    gap:8px;
+
+    z-index:999999;
+
+    box-shadow:0 0 20px #0008;
+
+    scrollbar-width:none;
+}
+
+#waterPanel::-webkit-scrollbar{
+
+    display:none;
+}
+
+#waterPanelHeader{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    color:white;
+
+    font-size:11px;
+}
+
+#closeWaterPanel{
+
+    width:18px;
+    height:18px;
+
+    border:none;
+
+    border-radius:4px;
+
+    background:#444;
+
+    color:white;
+
+    font-size:10px;
+}
+
+.waterControl{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:3px;
+}
+
+.waterControl label{
+
+    color:#bbb;
+
+    font-size:10px;
+}
 </style>
 </head>
 
 <body>
+    <div id="waterPanel">
+
+    <div id="waterPanelHeader">
+
+        <span>
+            Water
+        </span>
+
+        <button id="closeWaterPanel">
+            ✕
+        </button>
+
+    </div>
+
+    <div class="waterControl">
+
+        <label>Color</label>
+
+        <input
+            type="color"
+            id="waterColor"
+            value="#1e90ff"
+        >
+
+    </div>
+
+    <div class="waterControl">
+
+        <label>Transparency</label>
+
+        <input
+            type="range"
+            id="waterTransparency"
+            min="0"
+            max="1"
+            step="0.01"
+            value="0.8"
+        >
+
+    </div>
+
+    <div class="waterControl">
+
+        <label>Wave Strength</label>
+
+        <input
+            type="range"
+            id="waterWaveStrength"
+            min="0"
+            max="20"
+            step="0.1"
+            value="4"
+        >
+
+    </div>
+
+    <div class="waterControl">
+
+        <label>Wave Speed</label>
+
+        <input
+            type="range"
+            id="waterWaveSpeed"
+            min="0"
+            max="10"
+            step="0.01"
+            value="1"
+        >
+
+    </div>
+
+    <div class="waterControl">
+
+        <label>Texture Scale</label>
+
+        <input
+            type="range"
+            id="waterTextureScale"
+            min="0.1"
+            max="10"
+            step="0.1"
+            value="1"
+        >
+
+    </div>
+
+    <div class="waterControl">
+
+        <label>Reflection</label>
+
+        <input
+            type="range"
+            id="waterReflection"
+            min="0"
+            max="20"
+            step="0.1"
+            value="4"
+        >
+
+    </div>
+
+</div>
     <div id="firePanel">
 
     <div id="firePanelHeader">
@@ -3460,6 +3688,12 @@ Scale -
 
     Mirar camara
 
+</button>
+<button
+    class="menuBtn"
+    onclick="createRealisticWater()"
+>
+    Agua realista
 </button>
 <button
     id="openLookConstraintBtn"
@@ -4176,7 +4410,7 @@ style="
         <img src="archivos/toastertext.png">
       </div>
 
-<div class="version2" id="appVersion">v 1.00.8</div>
+<div class="version2" id="appVersion">v 1.00.9</div>
 
 <div id="updateModal" class="updateModal hidden">
     <div class="updateBox">
@@ -4334,6 +4568,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
+import { Water } from "https://cdn.jsdelivr.net/npm/three@0.160/examples/jsm/objects/Water.js";
 
 /* SCENE */
 const scene = new THREE.Scene();
@@ -5285,30 +5520,27 @@ function updateTexturePanelVisibility(obj) {
     
     loadMaterialSettings(obj);
 }
-function loadMaterialSettings(obj) {
-
-    let material = null;
-
-    obj.traverse((child) => {
-
-        if (child.isMesh && child.material && !material) {
-            material = child.material;
-        }
-    });
-
-    if (!material) return;
-
-    // COLOR
-    document.getElementById("materialColor").value =
-        "#" + material.color.getHexString();
-
-    // OPACIDAD
-    document.getElementById("materialOpacity").value =
-        material.opacity ?? 1;
-
-    // TEXTURA TRANSPARENTE
-    document.getElementById("transparentTextureToggle").checked =
-        material.transparent === true;
+function loadMaterialSettings() {
+    
+    if (
+        !selected ||
+        !selected.material
+    ) return;
+    
+    const mat =
+        selected.material;
+    
+    // agua
+    if (selected.userData.isWater) {
+        
+        return;
+    }
+    
+    if (!mat.color) return;
+    
+    materialColor.value =
+        "#" +
+        mat.color.getHexString();
 }
 /* ================= MATERIAL PANEL ================= */
 
@@ -5569,6 +5801,7 @@ function select(obj) {
     selected = obj;
     updateSelectionOutline();
     selectedInUI = obj;
+    updateWaterPanel();
     updateTexturePanelVisibility(obj);
     if(
     selected &&
@@ -8570,7 +8803,8 @@ function setViewportMode(mode) {
             
             if (!child.isMesh)
             return;
-
+if(child.userData.isWater)
+return;
             const original =
                 child.userData.originalMaterial;
 
@@ -11587,6 +11821,395 @@ function loadFireSettings(obj){
     firePanel.style.display =
     "flex";
 }
+function createRealisticWater(){
+
+    const geometry =
+    new THREE.PlaneGeometry(
+        1000,
+        1000,
+        256,
+        256
+    );
+
+    const normalTexture =
+    new THREE.TextureLoader().load(
+
+'https://threejs.org/examples/textures/waternormals.jpg'
+
+    );
+
+    normalTexture.wrapS =
+    THREE.RepeatWrapping;
+
+    normalTexture.wrapT =
+    THREE.RepeatWrapping;
+
+    const water =
+    new Water(
+
+        geometry,
+
+        {
+
+            textureWidth:2048,
+            textureHeight:2048,
+
+            waterNormals:
+            normalTexture,
+
+            sunDirection:
+            new THREE.Vector3(
+                1,
+                1,
+                1
+            ),
+
+            sunColor:0xffffff,
+
+            waterColor:0x1e90ff,
+
+            distortionScale:4,
+
+            alpha:0.8,
+
+            fog:scene.fog !== undefined
+        }
+    );
+
+    water.rotation.x =
+    -Math.PI / 2;
+
+    water.receiveShadow =
+    true;
+
+    water.name =
+    "Water";
+
+    water.userData.isWater =
+    true;
+
+    water.userData.settings = {
+
+        waveSpeed:1,
+
+        waveStrength:4,
+
+        transparency:0.8,
+
+        color:"#1e90ff",
+
+        textureScale:1,
+
+        reflection:4
+    };
+
+    scene.add(water);
+
+    objects.push(water);
+
+    refreshOutliner();
+
+    return water;
+}
+const waterClock =
+new THREE.Clock();
+function updateWater() {
+    if(viewportMode !== "render"){
+        return;
+    }
+    const delta =
+        waterClock.getDelta();
+    
+    scene.traverse(obj => {
+        
+        if (
+            !obj.userData.isWater
+        ) return;
+        
+        const uniforms =
+            obj.material?.uniforms;
+        
+        if (
+            !uniforms ||
+            !uniforms.time
+        ) return;
+        
+        const s =
+            obj.userData.settings;
+        
+        uniforms.time.value +=
+            delta * s.waveSpeed;
+        
+        if (uniforms.distortionScale) {
+            
+            uniforms.distortionScale.value =
+                s.reflection;
+        }
+        
+        if (uniforms.alpha) {
+            
+            uniforms.alpha.value =
+                s.transparency;
+        }
+        
+        if (uniforms.waterColor) {
+            
+            uniforms.waterColor.value.set(
+                s.color
+            );
+        }
+        
+        if (uniforms.size) {
+            
+            uniforms.size.value =
+                s.textureScale;
+        }
+        
+    });
+}
+function updateWaterPanel(){
+
+    if(
+        selected &&
+        selected.userData.isWater
+    ){
+
+        waterPanel.style.display =
+        "flex";
+
+        const s =
+        selected.userData.settings;
+
+        waterColor.value =
+        s.color;
+
+        waterTransparency.value =
+        s.transparency;
+
+        waterWaveStrength.value =
+        s.waveStrength;
+
+        waterWaveSpeed.value =
+        s.waveSpeed;
+
+        waterTextureScale.value =
+        s.textureScale;
+
+        waterReflection.value =
+        s.reflection;
+
+    }else{
+
+        waterPanel.style.display =
+        "none";
+    }
+}
+closeWaterPanel.onclick = ()=>{
+
+    waterPanel.style.display =
+    "none";
+};
+waterColor.oninput = ()=>{
+
+    if(
+        selected &&
+        selected.userData.isWater
+    ){
+
+        selected.userData
+        .settings
+        .color =
+        waterColor.value;
+    }
+};
+
+waterTransparency.oninput = ()=>{
+
+    if(
+        selected &&
+        selected.userData.isWater
+    ){
+
+        selected.userData
+        .settings
+        .transparency =
+
+        parseFloat(
+            waterTransparency.value
+        );
+    }
+};
+
+waterWaveStrength.oninput = ()=>{
+
+    if(
+        selected &&
+        selected.userData.isWater
+    ){
+
+        selected.userData
+        .settings
+        .waveStrength =
+
+        parseFloat(
+            waterWaveStrength.value
+        );
+    }
+};
+
+waterWaveSpeed.oninput = ()=>{
+
+    if(
+        selected &&
+        selected.userData.isWater
+    ){
+
+        selected.userData
+        .settings
+        .waveSpeed =
+
+        parseFloat(
+            waterWaveSpeed.value
+        );
+    }
+};
+
+waterTextureScale.oninput = ()=>{
+
+    if(
+        selected &&
+        selected.userData.isWater
+    ){
+
+        selected.userData
+        .settings
+        .textureScale =
+
+        parseFloat(
+            waterTextureScale.value
+        );
+    }
+};
+
+waterReflection.oninput = ()=>{
+
+    if(
+        selected &&
+        selected.userData.isWater
+    ){
+
+        selected.userData
+        .settings
+        .reflection =
+
+        parseFloat(
+            waterReflection.value
+        );
+    }
+};
+window.createRealisticWater =
+function(){
+
+    const geometry =
+    new THREE.PlaneGeometry(
+
+        1000,
+        1000,
+        256,
+        256
+
+    );
+
+    const normalTexture =
+    new THREE.TextureLoader().load(
+
+        'https://threejs.org/examples/textures/waternormals.jpg'
+
+    );
+
+    normalTexture.wrapS =
+    THREE.RepeatWrapping;
+
+    normalTexture.wrapT =
+    THREE.RepeatWrapping;
+
+    const water =
+    new Water(
+
+        geometry,
+
+        {
+
+            textureWidth:2048,
+
+            textureHeight:2048,
+
+            waterNormals:
+            normalTexture,
+
+            sunDirection:
+            new THREE.Vector3(
+                1,
+                1,
+                1
+            ),
+
+            sunColor:0xffffff,
+
+            waterColor:0x1e90ff,
+
+            distortionScale:4,
+
+            alpha:0.8,
+
+            fog:
+            scene.fog !== undefined
+
+        }
+
+    );
+
+    water.rotation.x =
+    -Math.PI / 2;
+
+    water.receiveShadow =
+    true;
+
+    water.name =
+    "Water";
+
+    water.userData.isWater =
+    true;
+
+    water.userData.settings = {
+
+        waveSpeed:1,
+
+        waveStrength:4,
+
+        transparency:0.8,
+
+        color:"#1e90ff",
+
+        textureScale:1,
+
+        reflection:4
+
+    };
+
+    scene.add(water);
+
+    objects.push(water);
+
+    refreshOutliner();
+
+    selected = water;
+
+    updateWaterPanel();
+
+    transform.attach(water);
+
+};
 /* LOOP */
 function animate(){
     spawn.lookAt(camera.position);
@@ -11596,6 +12219,8 @@ function animate(){
         child.lookAt(gizmoCamera.position);
     }
 });
+
+updateWater();
 updateFireParticles();
 boneHelpers.forEach(helper => {
 
