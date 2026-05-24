@@ -2686,10 +2686,220 @@ height:260px;
     user-select:none;
 
 }
+#firePanel{
+
+    position:fixed;
+
+    top:50px;
+    left:90px;
+
+    width:170px;
+    max-height:260px;
+
+    overflow-y:auto;
+
+    background:#1f1f1f;
+
+    border:1px solid #444;
+
+    border-radius:10px;
+
+    padding:8px;
+
+    display:none;
+
+    flex-direction:column;
+
+    gap:8px;
+
+    z-index:999999;
+
+    box-shadow:0 0 20px #0008;
+
+    scrollbar-width:none;
+}
+
+#firePanel::-webkit-scrollbar{
+
+    display:none;
+}
+
+#firePanelHeader{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    color:white;
+
+    font-size:11px;
+}
+
+#closeFirePanel{
+
+    width:18px;
+    height:18px;
+
+    border:none;
+
+    border-radius:4px;
+
+    background:#444;
+
+    color:white;
+
+    font-size:10px;
+}
+
+.fireControl{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:3px;
+}
+
+.fireControl label{
+
+    color:#bbb;
+
+    font-size:10px;
+}
 </style>
 </head>
 
 <body>
+    <div id="firePanel">
+
+    <div id="firePanelHeader">
+
+        <span>
+            particle
+        </span>
+
+        <button id="closeFirePanel">
+            ✕
+        </button>
+
+    </div>
+
+    <div class="fireControl">
+
+        <label>Color</label>
+
+        <input
+            type="color"
+            id="fireColor"
+            value="#ff6600"
+        >
+
+    </div>
+
+    <div class="fireControl">
+
+        <label>Transparency</label>
+
+        <input
+            type="range"
+            id="fireOpacity"
+            min="0"
+            max="1"
+            step="0.01"
+            value="0.7"
+        >
+
+    </div>
+
+    <div class="fireControl">
+
+        <label>Amount</label>
+
+        <input
+            type="range"
+            id="fireCount"
+            min="1"
+            max="3000"
+            value="80"
+        >
+
+    </div>
+
+    <div class="fireControl">
+
+        <label>Size</label>
+
+        <input
+            type="range"
+            id="fireSize"
+            min="0.01"
+            max="5"
+            step="0.1"
+            value="1"
+        >
+
+    </div>
+
+    <div class="fireControl">
+
+        <label>Height</label>
+
+        <input
+            type="range"
+            id="fireHeight"
+            min="1"
+            max="50"
+            value="20"
+        >
+
+    </div>
+
+    <div class="fireControl">
+
+        <label>Width</label>
+
+        <input
+            type="range"
+            id="fireWidth"
+            min="1"
+            max="50"
+            value="20"
+        >
+
+    </div>
+
+    <div class="fireControl">
+
+        <label>Depth</label>
+
+        <input
+            type="range"
+            id="fireDepth"
+            min="1"
+            max="50"
+            value="20"
+        >
+
+    </div>
+
+    <div class="fireControl">
+
+        <label>Speed</label>
+
+        <input
+            type="range"
+            id="fireSpeed"
+            min="0.001"
+            max="1"
+            step="0.001"
+            value="0.03"
+        >
+
+    </div>
+
+</div>
     <!-- SCRIPT PANEL -->
 
 <div id="scriptPanel">
@@ -3235,6 +3445,12 @@ Scale -
         <input type="text" id="searchInput" placeholder="Buscar...">
 
         <div id="buttonContainer">
+            <button
+    class="menuBtn"
+    id="fireParticleBtn"
+>simple particle
+  
+</button>
 <button
     id="billboardBtn"
     class="menuBtn"
@@ -4321,6 +4537,7 @@ function filterButtons() {
 }
 /* variables */
 const boneHelpers = [];
+const fireSystems = [];
 let boneDisplayScale = 0.02;
 let workspaceMode = "object";
 let currentPreviewPreset = null;
@@ -5353,6 +5570,13 @@ function select(obj) {
     updateSelectionOutline();
     selectedInUI = obj;
     updateTexturePanelVisibility(obj);
+    if(
+    selected &&
+    selected.userData.isFireParticle
+){
+
+    loadFireSettings(selected);
+}
     transform.addEventListener("dragging-changed", (e) => {
     
     orbit.enabled = !e.value;
@@ -11121,6 +11345,248 @@ boneSizeSlider.addEventListener(
         
     }
 );
+fireParticleBtn.onclick = ()=>{
+
+    firePanel.style.display = "flex";
+
+    createFireParticle();
+};
+closeFirePanel.onclick = ()=>{
+
+    firePanel.style.display = "none";
+};
+function createFireParticle(){
+
+    const group =
+    new THREE.Group();
+
+    group.name =
+    "simple Particle";
+
+    group.userData.isFireParticle =
+    true;
+
+    group.userData.settings = {
+
+        color:fireColor.value,
+
+        opacity:
+        parseFloat(fireOpacity.value),
+
+        count:
+        parseInt(fireCount.value),
+
+        size:
+        parseFloat(fireSize.value),
+
+        height:
+        parseFloat(fireHeight.value),
+
+        width:
+        parseFloat(fireWidth.value),
+
+        depth:
+        parseFloat(fireDepth.value),
+
+        speed:
+        parseFloat(fireSpeed.value)
+    };
+
+    buildFire(group);
+
+    scene.add(group);
+
+    objects.push(group);
+
+    fireSystems.push(group);
+
+    selected = group;
+
+    transform.attach(group);
+
+    refreshOutliner();
+}
+function buildFire(group){
+
+    while(group.children.length){
+
+        group.remove(
+            group.children[0]
+        );
+    }
+
+    const s =
+    group.userData.settings;
+
+    for(let i = 0; i < s.count; i++){
+
+        const geo =
+    new THREE.CircleGeometry(
+        0.5,
+        32
+    );
+        const mat =
+        new THREE.MeshBasicMaterial({
+
+            color:s.color,
+
+            transparent:true,
+
+            opacity:s.opacity,
+
+            side:
+            THREE.DoubleSide,
+
+            depthWrite:false,
+
+            blending:
+            THREE.AdditiveBlending
+        });
+
+        const p =
+        new THREE.Mesh(geo,mat);
+
+        p.position.set(
+
+            (Math.random()-0.5)
+            * s.width,
+
+            Math.random()
+            * s.height,
+
+            (Math.random()-0.5)
+            * s.depth
+        );
+
+        const size =
+        (Math.random()*1.2+0.3)
+        * s.size;
+
+        p.scale.set(
+            size,
+            size,
+            size
+        );
+
+        p.userData.speed =
+        Math.random()*0.05
+        + 0.01;
+
+        group.add(p);
+    }
+}
+function updateFireParticles() {
+    
+    // solo animar en modo render
+    if (viewportMode !== "render") {
+        return;
+    }
+    
+    fireSystems.forEach(group => {
+        
+        const s =
+            group.userData.settings;
+        
+        group.children.forEach(p => {
+            
+            p.lookAt(camera.position);
+            
+            p.position.y +=
+                p.userData.speed *
+                s.speed * 10;
+            
+            if (
+                p.position.y >
+                s.height
+            ) {
+                
+                p.position.y = 0;
+                
+                p.position.x =
+                    (Math.random() - 0.5) *
+                    s.width;
+                
+                p.position.z =
+                    (Math.random() - 0.5) *
+                    s.depth;
+            }
+        });
+    });
+}
+function updateSelectedFire(){
+
+    if(
+        !selected ||
+        !selected.userData.isFireParticle
+    ) return;
+
+    selected.userData.settings = {
+
+        color:fireColor.value,
+
+        opacity:
+        parseFloat(fireOpacity.value),
+
+        count:
+        parseInt(fireCount.value),
+
+        size:
+        parseFloat(fireSize.value),
+
+        height:
+        parseFloat(fireHeight.value),
+
+        width:
+        parseFloat(fireWidth.value),
+
+        depth:
+        parseFloat(fireDepth.value),
+
+        speed:
+        parseFloat(fireSpeed.value)
+    };
+
+    buildFire(selected);
+}
+[
+    fireColor,
+    fireOpacity,
+    fireCount,
+    fireSize,
+    fireHeight,
+    fireWidth,
+    fireDepth,
+    fireSpeed
+]
+.forEach(el=>{
+
+    el.addEventListener(
+        "input",
+        updateSelectedFire
+    );
+});
+function loadFireSettings(obj){
+
+    if(
+        !obj ||
+        !obj.userData.isFireParticle
+    ) return;
+
+    const s =
+    obj.userData.settings;
+
+    fireColor.value = s.color;
+    fireOpacity.value = s.opacity;
+    fireCount.value = s.count;
+    fireSize.value = s.size;
+    fireHeight.value = s.height;
+    fireWidth.value = s.width;
+    fireDepth.value = s.depth;
+    fireSpeed.value = s.speed;
+
+    firePanel.style.display =
+    "flex";
+}
 /* LOOP */
 function animate(){
     spawn.lookAt(camera.position);
@@ -11130,6 +11596,7 @@ function animate(){
         child.lookAt(gizmoCamera.position);
     }
 });
+updateFireParticles();
 boneHelpers.forEach(helper => {
 
     const distance =
