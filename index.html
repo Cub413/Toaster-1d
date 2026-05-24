@@ -4529,7 +4529,7 @@ style="
         <img src="archivos/toastertext.png">
       </div>
 
-<div class="version2" id="appVersion">v 1.01.1</div>
+<div class="version2" id="appVersion">v 1.01.01</div>
 
 <div id="updateModal" class="updateModal hidden">
     <div class="updateBox">
@@ -13052,6 +13052,22 @@ setInterval(() => {
         forceUIReset();
     }
 }, 1000);
+function unlockOnVertical() {
+    if (window.innerHeight > window.innerWidth) {
+        draggedOutlinerObject = null;
+        console.log("Outliner desbloqueado (modo vertical)");
+    }
+}
+
+window.addEventListener(
+    "orientationchange",
+    () => setTimeout(unlockOnVertical, 200)
+);
+
+window.addEventListener(
+    "resize",
+    unlockOnVertical
+);
 /* LOOP */
 function animate(){
     spawn.lookAt(camera.position);
