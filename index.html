@@ -20,7 +20,61 @@ body{
 .topbar, .toolbar, #overlay, .btn, .menuBtn{
     user-select:none;
 }
+.objectPicker{
 
+    display:none;
+
+    flex-direction:column;
+
+    gap:6px;
+
+    margin-top:10px;
+
+    max-height:180px;
+
+    overflow:auto;
+
+    background:#222;
+
+    border-radius:10px;
+
+    padding:8px;
+}
+
+.objectItem{
+
+    padding:10px;
+
+    background:#333;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    font-size:13px;
+}
+
+.objectItem:hover{
+
+    background:#444;
+}
+
+.objectSelectBtn{
+
+    width:100%;
+
+    padding:10px;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:#2a2a2a;
+
+    color:white;
+
+    cursor:pointer;
+}
 /* TOP BAR */
 .topbar{
     position:fixed;
@@ -3024,10 +3078,367 @@ height:260px;
     opacity:1;
     transform:translateX(-50%) translateY(0);
 }
+
+#nodeSys{
+
+    position:fixed;
+
+    inset:0;
+
+    background:#121212;
+
+    display:none;
+
+    z-index:999999;
+
+    overflow:hidden;
+
+    font-family:Arial;
+
+    touch-action:none;
+}
+
+#workspace{
+
+    position:absolute;
+
+    inset:0;
+
+    overflow:hidden;
+
+    background:
+    linear-gradient(#1d1d1d 1px,transparent 1px),
+    linear-gradient(90deg,#1d1d1d 1px,transparent 1px);
+
+    background-size:40px 40px;
+}
+
+#canvas{
+
+    position:absolute;
+
+    width:10000px;
+
+    height:10000px;
+
+    transform-origin:0 0;
+}
+
+#svg{
+
+    position:absolute;
+
+    width:10000px;
+
+    height:10000px;
+
+    pointer-events:none;
+}
+
+#toolbar{
+
+    position:fixed;
+
+    top:12px;
+
+    left:12px;
+
+    z-index:1000;
+
+    display:flex;
+
+    gap:8px;
+}
+
+#toolbar button{
+
+    padding:12px 16px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#222;
+
+    color:white;
+
+    font-size:18px;
+}
+
+#menu{
+
+    position:fixed;
+
+    right:0;
+
+    top:0;
+
+    width:180px;
+
+    height:100vh;
+
+    background:#181818;
+
+    display:flex;
+
+    flex-direction:column;
+
+    border-left:1px solid #333;
+
+    z-index:1000;
+}
+
+#search{
+
+    margin:10px;
+
+    padding:12px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#2a2a2a;
+
+    color:white;
+
+    font-size:15px;
+}
+
+#nodeList{
+
+    flex:1;
+
+    overflow-y:auto;
+
+    padding:8px;
+}
+
+.menuItem{
+
+    padding:12px;
+
+    margin-bottom:6px;
+
+    background:#252525;
+
+    border-radius:10px;
+
+    color:white;
+
+    font-size:14px;
+}
+
+.node{
+
+    position:absolute;
+
+    width:250px;
+
+    background:#1f1f1f;
+
+    border-radius:14px;
+
+    color:white;
+
+    box-shadow:0 8px 25px rgba(0,0,0,.45);
+}
+
+.header{
+
+    background:#333;
+
+    padding:14px;
+
+    font-weight:bold;
+
+    border-radius:14px 14px 0 0;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    touch-action:none;
+}
+
+.deleteBtn{
+
+    background:#ff3b3b;
+
+    border:none;
+
+    color:white;
+
+    border-radius:8px;
+
+    width:28px;
+
+    height:28px;
+
+    font-size:18px;
+}
+
+.body{
+
+    padding:15px;
+
+    position:relative;
+}
+
+.socket{
+
+    width:34px;
+
+    height:34px;
+
+    border-radius:50%;
+
+    position:absolute;
+
+    top:50%;
+
+    transform:translateY(-50%);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+}
+
+.socket::after{
+
+    content:"";
+
+    width:18px;
+
+    height:18px;
+
+    border-radius:50%;
+}
+
+.input{
+
+    left:-17px;
+}
+
+.input::after{
+
+    background:#ff5722;
+}
+
+.output{
+
+    right:-17px;
+}
+
+.output::after{
+
+    background:#00bcd4;
+}
+
+input,select{
+
+    width:100%;
+
+    margin:10px 0;
+
+    padding:10px;
+
+    background:#2a2a2a;
+
+    border:none;
+
+    border-radius:8px;
+
+    color:white;
+}
+#updateChanges{
+
+    margin-top:12px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:6px;
+}
+
+.updateItem{
+
+    padding:8px 10px;
+
+    border-radius:6px;
+
+    background:#202020;
+
+    border:1px solid #3a3a3a;
+
+    font-size:12px;
+
+    color:#d7d7d7;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+}
+
+.updateItem i{
+
+    color:#4ea1ff;
+
+    font-size:11px;
+}
 </style>
 </head>
 
 <body>
+    <!-- NODESYS -->
+
+<div id="nodeSys">
+
+    <!-- TOOLBAR -->
+
+    <div id="toolbar">
+
+        <button onclick="zoomIn()">+</button>
+
+        <button onclick="zoomOut()">−</button>
+
+        <button id="closeNodeSys">✕</button>
+
+    </div>
+
+    <!-- MENU -->
+
+    <div id="menu">
+
+        <input
+            id="search"
+            placeholder="Buscar..."
+        >
+
+        <div id="nodeList"></div>
+
+    </div>
+
+    <!-- WORKSPACE -->
+
+    <div id="workspace">
+
+        <div id="canvas">
+
+            <svg id="svg"></svg>
+
+        </div>
+
+    </div>
+
+</div>
     <!-- BOTÓN -->
 <div id="appToast"></div>
 <div id="cubeFacesPanel" style="
@@ -3531,7 +3942,11 @@ scene.add(cube);
 <div id="updateModal" class="updateModal hidden">
     <div class="updateBox">
         <h2>New update</h2>
+        
         <p id="updateText"></p>
+        
+        <div id="updateChanges"></div>
+        
         <button id="closeUpdate">Close</button>
     </div>
 </div>
@@ -3908,6 +4323,9 @@ Scale -
 
     Look Constraint
 
+</button>
+<button class="menuBtn" id="openNodeSys">
+    NodeSys
 </button>
 <button class="menuBtn" id="cubeFacesBtn">
     Cube Faces
@@ -4626,7 +5044,7 @@ style="
         <img src="archivos/toastertext.png">
       </div>
 
-<div class="version2" id="appVersion">v 1.01.02</div>
+<div class="version2" id="appVersion">v 1.01.03</div>
 
 <div id="updateModal" class="updateModal hidden">
     <div class="updateBox">
@@ -4988,6 +5406,7 @@ function filterButtons() {
 }
 /* variables */
 let holdTargetParent = null;
+const nodeTypes = {};
 let holdChildrenToAdd = [];
 let holdTimer = null;
 const boneHelpers = [];
@@ -5524,23 +5943,83 @@ window.addEventListener("load", () => {
 });
 
 function showUpdatePanel(oldV, newV) {
-    const modal = document.getElementById("updateModal");
-    const text = document.getElementById("updateText");
-    const box = document.querySelector(".updateBox");
-    const btn = document.getElementById("closeUpdate");
-    
-    text.textContent = `Updated from ${oldV} → ${newV}`;
-    modal.classList.remove("hidden");
-    
-    function close() {
-        modal.classList.add("hidden");
-    }
-    
-    btn.onclick = close;
-    modal.onclick = close;
-    box.onclick = (e) => e.stopPropagation();
-}
 
+    const modal =
+        document.getElementById("updateModal");
+
+    const text =
+        document.getElementById("updateText");
+
+    const changes =
+        document.getElementById("updateChanges");
+
+    const box =
+        document.querySelector(".updateBox");
+
+    const btn =
+        document.getElementById("closeUpdate");
+
+    text.innerHTML =
+        `Updated from <b>${oldV}</b> to <b>${newV}</b>`;
+
+    // LIMPIAR LISTA
+    changes.innerHTML = "";
+
+    // CAMBIOS
+    const updateList = [
+
+        "Bug Fix",
+
+        "Water Update",
+
+        "New Material",
+
+        "NodeSys"
+
+    ];
+
+    updateList.forEach(change => {
+
+        const item =
+            document.createElement("div");
+
+        item.className =
+            "updateItem";
+
+        item.innerHTML = `
+            <i class="fa-solid fa-wrench"></i>
+            ${change}
+        `;
+
+        changes.appendChild(item);
+
+    });
+
+    modal.classList.remove("hidden");
+
+    box.animate(
+        [
+            {
+                transform:"scale(0.7)",
+                opacity:0
+            },
+            {
+                transform:"scale(1)",
+                opacity:1
+            }
+        ],
+        {
+            duration:220,
+            easing:"ease-out"
+        }
+    );
+
+    btn.onclick = () => {
+
+        modal.classList.add("hidden");
+
+    };
+}
 const hideTexturePanelFor = new Set([
     "light",
     "spawn",
@@ -13515,6 +13994,893 @@ function showToast(message, duration = 2500){
         toast.classList.remove("show");
     }, duration);
 }
+const nodeSys =
+document.getElementById("nodeSys");
+window.zoomIn = function() {
+    
+    scale *= 1.2;
+    
+    update();
+};
+
+window.zoomOut = function() {
+    
+    scale /= 1.2;
+    
+    update();
+};
+document
+.getElementById("openNodeSys")
+.onclick=()=>{
+
+    nodeSys.style.display="block";
+
+    loadOutlinerObjects();
+};
+
+document
+.getElementById("closeNodeSys")
+.onclick=()=>{
+
+    nodeSys.style.display="none";
+};
+
+const canvas=
+document.getElementById("canvas");
+
+const svg=
+document.getElementById("svg");
+
+let scale=1;
+
+let connections=[];
+
+let nodeDrag=null;
+
+let currentConnection=null;
+
+let dragOffset={x:0,y:0};
+
+let tempX=0,tempY=0;
+
+function loadOutlinerObjects(){
+
+    nodeTypes.Main=[];
+
+    objects.forEach(obj=>{
+
+        nodeTypes.Main.push({
+
+            name:
+            obj.name ||
+            obj.userData.name ||
+            obj.type,
+
+            ref:obj
+        });
+
+    });
+
+    render();
+}
+
+
+function update(){
+
+    canvas.style.transform=
+    `scale(${scale})`;
+
+    drawConnections();
+}
+
+function wx(x){
+
+    return x/scale;
+}
+
+function wy(y){
+
+    return y/scale;
+}
+
+function center(){
+
+    return{
+
+        x:wx(window.innerWidth/2)-125,
+
+        y:wy(window.innerHeight/2)-80
+
+    };
+}
+
+function addNode(name){
+
+    const c=center();
+
+    createNode(name,c.x,c.y);
+}
+
+function addObjectNode(data){
+
+    const c=center();
+
+    createObjectNode(
+        data.ref,
+        data.name,
+        c.x,
+        c.y
+    );
+}
+
+function removeNode(node){
+
+    connections =
+    connections.filter(c =>
+
+        c.from.closest(".node") !== node &&
+        c.to.closest(".node") !== node
+
+    );
+
+    node.remove();
+
+    drawConnections();
+}
+
+function createNode(name,x,y){
+
+    const node =
+    document.createElement("div");
+
+    node.className =
+    "node";
+node.dataset.type = name;
+    node.style.left =
+    x + "px";
+
+    node.style.top =
+    y + "px";
+
+    let bodyHTML = "";
+
+    // =========================
+    // OBJECT NODE
+    // =========================
+
+    if(name === "Object"){
+
+        bodyHTML = `
+
+        <button class="objectSelectBtn">
+            Select
+        </button>
+
+        <div class="objectPicker">
+
+            ${
+                objects.map(obj=>`
+
+                <div
+                    class="objectItem"
+                    data-uuid="${obj.uuid}"
+                >
+
+                    ${
+                        obj.name ||
+                        obj.userData.name ||
+                        obj.type
+                    }
+
+                </div>
+
+                `).join("")
+            }
+
+        </div>
+        `;
+    }
+
+    // =========================
+    // COLOR NODE
+    // =========================
+// =========================
+// REFLECTION NODE
+// =========================
+
+else if(name === "Reflection"){
+
+    bodyHTML = `
+
+    <div style="
+    margin-bottom:10px;
+    font-size:13px;
+    opacity:.7;
+    ">
+        Reflection
+    </div>
+
+    <input
+        type="range"
+        class="reflectionSlider"
+        min="0"
+        max="1"
+        step="0.01"
+        value="0.5"
+    >
+    `;
+}
+    else if(name === "Color"){
+
+        bodyHTML = `
+
+        <input
+    type="color"
+    class="colorInput"
+            
+            value="#ffffff"
+        >
+        `;
+    }
+
+    node.innerHTML =
+    `
+    <div class="header">
+
+        <span>${name}</span>
+
+        <button class="deleteBtn">
+            ×
+        </button>
+
+    </div>
+
+    <div class="body">
+
+        ${bodyHTML}
+
+        <div class="socket input"></div>
+
+        <div class="socket output"></div>
+
+    </div>
+    `;
+
+    canvas.appendChild(node);
+
+    // =========================
+    // DELETE
+    // =========================
+
+    node
+    .querySelector(".deleteBtn")
+    .onclick = ()=>removeNode(node);
+
+    // =========================
+    // DRAG
+    // =========================
+
+    node
+    .querySelector(".header")
+    .addEventListener(
+    "pointerdown",
+    e=>{
+
+        nodeDrag = node;
+
+        dragOffset.x =
+        wx(e.clientX) -
+        parseFloat(node.style.left);
+
+        dragOffset.y =
+        wy(e.clientY) -
+        parseFloat(node.style.top);
+    });
+
+    // =========================
+    // CONNECTION
+    // =========================
+
+    node
+    .querySelector(".output")
+    .addEventListener(
+    "pointerdown",
+    e=>{
+
+        e.stopPropagation();
+
+        currentConnection = {
+
+            from:e.target
+        };
+
+        tempX = wx(e.clientX);
+
+        tempY = wy(e.clientY);
+
+        drawConnections();
+    });
+
+    // =========================
+    // OBJECT PICKER
+    // =========================
+
+    if(name === "Object"){
+
+        const picker =
+        node.querySelector(".objectPicker");
+
+        const selectBtn =
+        node.querySelector(".objectSelectBtn");
+
+        selectBtn.onclick = e => {
+
+            e.stopPropagation();
+
+            picker.style.display =
+
+            picker.style.display === "flex"
+
+            ? "none"
+
+            : "flex";
+        };
+
+        picker
+        .querySelectorAll(".objectItem")
+        .forEach(item=>{
+
+            item.onclick = ()=>{
+
+                const uuid =
+                item.dataset.uuid;
+
+                const obj =
+                scene.getObjectByProperty(
+                    "uuid",
+                    uuid
+                );
+
+                node.object3D = obj;
+
+                selectBtn.textContent =
+                item.textContent.trim();
+
+                picker.style.display =
+                "none";
+            };
+        });
+    }
+
+    // =========================
+    // COLOR APPLY
+    // =========================
+
+    if(name === "Color"){
+
+        const colorInput =
+        node.querySelector(".colorInput");
+
+        colorInput.addEventListener(
+        "input",
+        ()=>{
+
+            connections.forEach(c=>{
+
+                const fromNode =
+                c.from.closest(".node");
+
+                const toNode =
+                c.to.closest(".node");
+
+                if(fromNode !== node)
+                return;
+
+                if(!toNode.object3D)
+                return;
+
+                const obj =
+                toNode.object3D;
+
+                obj.traverse(child=>{
+
+                    if(child.material){
+
+                        child.material.color
+                        .set(
+                            colorInput.value
+                        );
+                    }
+                });
+            });
+        });
+    }
+
+    // =========================
+    // STOP PROPAGATION
+    // =========================
+
+    node
+    .querySelectorAll(
+    "input,select,button"
+    )
+    .forEach(el=>{
+
+        el.addEventListener(
+        "pointerdown",
+        e=>e.stopPropagation()
+        );
+    });
+}
+function createObjectNode(obj,name,x,y){
+
+    const node=
+    document.createElement("div");
+
+    node.className="node";
+
+    node.style.left=x+"px";
+
+    node.style.top=y+"px";
+
+    node.object3D=obj;
+
+    node.innerHTML=
+    `
+    <div class="header">
+
+    <span>${name}</span>
+
+    <button class="deleteBtn">
+    ×
+    </button>
+
+    </div>
+
+    <div class="body">
+
+    <div style="
+    font-size:12px;
+    opacity:.7;
+    margin-bottom:10px;
+    ">
+    Scene Object
+    </div>
+
+    <div class="socket input"></div>
+
+    <div class="socket output"></div>
+
+    </div>
+    `;
+
+    canvas.appendChild(node);
+
+    node
+    .querySelector(".deleteBtn")
+    .onclick=()=>removeNode(node);
+
+    node
+    .querySelector(".header")
+    .addEventListener(
+    "pointerdown",
+    e=>{
+
+        nodeDrag=node;
+
+        dragOffset.x=
+        wx(e.clientX)-
+        parseFloat(node.style.left);
+
+        dragOffset.y=
+        wy(e.clientY)-
+        parseFloat(node.style.top);
+    });
+
+    node
+    .querySelector(".output")
+    .addEventListener(
+    "pointerdown",
+    e=>{
+
+        e.stopPropagation();
+
+        currentConnection={
+            from:e.target
+        };
+
+        tempX=wx(e.clientX);
+
+        tempY=wy(e.clientY);
+
+        drawConnections();
+    });
+}
+
+document.addEventListener(
+"pointermove",
+e=>{
+
+    tempX=wx(e.clientX);
+
+    tempY=wy(e.clientY);
+
+    if(nodeDrag){
+
+        nodeDrag.style.left=
+        (wx(e.clientX)-dragOffset.x)
+        +"px";
+
+        nodeDrag.style.top=
+        (wy(e.clientY)-dragOffset.y)
+        +"px";
+    }
+
+    drawConnections();
+});
+
+document.addEventListener(
+    "pointerup",
+    e => {
+        
+        if (currentConnection) {
+            
+            const inputs = [
+                ...document.querySelectorAll(".input")
+            ];
+            
+            let nearest = null;
+            
+            let min = 60;
+            
+            inputs.forEach(inp => {
+                
+                const p = socketPos(inp);
+                
+                const d = Math.hypot(
+                    p.x - tempX,
+                    p.y - tempY
+                );
+                
+                if (d < min) {
+                    
+                    min = d;
+                    
+                    nearest = inp;
+                }
+            });
+            
+            if (nearest) {
+                
+                connections.push({
+                    
+                    from: currentConnection.from,
+                    
+                    to: nearest
+                });
+                
+                // =========================
+                // APPLY LOGIC
+                // =========================
+                
+                const fromNode =
+                    currentConnection.from
+                    .closest(".node");
+                
+                const toNode =
+                    nearest
+                    .closest(".node");
+                
+                const fromType =
+                    fromNode.dataset.type;
+                
+                const toType =
+                    toNode.dataset.type;
+                
+                // COLOR -> OBJECT
+                // =========================
+// REFLECTION -> OBJECT
+// =========================
+
+if(
+    fromType === "Reflection" &&
+    toType === "Object"
+){
+
+    const obj =
+    toNode.object3D;
+
+    if(obj){
+
+        const slider =
+        fromNode.querySelector(
+            ".reflectionSlider"
+        );
+
+        const applyReflection = ()=>{
+
+            const value =
+            parseFloat(
+                slider.value
+            );
+
+            obj.traverse(child=>{
+
+                if(child.material){
+
+                    // STANDARD MATERIAL
+
+                    if(
+                        child.material.isMeshStandardMaterial ||
+                        child.material.isMeshPhysicalMaterial
+                    ){
+
+                        child.material.metalness =
+                        value;
+
+                        child.material.roughness =
+                        1 - value;
+
+                        child.material.needsUpdate =
+                        true;
+                    }
+
+                    // CONVERT BASIC MATERIALS
+
+                    else{
+
+                        const newMat =
+                        new THREE.MeshStandardMaterial({
+
+                            color:
+                            child.material.color
+                            ? child.material.color
+                            : new THREE.Color("white"),
+
+                            map:
+                            child.material.map || null,
+
+                            metalness:value,
+
+                            roughness:1-value
+                        });
+
+                        child.material =
+                        newMat;
+                    }
+                }
+            });
+        };
+
+        applyReflection();
+
+        slider.addEventListener(
+        "input",
+        applyReflection
+        );
+    }
+}
+                if (
+                    fromType === "Color" &&
+                    toType === "Object"
+                ) {
+                    
+                    const obj =
+                        toNode.object3D;
+                    
+                    if (obj) {
+                        
+                        const colorInput =
+                            fromNode.querySelector(
+                                ".colorInput"
+                            );
+                        
+                        const applyColor = () => {
+                            
+                            obj.traverse(child => {
+                                
+                                if (child.material) {
+                                    
+                                    child.material.color
+                                        .set(
+                                            colorInput.value
+                                        );
+                                }
+                            });
+                        };
+                        
+                        applyColor();
+                        
+                        colorInput.addEventListener(
+                            "input",
+                            applyColor
+                        );
+                    }
+                }
+            }
+        }
+        
+        nodeDrag = null;
+        
+        currentConnection = null;
+        
+        drawConnections();
+    });
+function socketPos(socket){
+
+    const n=
+    socket.closest(".node");
+
+    const x=
+    parseFloat(n.style.left);
+
+    const y=
+    parseFloat(n.style.top)+75;
+
+    if(
+    socket.classList
+    .contains("output")
+    )
+
+    return{
+        x:x+250,
+        y
+    };
+
+    return{x,y};
+}
+
+function path(p1,p2){
+
+    const d=
+    document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "path"
+    );
+
+    d.setAttribute(
+    "d",
+
+    `M${p1.x} ${p1.y}
+    C${p1.x+120} ${p1.y},
+    ${p2.x-120} ${p2.y},
+    ${p2.x} ${p2.y}`
+    );
+
+    d.setAttribute(
+    "stroke",
+    "#00bcd4"
+    );
+
+    d.setAttribute(
+    "stroke-width",
+    "4"
+    );
+
+    d.setAttribute(
+    "fill",
+    "none"
+    );
+
+    svg.appendChild(d);
+}
+
+function drawConnections(){
+
+    svg.innerHTML="";
+
+    connections.forEach(c=>
+
+    path(
+    socketPos(c.from),
+    socketPos(c.to)
+    )
+
+    );
+
+    if(currentConnection){
+
+        path(
+
+        socketPos(
+        currentConnection.from
+        ),
+
+        {
+            x:tempX,
+            y:tempY
+        }
+
+        );
+    }
+}
+
+const nodeList=
+document.getElementById("nodeList");
+
+const search=
+document.getElementById("search");
+
+function render(filter = "") {
+    
+    nodeList.innerHTML = "";
+    
+    // =========================
+    // OBJECT BUTTON
+    // =========================
+    
+    const objectBtn =
+        document.createElement("div");
+    
+    objectBtn.className =
+        "menuItem";
+    
+    objectBtn.textContent =
+        "Object";
+    
+    objectBtn.onclick = () => {
+        
+        createNode(
+            "Object",
+            center().x,
+            center().y
+        );
+    };
+    
+    nodeList.appendChild(objectBtn);
+    // =========================
+// REFLECTION BUTTON
+// =========================
+
+const reflectionBtn =
+document.createElement("div");
+
+reflectionBtn.className =
+"menuItem";
+
+reflectionBtn.textContent =
+"Reflection";
+
+reflectionBtn.onclick = ()=>{
+
+    createNode(
+        "Reflection",
+        center().x,
+        center().y
+    );
+};
+
+nodeList.appendChild(reflectionBtn);
+    // =========================
+    // COLOR BUTTON
+    // =========================
+    
+    const colorBtn =
+        document.createElement("div");
+    
+    colorBtn.className =
+        "menuItem";
+    
+    colorBtn.textContent =
+        "Color";
+    
+    colorBtn.onclick = () => {
+        
+        createNode(
+            "Color",
+            center().x,
+            center().y
+        );
+    };
+    
+    nodeList.appendChild(colorBtn);
+}
+search.addEventListener(
+"input",
+e=>render(e.target.value)
+);
+
+render();
 /* LOOP */
 function animate(){
     spawn.lookAt(camera.position);
