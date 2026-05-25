@@ -2476,7 +2476,7 @@ height:260px;
 
     color:white;
 
-    font-size:10px;
+    font-size:5px;
 
     display:flex;
 
@@ -2490,7 +2490,7 @@ height:260px;
 
 .customSliderWrap {
     
-    width: 55px;
+    width: 300px;
     
     height: 12px;
     
@@ -2557,7 +2557,7 @@ height:260px;
 
 #scaleSlider::-moz-range-thumb{
 
-    width:10px;
+    width:30px;
     height:10px;
 
     border:none;
@@ -2976,14 +2976,108 @@ height:260px;
 
     background:#666;
 }
+.faceColorBtn{
+    width:40px;
+    height:40px;
+    margin:5px;
+    border:none;
+    cursor:pointer;
+    border-radius:6px;
+}
+#closeCubeFacesBtn {
+    background: #333;
+    color: white;
+    border: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 10px;
+    padding: 0;
+    line-height: 18px;
+}
+
+#closeCubeFacesBtn:hover {
+    background: #555;
+}
+#appToast{
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:#1f1f1f;
+    color:white;
+    padding:10px 16px;
+    border-radius:8px;
+    font-size:12px;
+    border:1px solid #333;
+    box-shadow:0 4px 14px rgba(0,0,0,.35);
+    opacity:0;
+    pointer-events:none;
+    transition:all .35s ease;
+    z-index:10000;
+    min-width:160px;
+    text-align:center;
+}
+
+#appToast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+}
 </style>
 </head>
 
 <body>
     <!-- BOTÓN -->
+<div id="appToast"></div>
+<div id="cubeFacesPanel" style="
+display:none;
+position:fixed;
+right:12px;
+top:90px;
+background:#1b1b1b;
+padding:8px;
+border:1px solid #333;
+z-index:9999;
+border-radius:6px;
+width:170px;
+font-size:11px;
+box-shadow:0 4px 12px rgba(0,0,0,.35);
+">
+    
+    <div style="
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:6px;
+    ">
+        
+        <h3 style="
+        margin:0;
+        font-size:12px;
+        font-weight:600;
+        ">
+            Faces
+        </h3>
 
 
 
+
+
+        <button id="closeCubeFacesBtn">
+            ✕
+        </button>
+    </div>
+
+    <div id="cubeFacesColors"></div>
+
+    <input
+        type="file"
+        id="cubeFaceTextureInput"
+        accept="image/*"
+        style="display:none;"
+    >
+</div>
 <!-- PANEL -->
 
 <div id="bonePanel">
@@ -3705,7 +3799,7 @@ Scale -
         Scale
 
         <span id="scaleValue">
-            1.0
+            50
         </span>
 
     </div>
@@ -3714,10 +3808,10 @@ Scale -
 
         <input
             type="range"
-            min="0.1"
-            max="10"
+            min="0.01"
+            max="100"
             step="0.1"
-            value="1"
+            value="50"
             id="scaleSlider"
 
             oninput="window.updateScaleSlider(this.value)"
@@ -3814,6 +3908,9 @@ Scale -
 
     Look Constraint
 
+</button>
+<button class="menuBtn" id="cubeFacesBtn">
+    Cube Faces
 </button>
 <button
     id="openBonePanelBtn"
@@ -4529,7 +4626,7 @@ style="
         <img src="archivos/toastertext.png">
       </div>
 
-<div class="version2" id="appVersion">v 1.01.01</div>
+<div class="version2" id="appVersion">v 1.01.02</div>
 
 <div id="updateModal" class="updateModal hidden">
     <div class="updateBox">
@@ -7718,8 +7815,56 @@ function renderOutlinerItem(
     };
 
     item.appendChild(left);
-    item.appendChild(focus);
-    item.appendChild(dots);
+item.appendChild(focus);
+
+// botón sacar del grupo (solo para hijos)
+if (obj.parent && obj.parent !== scene && obj !== spawn) {
+    
+    const ungroup =
+        document.createElement("button");
+    
+    ungroup.innerHTML =
+        `<i class="fa-solid fa-up-right-from-square"></i>`;
+    
+    ungroup.title =
+        "Sacar del grupo";
+    
+    ungroup.onclick = e => {
+        
+        e.stopPropagation();
+        
+        const worldPos =
+            new THREE.Vector3();
+        
+        const worldQuat =
+            new THREE.Quaternion();
+        
+        const worldScale =
+            new THREE.Vector3();
+        
+        obj.updateMatrixWorld(true);
+        
+        obj.matrixWorld.decompose(
+            worldPos,
+            worldQuat,
+            worldScale
+        );
+        
+        obj.parent.remove(obj);
+        
+        scene.add(obj);
+        
+        obj.position.copy(worldPos);
+        obj.quaternion.copy(worldQuat);
+        obj.scale.copy(worldScale);
+        
+        refreshOutliner();
+    };
+    
+    item.appendChild(ungroup);
+}
+
+item.appendChild(dots);
 
     item.onclick = ()=>{
         select(obj);
@@ -7834,106 +7979,59 @@ document.getElementById("copyBtn").onclick=()=>{
 };
 
 document.getElementById("deleteBtn").onclick = () => {
-    if (selected) {
     
-    transform.detach();
-    
-    scene.remove(selected);
-    
-    selected = null;
-}
     if (!target || target === spawn) return;
     
+    const deletedObject = target;
+    
+    // deseleccionar si estaba seleccionado
+    if (selected === deletedObject) {
+        transform.detach();
+        selected = null;
+    }
+    
+    /* LIMPIAR LOOK TARGETS */
+    scene.traverse(child => {
+        if (child.userData.lookTarget === deletedObject) {
+            child.userData.lookTarget = null;
+            child.rotation.set(0, 0, 0);
+            child.quaternion.identity();
+        }
+    });
+    
+    /* LIMPIAR WATCHERS */
+    if (deletedObject.userData?.lookWatchers) {
+        deletedObject.userData.lookWatchers.forEach(watcher => {
+            watcher.userData.lookTarget = null;
+            watcher.rotation.set(0, 0, 0);
+            watcher.quaternion.identity();
+        });
+    }
+    
     // eliminar luz
-    if (target.userData.light) {
-        scene.remove(target.userData.light);
+    if (deletedObject.userData.light) {
+        scene.remove(deletedObject.userData.light);
     }
     
-    // eliminar target
-    if (target.userData.lightTarget) {
-        scene.remove(target.userData.lightTarget);
+    // eliminar target de luz
+    if (deletedObject.userData.lightTarget) {
+        scene.remove(deletedObject.userData.lightTarget);
     }
     
-    // eliminar icono
-    scene.remove(target);
+    // quitar del parent correcto
+    if (deletedObject.parent) {
+        deletedObject.parent.remove(deletedObject);
+    }
     
     // limpiar arrays
-    objects = objects.filter(o => o !== target);
-    lights = lights.filter(o => o !== target);
-    scene.traverse(child => {
-
-const deletedObject =
-    selected;
-
-/* LIMPIAR LOOK TARGETS */
-
-scene.traverse(child => {
-
-    /* SI EL OBJETO BORRADO
-       ERA EL TARGET */
-
-    if(
-        child.userData.lookTarget ===
-        deletedObject
-    ){
-
-        child.userData.lookTarget =
-            null;
-
-        child.rotation.set(
-            0,
-            0,
-            0
-        );
-
-        child.quaternion.identity();
-    }
-});
-
-/* SI EL OBJETO BORRADO
-   TENÍA WATCHERS */
-
-if(
-    deletedObject?.userData
-    ?.lookWatchers
-){
-
-    deletedObject.userData
-    .lookWatchers
-    .forEach(watcher => {
-
-        watcher.userData.lookTarget =
-            null;
-
-        watcher.rotation.set(
-            0,
-            0,
-            0
-        );
-
-        watcher.quaternion.identity();
-    });
-}
-
-/* DETACH */
-
-transform.detach();
-
-/* BORRAR */
-
-scene.remove(deletedObject);
-
-/* LIMPIAR */
-
-selected = null;
-});
-
+    objects = objects.filter(o => o !== deletedObject);
+    lights = lights.filter(o => o !== deletedObject);
+    
     clear();
     refreshOutliner();
     
     menu.style.display = "none";
 };
-
 document.getElementById("renameBtn").onclick = () => {
     
     console.log("click rename OK");
@@ -9161,7 +9259,7 @@ function setViewportMode(mode) {
 
         // guardar materiales originales
         saveOriginalMaterials(obj);
-        
+       
         // ocultar iconos editor
         if (obj.userData.editorUI) {
             
@@ -9208,13 +9306,24 @@ function setViewportMode(mode) {
             
             else if (isSolid) {
 
-                child.material =
-                    new THREE.MeshStandardMaterial({
+                if(Array.isArray(original)){
 
-                        color:
-                        original?.color ||
-                        new THREE.Color(0xaaaaaa)
-                    });
+    child.material =
+        original.map(mat =>
+            new THREE.MeshStandardMaterial({
+                color: mat.color
+            })
+        );
+
+}else{
+
+    child.material =
+        new THREE.MeshStandardMaterial({
+            color:
+            original?.color ||
+            new THREE.Color(0xaaaaaa)
+        });
+}
 
                 child.material.needsUpdate = true;
             }
@@ -9225,13 +9334,27 @@ function setViewportMode(mode) {
             
             else if (isTexture) {
 
-                if(original){
-
-                    child.material =
-                        original.clone();
-
-                    child.material.needsUpdate = true;
-                }
+                if (original) {
+    
+    if (Array.isArray(original)) {
+        
+        child.material =
+            original.map(mat =>
+                mat.clone()
+            );
+        
+        child.material.forEach(mat =>
+            mat.needsUpdate = true
+        );
+        
+    } else {
+        
+        child.material =
+            original.clone();
+        
+        child.material.needsUpdate = true;
+    }
+}
             }
             
             // =====================
@@ -9239,17 +9362,30 @@ function setViewportMode(mode) {
             // =====================
             
             else if (isRender) {
-
-                if(original){
-
-                    child.material =
-                        original.clone();
-
-                    child.material.wireframe = false;
-
-                    child.material.needsUpdate = true;
-                }
-            }
+    
+    if (original) {
+        
+        if (Array.isArray(original)) {
+            
+            child.material = original.map(mat => {
+                const clone = mat.clone();
+                clone.wireframe = false;
+                clone.needsUpdate = true;
+                return clone;
+            });
+            
+        } else if (typeof original.clone === "function") {
+            
+            child.material = original.clone();
+            child.material.wireframe = false;
+            child.material.needsUpdate = true;
+            
+        } else {
+            
+            child.material = original;
+        }
+    }
+}
         });
     });
 
@@ -9282,7 +9418,7 @@ function setViewportMode(mode) {
 
     }
 }
-
+restoreCubeFaceTextures();
 window.setViewportMode = setViewportMode;
 
 function markEditorUI(obj) {
@@ -11894,43 +12030,24 @@ function updateSelectionOutline() {
 }
 window.scaleUp = function() {
     
-    const obj =
-        getSelectedObject?.();
+    const obj = getSelectedObject?.();
     
-    if (!obj)
-        return;
+    if (!obj) return;
     
     obj.scale.x += 0.5;
-    
     obj.scale.y += 0.5;
-    
     obj.scale.z += 0.5;
-    
 };
 
 window.scaleDown = function() {
     
-    const obj =
-        getSelectedObject?.();
+    const obj = getSelectedObject?.();
     
-    if (!obj)
-        return;
+    if (!obj) return;
     
     obj.scale.x -= 0.5;
-    
     obj.scale.y -= 0.5;
-    
     obj.scale.z -= 0.5;
-    
-    obj.scale.x =
-        Math.max(0.1, obj.scale.x);
-    
-    obj.scale.y =
-        Math.max(0.1, obj.scale.y);
-    
-    obj.scale.z =
-        Math.max(0.1, obj.scale.z);
-    
 };
 window.updateScaleSlider = function(value){
 
@@ -13158,6 +13275,246 @@ window.addEventListener(
     "resize",
     unlockOnVertical
 );
+function activarDefensaTransform() {
+    
+    const originalError = console.error;
+    
+    console.error = function(...args) {
+        
+        const msg = args.join(" ");
+        
+        if (
+            msg.includes(
+                "TransformControls: The attached 3D object must be a part of the scene graph."
+            )
+        ) {
+            
+            console.log(
+                "🛡️ DEFENSA: objeto inválido detectado, deseleccionando automáticamente"
+            );
+            
+            if (transform) {
+                transform.detach();
+            }
+            
+            selected = null;
+            
+            return;
+        }
+        
+        originalError.apply(console, args);
+    };
+}
+
+activarDefensaTransform();
+const cubeFacesBtn =
+document.getElementById(
+    "cubeFacesBtn"
+);
+
+const cubeFacesPanel =
+document.getElementById(
+    "cubeFacesPanel"
+);
+const closeCubeFacesBtn =
+document.getElementById(
+    "closeCubeFacesBtn"
+);
+closeCubeFacesBtn.onclick = () => {
+
+    cubeFacesPanel.style.display =
+        "none";
+};
+const cubeFacesColors =
+document.getElementById(
+    "cubeFacesColors"
+);
+
+const cubeFaceTextureInput =
+document.getElementById(
+    "cubeFaceTextureInput"
+);
+
+let selectedFaceIndex = 0;
+
+const faceColors = [
+    "#ff0000",
+    "#00ff00",
+    "#0000ff",
+    "#ffff00",
+    "#ff00ff",
+    "#00ffff"
+];
+
+cubeFacesBtn.onclick = () => {
+
+    if(
+        !selected ||
+        selected.geometry.type !==
+        "BoxGeometry"
+    ){
+        showToast("selecciona un cubo");
+        return;
+    }
+
+    openCubeFacesPanel();
+};
+
+function openCubeFacesPanel() {
+    
+    cubeFacesPanel.style.display =
+        "block";
+    
+    cubeFacesColors.innerHTML = "";
+    
+    selected.material =
+        faceColors.map(color =>
+            new THREE.MeshStandardMaterial({
+                color: color
+            })
+        );
+    
+    selected.userData.faceTextures ??= {};
+    
+    faceColors.forEach(
+        (color, index) => {
+            
+            const btn =
+                document.createElement("button");
+            
+            btn.className =
+                "faceColorBtn";
+            
+            btn.style.background =
+                color;
+            
+            btn.onclick = () => {
+                
+                selectedFaceIndex =
+                    index;
+                
+                cubeFaceTextureInput.click();
+            };
+            
+            cubeFacesColors.appendChild(btn);
+        }
+    );
+}
+cubeFaceTextureInput
+.addEventListener(
+    "change",
+    e => {
+
+        const file =
+            e.target.files[0];
+
+        if(!file) return;
+
+        const reader =
+            new FileReader();
+
+        reader.onload = event => {
+
+            applyTextureToFace(
+                event.target.result,
+                selectedFaceIndex
+            );
+        };
+
+        reader.readAsDataURL(file);
+    }
+);
+
+function applyTextureToFace(
+    imageSrc,
+    faceIndex
+) {
+    
+    if (
+        !Array.isArray(selected.material)
+    ) {
+        
+        selected.material =
+            faceColors.map(color =>
+                new THREE.MeshStandardMaterial({
+                    color: color
+                })
+            );
+    }
+    
+    const loader =
+        new THREE.TextureLoader();
+    
+    loader.load(
+        imageSrc,
+        texture => {
+            
+            selected.material[
+                faceIndex
+            ].map = texture;
+            
+            selected.material[
+                faceIndex
+            ].color.set(
+                0xffffff
+            );
+            
+            selected.material[
+                faceIndex
+            ].needsUpdate = true;
+            
+            selected.userData.faceTextures ??= {};
+            
+            selected.userData.faceTextures[
+                faceIndex
+            ] = imageSrc;
+        }
+    );
+}
+function restoreCubeFaceTextures(){
+
+    scene.traverse(obj => {
+
+        if(
+            !obj.userData.faceTextures
+        ) return;
+
+        const loader =
+            new THREE.TextureLoader();
+
+        Object.entries(
+            obj.userData.faceTextures
+        ).forEach(([face,src]) => {
+
+            loader.load(src, texture => {
+
+                obj.material[face].map =
+                    texture;
+
+                obj.material[face].color
+                    .set(0xffffff);
+
+                obj.material[face]
+                    .needsUpdate = true;
+            });
+        });
+    });
+}
+function showToast(message, duration = 2500){
+
+    const toast =
+        document.getElementById("appToast");
+
+    toast.textContent = message;
+
+    toast.classList.add("show");
+
+    clearTimeout(toast.hideTimer);
+
+    toast.hideTimer = setTimeout(() => {
+        toast.classList.remove("show");
+    }, duration);
+}
 /* LOOP */
 function animate(){
     spawn.lookAt(camera.position);
