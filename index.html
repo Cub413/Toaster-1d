@@ -335,7 +335,7 @@ body{
 }
 .extraPanel{
     margin:8px;
-    min-height:220px;
+    min-height:300px;
     border-radius:10px;
     background:#181818;
     border:1px solid #2f2f2f;
@@ -580,7 +580,7 @@ button{
   justify-content: center;
   align-items: center;
 
-  z-index: 99999;
+  z-index: 999999999999998;
 }
 
 .splash2 {
@@ -768,7 +768,7 @@ button{
     inset: 0;
     width: 100%;
     height: 100%;
-    z-index: 9999;
+    z-index: 9999999999999999;
     background: #000;
     display: flex;
     justify-content: center;
@@ -1478,7 +1478,7 @@ button{
     bottom: 0;
     
     width: 100%;
-    height: 20px;
+    height: 35px;
     
     background: #181818;
     
@@ -2104,7 +2104,7 @@ button{
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 99;
+    z-index: 999999999999999;
     backdrop-filter: blur(6px);
 }
 
@@ -3398,7 +3398,159 @@ input,select{
 
 <body>
     <!-- NODESYS -->
+<div class="overlay2" id="overlay2" onclick="closeSplash2(event)">
 
+  <div class="splash2" onclick="event.stopPropagation()">
+
+    <div class="top2">
+      <img class="bg2" src="archivos/update.png">
+
+      <div class="logo2">
+        <img src="archivos/toastertext.png">
+      </div>
+
+<div class="version2" id="appVersion">v 1.01.04</div>
+
+<div id="updateModal" class="updateModal hidden">
+    <div class="updateBox">
+        <h2>New update</h2>
+        <p id="updateText"></p>
+        <button id="closeUpdate">Close</button>
+    </div>
+</div>
+    </div>
+
+    <div class="content2">
+
+      <div class="col2">
+        <h3>Nuevo archivo</h3>
+
+  <div class="item2" onclick="window.toggleProjectMenu()">
+
+    <i class="fa-solid fa-folder"></i>
+
+    Proyecto
+
+</div>
+
+<div id="projectMenu" style="display: none;">
+
+    <div
+        class="projectMenuItem"
+        onclick="window.createNewProject()"
+    >
+
+        <i class="fa-solid fa-file-circle-plus"></i>
+
+        New Project
+
+    </div>
+
+    <div
+        class="projectMenuItem"
+        onclick="window.toggleSettingsPanel()"
+    >
+
+        <i class="fa-solid fa-gear"></i>
+
+        Settings
+
+    </div>
+
+</div>
+
+<div id="settingsPanel" class="settingsPanel">
+
+    <div class="settingsHeader">
+
+        Settings
+
+    </div>
+
+    <div class="settingsContent">
+<div class="item2" onclick="window.toggleMusic()">
+
+    <i class="fa-solid fa-music"></i>
+
+    <span id="musicText">Música: Sí</span>
+
+</div>
+<div class="item2" onclick="window.toggleOutline()">
+
+    <i class="fa-solid fa-border-all"></i>
+
+    <span id="outlineText">Outline: Sí</span>
+
+</div>
+<div class="item2" onclick="window.toggleGrid()">
+
+    <i class="fa-solid fa-border-none"></i>
+
+    <span id="gridText">Grid: Sí</span>
+
+</div>
+<div class="item2" onclick="window.toggleGrid()">
+    
+    <i class="fa-solid fa-border-none"></i>
+    
+    <span id="gridModeText">Grid: 20x20</span>
+    
+</div>
+        <!-- aquí añadirás cosas -->
+
+    </div>
+
+</div>
+        <div class="item2" onclick="openPanel2('modelos','distintos objetos 3d')">
+          <i class="fa-solid fa-cubes"></i> objetos
+        </div>
+
+        <div class="item2" onclick="openPanel2('renderizador','usamos three js para el renderizado')">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> render
+        </div>
+
+        <div class="item2" onclick="openPanel2('Video','contamos con animación y exportación de videos')">
+          <i class="fa-solid fa-video"></i> Video
+        </div>
+      </div>
+
+      <div class="col2">
+        <h3>Ayuda</h3>
+
+        <div class="item2" onclick="openPanel2('informacion','esta es una app recientemente desarrollada,por lo cual no contamos con muchas funciones')">
+          <i class="fa-solid fa-book"></i> información
+        </div>
+
+        <div class="item2" onclick="openPanel2('Tutoriales','Aprende paso a paso sobre el uso de esta app en nuestro sitio web o canal de Youtube')">
+          <i class="fa-solid fa-graduation-cap"></i> Tutoriales
+        </div>
+
+        <div class="item2" onclick="openPanel2('Soporte','Ayuda técnica itoc99920@gmail.com')">
+          <i class="fa-solid fa-circle-question"></i> Soporte
+        </div>
+
+        <div class="item2" onclick="openPanel2('Comunidad','escuchamos informe de bugs e ideas de parte de los usuarios')">
+          <i class="fa-solid fa-users"></i> Comunidad
+        </div>
+
+        <div class="item2" onclick="window.open('https://cub413.github.io/Toaster-1d-web/')">
+          <i class="fa-solid fa-globe"></i> Sitio web
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="panel2" id="panel2" onclick="closePanel2(event)">
+  <div class="panel-box2" onclick="event.stopPropagation()">
+    <span class="close2" onclick="closePanel2()">✖</span>
+    <h3 id="title2"></h3>
+    <p id="text2"></p>
+  </div>
+</div>
 <div id="nodeSys">
 
     <!-- TOOLBAR -->
@@ -4186,6 +4338,9 @@ value="250">
 
 <div id="editTopPanel">
 
+
+
+
     <button
     class="itemBtn"
     onclick="toggleAlwaysVisibleSelected()"
@@ -4235,13 +4390,7 @@ Scale -
     </div>
 
 </div>
-    <button class="itemBtn">boton</button>
 
-    <button class="itemBtn">boton</button>
-
-    <button class="itemBtn">botón</button>
-
-    <button class="itemBtn">boton?</button>
 
 </div>
     <div id="selectionBox"></div>
@@ -4324,9 +4473,7 @@ Scale -
     Look Constraint
 
 </button>
-<button class="menuBtn" id="openNodeSys">
-    NodeSys
-</button>
+
 <button class="menuBtn" id="cubeFacesBtn">
     Cube Faces
 </button>
@@ -4550,7 +4697,9 @@ Scale -
 
         Edición
     </button>
-
+<button class="workspaceBtn" id="openNodeSys">
+    NodeSys
+</button>
 </div>
 
 
@@ -4670,6 +4819,7 @@ style="
         <label style="color:#ccc;font-size:11px;"></label>
         <input id="textureIntensity" type="range" min="0" max="2" step="0.01" value="1">
     </div>
+
 </div>
 <div class="extraPanel" id="lightSettingsPanel" style="display:none;">
 
@@ -4778,28 +4928,19 @@ style="
             style="width:100%;"
         >
     </div>
-<label>
-    <input type="checkbox" id="pixelFusionToggle">
-    Fusión de píxeles
-</label>
-    <!-- TEXTURA TRANSPARENTE -->
-    <div style="padding:8px;display:flex;align-items:center;gap:8px;">
+    <button id="transparentTextureToggle" class="textureBtn dangerBtn">
+       textura Transparente
+    </button>
 
-        <input
-            type="checkbox"
-            id="transparentTextureToggle"
-        >
+    <button id="pixelFusionToggle" class="textureBtn dangerBtn">
+        Fusión de pixeles
+    </button>
 
-        <label
-            for="transparentTextureToggle"
-            style="font-size:11px;color:#ccc;"
-        >
-            Textura transparente
-        </label>
 
-    </div>
 
 </div>
+
+
 <div class="extraPanel" id="scenePanel">
 
     <div style="
@@ -5033,159 +5174,7 @@ style="
 </button>
     <input id="renameInput" type="text" style="position:absolute; opacity:0; pointer-events:none;">
 </div>
-<div class="overlay2" id="overlay2" onclick="closeSplash2(event)">
 
-  <div class="splash2" onclick="event.stopPropagation()">
-
-    <div class="top2">
-      <img class="bg2" src="archivos/update.png">
-
-      <div class="logo2">
-        <img src="archivos/toastertext.png">
-      </div>
-
-<div class="version2" id="appVersion">v 1.01.03</div>
-
-<div id="updateModal" class="updateModal hidden">
-    <div class="updateBox">
-        <h2>New update</h2>
-        <p id="updateText"></p>
-        <button id="closeUpdate">Close</button>
-    </div>
-</div>
-    </div>
-
-    <div class="content2">
-
-      <div class="col2">
-        <h3>Nuevo archivo</h3>
-
-  <div class="item2" onclick="window.toggleProjectMenu()">
-
-    <i class="fa-solid fa-folder"></i>
-
-    Proyecto
-
-</div>
-
-<div id="projectMenu" style="display: none;">
-
-    <div
-        class="projectMenuItem"
-        onclick="window.createNewProject()"
-    >
-
-        <i class="fa-solid fa-file-circle-plus"></i>
-
-        New Project
-
-    </div>
-
-    <div
-        class="projectMenuItem"
-        onclick="window.toggleSettingsPanel()"
-    >
-
-        <i class="fa-solid fa-gear"></i>
-
-        Settings
-
-    </div>
-
-</div>
-
-<div id="settingsPanel" class="settingsPanel">
-
-    <div class="settingsHeader">
-
-        Settings
-
-    </div>
-
-    <div class="settingsContent">
-<div class="item2" onclick="window.toggleMusic()">
-
-    <i class="fa-solid fa-music"></i>
-
-    <span id="musicText">Música: Sí</span>
-
-</div>
-<div class="item2" onclick="window.toggleOutline()">
-
-    <i class="fa-solid fa-border-all"></i>
-
-    <span id="outlineText">Outline: Sí</span>
-
-</div>
-<div class="item2" onclick="window.toggleGrid()">
-
-    <i class="fa-solid fa-border-none"></i>
-
-    <span id="gridText">Grid: Sí</span>
-
-</div>
-<div class="item2" onclick="window.toggleGrid()">
-    
-    <i class="fa-solid fa-border-none"></i>
-    
-    <span id="gridModeText">Grid: 20x20</span>
-    
-</div>
-        <!-- aquí añadirás cosas -->
-
-    </div>
-
-</div>
-        <div class="item2" onclick="openPanel2('modelos','distintos objetos 3d')">
-          <i class="fa-solid fa-cubes"></i> objetos
-        </div>
-
-        <div class="item2" onclick="openPanel2('renderizador','usamos three js para el renderizado')">
-          <i class="fa-solid fa-wand-magic-sparkles"></i> render
-        </div>
-
-        <div class="item2" onclick="openPanel2('Video','contamos con animación y exportación de videos')">
-          <i class="fa-solid fa-video"></i> Video
-        </div>
-      </div>
-
-      <div class="col2">
-        <h3>Ayuda</h3>
-
-        <div class="item2" onclick="openPanel2('informacion','esta es una app recientemente desarrollada,por lo cual no contamos con muchas funciones')">
-          <i class="fa-solid fa-book"></i> información
-        </div>
-
-        <div class="item2" onclick="openPanel2('Tutoriales','Aprende paso a paso sobre el uso de esta app en nuestro sitio web o canal de Youtube')">
-          <i class="fa-solid fa-graduation-cap"></i> Tutoriales
-        </div>
-
-        <div class="item2" onclick="openPanel2('Soporte','Ayuda técnica itoc99920@gmail.com')">
-          <i class="fa-solid fa-circle-question"></i> Soporte
-        </div>
-
-        <div class="item2" onclick="openPanel2('Comunidad','escuchamos informe de bugs e ideas de parte de los usuarios')">
-          <i class="fa-solid fa-users"></i> Comunidad
-        </div>
-
-        <div class="item2" onclick="window.open('https://cub413.github.io/Toaster-1d-web/')">
-          <i class="fa-solid fa-globe"></i> Sitio web
-        </div>
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
-
-<div class="panel2" id="panel2" onclick="closePanel2(event)">
-  <div class="panel-box2" onclick="event.stopPropagation()">
-    <span class="close2" onclick="closePanel2()">✖</span>
-    <h3 id="title2"></h3>
-    <p id="text2"></p>
-  </div>
-</div>
 <!-- IMPORTMAP (OBLIGATORIO COMO PEDISTE) -->
 <script type="importmap">
 {
@@ -6306,11 +6295,13 @@ child.userData.originalMaterial =
 /* TEXTURA TRANSPARENTE */
 
 document.getElementById("transparentTextureToggle")
-    .addEventListener("change", (e) => {
+    .addEventListener("click", function() {
+        
+        this.classList.toggle("active");
         
         if (!selectedMaterialTarget) return;
         
-        const enabled = e.target.checked;
+        const enabled = this.classList.contains("active");
         
         selectedMaterialTarget.traverse((child) => {
             
@@ -10062,41 +10053,7 @@ ambientIntensity.addEventListener("input", (e) => {
     ambientLight.intensity =
         parseFloat(e.target.value);
 });
-pixelRatioSelect.addEventListener("change", (e) => {
 
-    const value =
-        parseInt(e.target.value);
-
-    let ratio = 1;
-
-    // MOBILE/EDITOR SCALE
-
-    switch(value){
-
-        case 1:
-            ratio = 1;
-            break;
-
-        case 2:
-            ratio = 1.5;
-            break;
-
-        case 3:
-            ratio = 2;
-            break;
-
-        case 4:
-            ratio = 3;
-            break;
-    }
-
-    renderer.setPixelRatio(ratio);
-
-    renderer.setSize(
-        window.innerWidth,
-        window.innerHeight
-    );
-});
 window.setWorkspace = function(mode){
 
     workspaceMode = mode;
@@ -13615,49 +13572,50 @@ window.addEventListener(
     endBoneDrag
 );
 document.getElementById("pixelFusionToggle")
-.addEventListener("change", (e) => {
-
-    if (!selectedMaterialTarget) return;
-
-    const enabled = e.target.checked;
-
-    selectedMaterialTarget.traverse((child) => {
-
-        if (
-            child.isMesh &&
-            child.material &&
-            child.material.map
-        ) {
-
-            const tex = child.material.map;
-
-            if (enabled) {
-                // suavizado
-                tex.magFilter = THREE.LinearFilter;
-                tex.minFilter = THREE.LinearMipmapLinearFilter;
-            } else {
-                // pixelado
-                tex.magFilter = THREE.NearestFilter;
-                tex.minFilter = THREE.NearestFilter;
-            }
-
-            tex.needsUpdate = true;
-
-            // guardar también en original
+    .addEventListener("click", function() {
+        
+        this.classList.toggle("active");
+        
+        if (!selectedMaterialTarget) return;
+        
+        const enabled = this.classList.contains("active");
+        
+        selectedMaterialTarget.traverse((child) => {
+            
             if (
-                child.userData.originalMaterial &&
-                child.userData.originalMaterial.map
+                child.isMesh &&
+                child.material &&
+                child.material.map
             ) {
-                const originalTex =
-                    child.userData.originalMaterial.map;
-
-                originalTex.magFilter = tex.magFilter;
-                originalTex.minFilter = tex.minFilter;
-                originalTex.needsUpdate = true;
+                
+                const tex = child.material.map;
+                
+                if (enabled) {
+                    // suavizado
+                    tex.magFilter = THREE.LinearFilter;
+                    tex.minFilter = THREE.LinearMipmapLinearFilter;
+                } else {
+                    // pixelado
+                    tex.magFilter = THREE.NearestFilter;
+                    tex.minFilter = THREE.NearestFilter;
+                }
+                
+                tex.needsUpdate = true;
+                
+                if (
+                    child.userData.originalMaterial &&
+                    child.userData.originalMaterial.map
+                ) {
+                    const originalTex =
+                        child.userData.originalMaterial.map;
+                    
+                    originalTex.magFilter = tex.magFilter;
+                    originalTex.minFilter = tex.minFilter;
+                    originalTex.needsUpdate = true;
+                }
             }
-        }
+        });
     });
-});
 /* ===== DETECTOR GLOBAL ANTI-CRASH ===== */
 
 (function () {
@@ -14180,7 +14138,63 @@ node.dataset.type = name;
         </div>
         `;
     }
+else if (name === "Noise") {
+    
+    bodyHTML = `
 
+    <div style="
+    margin-bottom:6px;
+    font-size:11px;
+    opacity:.7;
+    ">
+        Noise
+    </div>
+
+    <div style="
+    font-size:10px;
+    margin-bottom:2px;
+    ">
+        Detail
+    </div>
+
+    <input
+        type="range"
+        class="noiseDetail"
+        min="1"
+        max="255"
+        value="120"
+    >
+
+    <div style="
+    font-size:10px;
+    margin-top:6px;
+    margin-bottom:2px;
+    ">
+        Zoom
+    </div>
+
+    <input
+        type="range"
+        class="noiseZoom"
+        min="1"
+        max="100"
+        value="12"
+    >
+
+    <canvas
+        class="noisePreview"
+        width="96"
+        height="96"
+        style="
+        width:100%;
+        height:70px;
+        margin-top:8px;
+        border-radius:6px;
+        background:#111;
+        "
+    ></canvas>
+    `;
+}
     // =========================
     // COLOR NODE
     // =========================
@@ -14304,7 +14318,125 @@ else if(name === "Reflection"){
     // =========================
     // OBJECT PICKER
     // =========================
+if (name === "Noise") {
+    
+    const detailSlider =
+        node.querySelector(".noiseDetail");
+    
+    const zoomSlider =
+        node.querySelector(".noiseZoom");
+    
+    const preview =
+        node.querySelector(".noisePreview");
+    
+    const ctx =
+        preview.getContext("2d");
+    
+    function generateNoise() {
+        
+        const detail =
+            parseInt(detailSlider.value);
+        
+        const zoom =
+            parseFloat(zoomSlider.value);
+        
+        const w = preview.width;
+        const h = preview.height;
+        
+        const img =
+            ctx.createImageData(w, h);
+        
+        for (let y = 0; y < h; y++) {
+            
+            for (let x = 0; x < w; x++) {
+                
+                const i =
+                    (y * w + x) * 4;
+                
+                const nx =
+                    Math.floor(x / zoom);
+                
+                const ny =
+                    Math.floor(y / zoom);
+                
+                const rand =
+                    (
+                        Math.sin(
+                            nx * 12.9898 +
+                            ny * 78.233
+                        ) * 43758.5453
+                    );
+                
+                let v =
+                    (rand - Math.floor(rand)) *
+                    detail;
+                
+                v = Math.max(
+                    0,
+                    Math.min(255, v)
+                );
+                
+                img.data[i] = v;
+                img.data[i + 1] = v;
+                img.data[i + 2] = v;
+                img.data[i + 3] = 255;
+            }
+        }
+        
+        ctx.putImageData(img, 0, 0);
+        
+        const texture =
+            new THREE.CanvasTexture(preview);
+        
+        texture.wrapS =
+            THREE.RepeatWrapping;
+        
+        texture.wrapT =
+            THREE.RepeatWrapping;
+        
+        texture.needsUpdate = true;
+        
+        connections.forEach(c => {
+            
+            const fromNode =
+                c.from.closest(".node");
+            
+            const toNode =
+                c.to.closest(".node");
+            
+            if (fromNode !== node)
+                return;
+            
+            if (!toNode.object3D)
+                return;
+            
+            toNode.object3D.traverse(child => {
+                
+                if (child.material) {
+                    
+                    child.material.map =
+                        texture;
+                    
+                    child.material.needsUpdate =
+                        true;
+                }
+            });
+        });
+    }
+    
+    detailSlider.addEventListener(
+        "input",
+        generateNoise
+    );
+    
+    zoomSlider.addEventListener(
+        "input",
+        generateNoise
+    );
+    
+    generateNoise();
 
+}
     if(name === "Object"){
 
         const picker =
@@ -14831,7 +14963,25 @@ function render(filter = "") {
     // =========================
 // REFLECTION BUTTON
 // =========================
+const noiseBtn =
+document.createElement("div");
 
+noiseBtn.className =
+"menuItem";
+
+noiseBtn.textContent =
+"Noise";
+
+noiseBtn.onclick = ()=>{
+
+    createNode(
+        "Noise",
+        center().x,
+        center().y
+    );
+};
+
+nodeList.appendChild(noiseBtn);
 const reflectionBtn =
 document.createElement("div");
 
@@ -14881,6 +15031,41 @@ e=>render(e.target.value)
 );
 
 render();
+pixelRatioSelect.addEventListener("change", (e) => {
+    
+    const value =
+        parseInt(e.target.value);
+    
+    let ratio = 1;
+    
+    // MOBILE/EDITOR SCALE
+    
+    switch (value) {
+        
+        case 1:
+            ratio = 1;
+            break;
+            
+        case 2:
+            ratio = 1.5;
+            break;
+            
+        case 3:
+            ratio = 2;
+            break;
+            
+        case 4:
+            ratio = 3;
+            break;
+    }
+    
+    renderer.setPixelRatio(ratio);
+    
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
+});
 /* LOOP */
 function animate(){
     spawn.lookAt(camera.position);
